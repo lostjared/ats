@@ -10,5 +10,8 @@ AC_PROG_LIBTOOL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
+# Checks for typedefs, structures, and compiler characteristics.
+AC_CHECK_HEADER_STDBOOL
+
 
 AC_OUTPUT(Makefile system/Makefile ats.pc dbg/Makefile)
