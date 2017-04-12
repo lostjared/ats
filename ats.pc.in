@@ -3,7 +3,7 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@/ats
 
-Name: mx
+Name: ats
 Description: ATS
 Requires: 
 Version: 1.0
