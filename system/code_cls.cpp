@@ -1,8 +1,9 @@
 #include "code.hpp"
 
 namespace interp {
+
+	void Code::clear() {
     
-    std::vector<TextLine> lines;
-    
-    
+	}
 }
+
