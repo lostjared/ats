@@ -33,12 +33,8 @@
 #include"function.hpp"
 #include<unordered_map>
 
-
-
-
 int main() {
-    bool active = true;
-    while(active) {
+    while(1) {
         try {
             std::cout << "> ";
             std::string input_line;
@@ -60,9 +56,7 @@ int main() {
                 interp::inputText(v, input_line);
                 continue;
             }
-            
             int token_count = v.size()-1;
-            
             if(token_count == rt->second.args) rt->second.func(v);
             else {
                 std::cout << "Error " << first_token << " requires: " << rt->second.args << " arguments. You gave " << token_count << "\n";

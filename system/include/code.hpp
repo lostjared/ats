@@ -35,9 +35,7 @@ namespace interp {
     bool openLineSource(const std::string &text);
     void insertText(const TextLine &in);
     bool procLine(const TextLine &text, Code &code);
-    
     extern std::vector<TextLine> lines;
-
 }
 
 #endif
