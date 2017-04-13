@@ -38,6 +38,7 @@ namespace symbol {
         Variable &operator[](const std::string &index);
         
         void list_sorted(std::ostream &out);
+        void clear();
         
     protected:
         std::unordered_map<std::string, Variable> var;

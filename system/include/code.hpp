@@ -19,6 +19,7 @@ namespace interp {
         TextLine(const TextLine &t);
         bool operator<(const TextLine &t) const;
         bool operator==(const TextLine &t1) const;
+        bool operator!=(const TextLine &t1) const;
         TextLine &operator=(const TextLine &t);
         
         int index;

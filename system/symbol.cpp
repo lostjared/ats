@@ -55,4 +55,10 @@ namespace symbol {
             out << z->name << " = { \"" << z->text << "\" : " << z->value << " }\n";
         }
     }
+    
+    void Symbol::clear() {
+        if(!var.empty()) {
+            var.erase(var.begin(), var.end());
+        }
+    }
 }

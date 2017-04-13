@@ -23,6 +23,11 @@ namespace interp {
     bool TextLine::operator==(const TextLine &t1) const {
         return (index == t1.index);
     }
+    
+    bool TextLine::operator!=(const TextLine &t1) const {
+        return (index != t1.index);
+    }
+    
     TextLine &TextLine::operator=(const TextLine &t) {
         index = t.index;
         text = t.text;
