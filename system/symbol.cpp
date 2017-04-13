@@ -23,4 +23,8 @@ namespace symbol {
         v = it->second;
         return true;
     }
+    
+    Variable &Symbol::operator[](std::string index) {
+        return var[index];
+    }
 }

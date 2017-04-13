@@ -24,6 +24,7 @@ namespace symbol {
         bool exisits(const std::string &name);
         void set(const std::string &name, const Variable &v);
         bool get(const std::string &name, Variable &v);
+        Variable &operator[](std::string index);
         
     protected:
         std::unordered_map<std::string, Variable> var;
