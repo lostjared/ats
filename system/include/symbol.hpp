@@ -17,14 +17,21 @@ namespace symbol {
         
         Variable();
         Variable(const Variable &v);
+        Variable(const std::string &name, const std::string &text);
+        Variable(const std::string &name, const float &v);
+        Variable(const std::string &name, const std::string &text, const float &v);
         Variable &operator=(const Variable &v);
-        
         bool operator<(const Variable &v) const;
     };
     
     class Symbol {
     public:
         Symbol();
+        Symbol(const Symbol &s);
+        Symbol(const Symbol &&s);
+        Symbol &operator=(const Symbol &s);
+        Symbol &operator=(const Symbol &&s);
+        
         bool exisits(const std::string &name);
         void set(const std::string &name, const Variable &v);
         bool get(const std::string &name, Variable &v);

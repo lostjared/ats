@@ -7,6 +7,23 @@ namespace symbol {
         
     }
     
+    Symbol::Symbol(const Symbol &s) : var(s.var) {
+        
+    }
+    Symbol::Symbol(const Symbol &&s) : var(std::move(s.var)) {
+        
+    }
+    Symbol &Symbol::operator=(const Symbol &s) {
+        var = s.var;
+        return *this;
+    }
+    
+    Symbol &Symbol::operator=(const Symbol &&s) {
+        var = std::move(s.var);
+        return *this;
+    }
+    
+    
     bool Symbol::exisits(const std::string &name) {
         auto it = var.find(name);
         if(it == var.end()) return false;
