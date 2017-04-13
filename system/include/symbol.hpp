@@ -4,6 +4,8 @@
 #include<iostream>
 #include<string>
 #include<unordered_map>
+#include<vector>
+#include<algorithm>
 
 namespace symbol {
     
@@ -16,6 +18,8 @@ namespace symbol {
         Variable();
         Variable(const Variable &v);
         Variable &operator=(const Variable &v);
+        
+        bool operator<(const Variable &v) const;
     };
     
     class Symbol {
@@ -24,7 +28,9 @@ namespace symbol {
         bool exisits(const std::string &name);
         void set(const std::string &name, const Variable &v);
         bool get(const std::string &name, Variable &v);
-        Variable &operator[](std::string index);
+        Variable &operator[](const std::string &index);
+        
+        void list_sorted(std::ostream &out);
         
     protected:
         std::unordered_map<std::string, Variable> var;

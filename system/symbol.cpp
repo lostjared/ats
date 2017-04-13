@@ -24,7 +24,18 @@ namespace symbol {
         return true;
     }
     
-    Variable &Symbol::operator[](std::string index) {
+    Variable &Symbol::operator[](const std::string &index) {
         return var[index];
+    }
+    
+    void Symbol::list_sorted(std::ostream &out) {
+        std::vector<Variable> var_;
+        for(auto i = var.begin(); i != var.end(); ++i) {
+            var_.push_back(i->second);
+        }
+        std::sort(var_.begin(), var_.end());
+        for(auto z = var_.begin(); z != var_.end(); ++z) {
+            out << z->name << " = { \"" << z->text << "\" : " << z->value << " }\n";
+        }
     }
 }

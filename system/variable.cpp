@@ -17,4 +17,9 @@ namespace symbol {
         value = v.value;
         return *this;
     }
+    
+    bool Variable::operator<(const Variable &v) const {
+        if(name < v.name) return true;
+        return false;
+    }
 }

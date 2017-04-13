@@ -8,6 +8,7 @@
 #include<fstream>
 #include<sstream>
 #include "lexer.hpp"
+#include "symbol.hpp"
 
 namespace interp {
     
@@ -28,6 +29,9 @@ namespace interp {
     public:
         Code() {}
         void clear();
+        
+    private:
+        symbol::Symbol symbols;
     };
 
     void inputText(std::vector<lex::Token> &tokens, std::string text);
