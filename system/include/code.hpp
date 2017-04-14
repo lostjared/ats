@@ -31,7 +31,6 @@ namespace interp {
         Code() {}
         void clear();
         
-    private:
         symbol::Symbol symbols;
     };
 

@@ -52,7 +52,7 @@ namespace symbol {
         }
         std::sort(var_.begin(), var_.end());
         for(auto z = var_.begin(); z != var_.end(); ++z) {
-            out << z->name << " = { \"" << z->text << "\" : " << z->value << " }\n";
+            out << z->name << " = { \"" << z->get_text() << "\" : " << z->get_double() << " }\n";
         }
     }
     
