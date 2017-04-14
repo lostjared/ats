@@ -35,10 +35,15 @@ namespace symbol {
         double &get_double();
         double &get_double(unsigned long index);
         
+        bool isArray() const { return is_array; }
+        unsigned long arraySize() const { return array_size; }
+        
     private:
         bool is_array;
         unsigned long array_size;
     };
+    
+    std::ostream &operator<<(std::ostream &out, Variable &v);
     
     class Symbol {
     public:
