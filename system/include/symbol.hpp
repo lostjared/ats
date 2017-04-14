@@ -49,7 +49,7 @@ namespace symbol {
         Symbol &operator=(const Symbol &&s);
         
         bool exisits(const std::string &name);
-        void set(const std::string &name, const Variable &v);
+        void set(const Variable &v);
         bool get(const std::string &name, Variable &v);
         Variable &operator[](const std::string &index);
         

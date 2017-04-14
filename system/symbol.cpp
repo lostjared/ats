@@ -30,8 +30,8 @@ namespace symbol {
         return true;
     }
     
-    void Symbol::set(const std::string &name, const Variable &v) {
-        var[name] = v;
+    void Symbol::set(const Variable &v) {
+        var[v.name] = v;
     }
     
     bool Symbol::get(const std::string &name, Variable &v) {
