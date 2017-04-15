@@ -21,7 +21,6 @@ namespace interp {
         bool operator==(const TextLine &t1) const;
         bool operator!=(const TextLine &t1) const;
         TextLine &operator=(const TextLine &t);
-        
         int index;
         std::string text;
     };

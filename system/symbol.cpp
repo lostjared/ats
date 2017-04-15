@@ -61,4 +61,9 @@ namespace symbol {
             var.erase(var.begin(), var.end());
         }
     }
+    
+    std::ostream &operator<<(std::ostream &out, Symbol &s) {
+        s.list_sorted(out);
+        return out;
+    }
 }

@@ -38,12 +38,12 @@ namespace symbol {
         bool isArray() const { return is_array; }
         unsigned long arraySize() const { return array_size; }
         
+        friend std::ostream &operator<<(std::ostream &out, Variable &v);
     private:
         bool is_array;
         unsigned long array_size;
     };
     
-    std::ostream &operator<<(std::ostream &out, Variable &v);
     
     class Symbol {
     public:
@@ -52,18 +52,19 @@ namespace symbol {
         Symbol(const Symbol &&s);
         Symbol &operator=(const Symbol &s);
         Symbol &operator=(const Symbol &&s);
-        
+        bool empty() const { return var.empty(); }
         bool exisits(const std::string &name);
         void set(const Variable &v);
         bool get(const std::string &name, Variable &v);
         Variable &operator[](const std::string &index);
-        
         void list_sorted(std::ostream &out);
         void clear();
-        
+        friend std::ostream &operator<<(std::ostream &out, Symbol &s);
     protected:
         std::unordered_map<std::string, Variable> var;
     };
+    
+    
 }
 
 #endif
