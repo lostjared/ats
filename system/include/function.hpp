@@ -29,6 +29,7 @@ namespace token {
     void token_Remove(std::vector<lex::Token> &tokens);
     void token_Display(std::vector<lex::Token> &tokens);
     void token_DisplaySymbols(std::vector<lex::Token> &tokens);
+    void token_DisplaySymbol(std::vector<lex::Token> &tokens);
 }
 
 #endif

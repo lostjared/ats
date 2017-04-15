@@ -10,7 +10,8 @@ std::unordered_map<std::string, Command> function_map = {
     { "clear",Command(token::token_Clear, 0) },
     { "remove",Command(token::token_Remove, 1) },
     { "display",Command(token::token_Display, 1) },
-    { "symbols",Command(token::token_DisplaySymbols, 0) }
+    { "symbols",Command(token::token_DisplaySymbols, 0) },
+    { "symbol", Command(token::token_DisplaySymbol, 1) }
 };
 
 namespace token {
