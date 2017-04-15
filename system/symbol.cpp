@@ -45,13 +45,13 @@ namespace symbol {
     }
     
     void Symbol::list_sorted(std::ostream &out) {
-        std::vector<Variable> var_;
+        std::vector<Variable *> var_;
         for(auto i = var.begin(); i != var.end(); ++i) {
-            var_.push_back(i->second);
+            var_.push_back(&i->second);
         }
         std::sort(var_.begin(), var_.end());
         for(auto z = var_.begin(); z != var_.end(); ++z) {
-            std::cout << *z << "\n";
+            std::cout << *(*z) << "\n";
         }
     }
     

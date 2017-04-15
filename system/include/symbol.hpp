@@ -24,11 +24,15 @@ namespace symbol {
         std::string name;
         
         Variable();
-        Variable(const Variable &v);
+        ~Variable();
+        //Variable(const Variable &v);
         Variable(const std::string &name, const Value &v);
         Variable(const std::string &name, const unsigned long arr_size);
-        Variable &operator=(const Variable &v);
+        //Variable &operator=(const Variable &v);
         bool operator<(const Variable &v) const;
+        
+        void createArray(const std::string &n, const unsigned long arr_size);
+        void create(const std::string &n, const Value &v);
         
         std::string &get_text();
         std::string &get_text(unsigned long index);
@@ -42,7 +46,7 @@ namespace symbol {
     private:
         bool is_array;
         unsigned long array_size;
-        std::shared_ptr<Value> values;
+        Value *values;
     };
     
     

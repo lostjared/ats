@@ -7,33 +7,28 @@ namespace symbol {
     Value::Value(const Value &v) : text(v.text), value(v.value) { }
     Value::Value(const std::string &t, const double &v) : text(t), value(v) { }
     
-    Variable::Variable() : is_array(false), array_size(0) {}
+    Variable::Variable() : is_array(false), array_size(0), values(nullptr) {}
     
-    Variable::Variable(const Variable &v) {
-        name = v.name;
-        is_array = v.is_array;
-        array_size = v.array_size;
-        values = v.values;
+    Variable::~Variable() {
+        if(values != nullptr) {
+            if(is_array)
+                delete [] values;
+            else
+                delete values;
+            values = nullptr;
+        }
+        std::cout << "destructor -> " << name << "\n";
     }
+    
     
     Variable::Variable(const std::string &n, const Value &value)  {
-        name = n;
-        values.reset(new Value(value));
-        is_array = false;
-        array_size = 0;
+        values = nullptr;
+        create(n, value);
     }
     
-    Variable::Variable(const std::string &n, const unsigned long arr_size) : is_array(true), array_size(arr_size) {
-        name = n;
-        values.reset(new Value[arr_size+1]);
-    }
-    
-    Variable &Variable::operator=(const Variable &v) {
-        name = v.name;
-        values = v.values;
-        is_array = v.is_array;
-        array_size = v.array_size;
-        return *this;
+    Variable::Variable(const std::string &n, const unsigned long arr_size) {
+        values = nullptr;
+        createArray(n, arr_size);
     }
     
     bool Variable::operator<(const Variable &v) const {
@@ -41,20 +36,34 @@ namespace symbol {
         return false;
     }
     
+    void Variable::createArray(const std::string &n, const unsigned long arr_size) {
+        array_size = arr_size;
+        is_array = true;
+        name = n;
+        values = new Value[arr_size+1];
+    }
+    
+    void Variable::create(const std::string &n, const Value &v) {
+        name = n;
+        values = new Value(v.text, v.value);
+        is_array = false;
+        array_size = 0;
+    }
+    
     std::string &Variable::get_text(unsigned long index) {
-        return values.get()[index].text;
+        return values[index].text;
     }
     
     std::string &Variable::get_text() {
-        return (*values.get()).text;
+        return values->text;
     }
     
     double &Variable::get_double() {
-        return (*values.get()).value;
+        return values->value;
     }
     
     double &Variable::get_double(unsigned long index) {
-        return values.get()[index].value;
+        return values[index].value;
     }
     
     std::ostream &operator<<(std::ostream &out, Variable &v) {

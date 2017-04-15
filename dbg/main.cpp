@@ -34,7 +34,10 @@
 #include<unordered_map>
 
 int main() {
-    
+
+    code.symbols["test"].create("test", symbol::Value("test", 1));
+    code.symbols["x"].createArray("test2", 100);
+
     while(1) {
         try {
             std::cout << "> ";
