@@ -10,6 +10,13 @@ namespace symbol {
     Variable::Variable() : is_array(false), array_size(0), values(nullptr) {}
     
     Variable::~Variable() {
+        free();
+#ifdef DEBUG_MODE
+        std::cout << "destructor -> " << name << "\n";
+#endif
+    }
+    
+    void Variable::free() {
         if(values != nullptr) {
             if(is_array)
                 delete [] values;
@@ -17,9 +24,7 @@ namespace symbol {
                 delete values;
             values = nullptr;
         }
-        std::cout << "destructor -> " << name << "\n";
     }
-    
     
     Variable::Variable(const std::string &n, const Value &value)  {
         values = nullptr;

@@ -6,7 +6,8 @@
 #include<unordered_map>
 #include<vector>
 #include<algorithm>
-#include<memory>
+
+#define DEBUG_MODE
 
 namespace symbol {
     
@@ -22,26 +23,20 @@ namespace symbol {
     class Variable {
     public:
         std::string name;
-        
         Variable();
         ~Variable();
-        //Variable(const Variable &v);
         Variable(const std::string &name, const Value &v);
         Variable(const std::string &name, const unsigned long arr_size);
-        //Variable &operator=(const Variable &v);
         bool operator<(const Variable &v) const;
-        
         void createArray(const std::string &n, const unsigned long arr_size);
         void create(const std::string &n, const Value &v);
-        
+        void free();
         std::string &get_text();
         std::string &get_text(unsigned long index);
         double &get_double();
         double &get_double(unsigned long index);
-        
         bool isArray() const { return is_array; }
         unsigned long arraySize() const { return array_size; }
-        
         friend std::ostream &operator<<(std::ostream &out, Variable &v);
     private:
         bool is_array;
@@ -59,7 +54,6 @@ namespace symbol {
         Symbol &operator=(const Symbol &&s);
         bool empty() const { return var.empty(); }
         bool exisits(const std::string &name);
-        void set(const Variable &v);
         bool get(const std::string &name, Variable &v);
         Variable &operator[](const std::string &index);
         Variable &variable(const std::string &index);

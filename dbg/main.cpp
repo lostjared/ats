@@ -34,10 +34,11 @@
 #include<unordered_map>
 
 int main() {
-
-    code.symbols["test"].create("test", symbol::Value("test", 1));
-    code.symbols["x"].createArray("test2", 100);
-
+    code.symbols["pi"].create("pi", symbol::Value("INF", 0));
+    
+    double &pi = code.symbols["pi"].get_double();
+    pi = 3.14159265359;
+        
     while(1) {
         try {
             std::cout << "> ";
