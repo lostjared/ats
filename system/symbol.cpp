@@ -1,6 +1,5 @@
 #include "symbol.hpp"
 
-
 namespace symbol {
     
     Symbol::Symbol() {
@@ -60,6 +59,17 @@ namespace symbol {
         if(!var.empty()) {
             var.erase(var.begin(), var.end());
         }
+    }
+    
+    bool Symbol::remove(const std::string &n) {
+        auto it = var.find(n);
+        if(it == var.end()) return false;
+        var.erase(it);
+        return true;
+    }
+    
+    Variable &Symbol::variable(const std::string &index) {
+        return var[index];
     }
     
     std::ostream &operator<<(std::ostream &out, Symbol &s) {

@@ -22,7 +22,7 @@ namespace symbol {
     class Variable {
     public:
         std::string name;
-        std::shared_ptr<Value> values;
+        
         Variable();
         Variable(const Variable &v);
         Variable(const std::string &name, const Value &v);
@@ -42,6 +42,7 @@ namespace symbol {
     private:
         bool is_array;
         unsigned long array_size;
+        std::shared_ptr<Value> values;
     };
     
     
@@ -57,8 +58,10 @@ namespace symbol {
         void set(const Variable &v);
         bool get(const std::string &name, Variable &v);
         Variable &operator[](const std::string &index);
+        Variable &variable(const std::string &index);
         void list_sorted(std::ostream &out);
         void clear();
+        bool remove(const std::string &n);
         friend std::ostream &operator<<(std::ostream &out, Symbol &s);
     protected:
         std::unordered_map<std::string, Variable> var;
