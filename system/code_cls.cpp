@@ -6,7 +6,7 @@ namespace interp {
         //clear code tree
         
         // clear symbol table
-        symbols.clear();
+        //symbols.clear();
 	}
 }
 
