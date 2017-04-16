@@ -20,6 +20,7 @@ AC_ARG_ENABLE(debug,
 
 if test x$enable_dbg = xyes; then
 	AC_DEFINE_UNQUOTED(DEBUG_MODE, 1, [debug])
+	echo "debug mode:  enabled"
 fi
 
 AC_OUTPUT(Makefile system/Makefile ats.pc dbg/Makefile)
