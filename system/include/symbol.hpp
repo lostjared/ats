@@ -7,8 +7,6 @@
 #include<vector>
 #include<algorithm>
 
-#define DEBUG_MODE
-
 namespace symbol {
     
     class Value {

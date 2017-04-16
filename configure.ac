@@ -13,5 +13,13 @@ AC_PROG_MAKE_SET
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
 
+enable_dbg=no
+
+AC_ARG_ENABLE(debug,
+[   --enable-debug              DebugMode ],enable_dbg=yes)
+
+if test x$enable_dbg = xyes; then
+	AC_DEFINE_UNQUOTED(DEBUG_MODE, 1, [debug])
+fi
 
 AC_OUTPUT(Makefile system/Makefile ats.pc dbg/Makefile)
