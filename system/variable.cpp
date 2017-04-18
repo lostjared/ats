@@ -45,6 +45,7 @@ namespace symbol {
     }
     
     void Variable::createArray(const std::string &n, const unsigned long arr_size) {
+        free();
         array_size = arr_size;
         is_array = true;
         name = n;
@@ -52,6 +53,7 @@ namespace symbol {
     }
     
     void Variable::create(const std::string &n, const Value &v) {
+        free();
         name = n;
         values = new Value(v.text, v.value);
         is_array = false;
