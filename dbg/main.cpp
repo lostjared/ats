@@ -1,31 +1,8 @@
 /*
  
- Line Sort - Practice Project
+ ats - Practice Project
  written by Jared Bruni
  http://lostsidedead.com
- 
- Enter digit then text like on old 8 bit machines
- 
- > 10 hey
- > 20 test
- > 30 here
- 
- enter list to display
- 
- > list
-
- > quit
- 
- to exit
- 
- other commands:
- 
- > save filename
- > open filename
- > clear
- > remove index
- > dispaly index
- > convert
  
  */
 
@@ -41,7 +18,7 @@ int main() {
         
     while(1) {
         try {
-            std::cout << "> ";
+            std::cout << "$> ";
             std::string input_line;
             std::getline(std::cin, input_line);
             std::istringstream stream(input_line);
