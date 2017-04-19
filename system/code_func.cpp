@@ -38,16 +38,16 @@ namespace interp {
         return true;
     }
     
-    void insertText(const TextLine &in) {
+    void insertText(std::vector<lex::Token> &tokens, const TextLine &in) {
         for(unsigned int i = 0; i < lines.size(); ++i) {
             if(lines[i].index == in.index) {
-                if(checkInstruction(in)) {
+                if(checkInstruction(tokens, in)) {
                 	lines[i].text = in.text;
                 	return;
                 } else return;
             }
         }
-        if(checkInstruction(in)) {
+        if(checkInstruction(tokens, in)) {
         	lines.push_back(in);
         	std::sort(lines.begin(), lines.end());
         }
@@ -64,30 +64,22 @@ namespace interp {
             std::string codetext;
             codetext = input_line.substr(input_line.find(tokens[0].getToken())+tokens[0].getToken().length()+1, input_line.length());
             TextLine in(value, codetext);
-            insertText(in);
+            insertText(tokens, in);
         } else {
             std::cerr << "Error invalid input.\n";
             return;
         }
     }
     
-    bool checkInstruction(const TextLine &text) {
-        std::vector<lex::Token> tokens;
-        std::istringstream input(text.text);
-        lex::Scanner scan(input);
-        while(scan.valid()) {
-            lex::Token token;
-            scan >> token;
-            tokens.push_back(token);
-        }
-        if(tokens.size()==0) {
+    bool checkInstruction(std::vector<lex::Token> &tokens, const TextLine &text) {
+        if(tokens.size()<= 1) {
             std::cerr << "Error: Statement requires instruction.\n";
             return false;
         }
-        if(tokens.size()>=1) {
-            icode::opc op = icode::strtoInc(tokens[0].getToken());
+        if(tokens.size()>=2) {
+            icode::opc op = icode::strtoInc(tokens[1].getToken());
             if(op == icode::opc::NOTINC) {
-                std::cerr << "Error: " << tokens[0].getToken() << " not a valid instruction..\n";
+                std::cerr << "Error: " << tokens[1].getToken() << " not a valid instruction..\n";
                 return false;
             } else {
                 // check operands

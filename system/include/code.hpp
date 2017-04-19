@@ -37,9 +37,9 @@ namespace interp {
     void inputText(std::vector<lex::Token> &tokens, std::string text);
     bool saveLineSource(const std::string &text);
     bool openLineSource(const std::string &text);
-    void insertText(const TextLine &in);
+    void insertText(std::vector<lex::Token> &tokens, const TextLine &in);
     bool procLine(const TextLine &text, Code &code);
-    bool checkInstruction(const TextLine &text);
+    bool checkInstruction(std::vector<lex::Token> &tokens, const TextLine &text);
     extern std::vector<TextLine> lines;
 }
 
