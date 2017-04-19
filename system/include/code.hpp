@@ -9,6 +9,7 @@
 #include<sstream>
 #include "lexer.hpp"
 #include "symbol.hpp"
+#include "icode.hpp"
 
 namespace interp {
     
@@ -38,6 +39,7 @@ namespace interp {
     bool openLineSource(const std::string &text);
     void insertText(const TextLine &in);
     bool procLine(const TextLine &text, Code &code);
+    bool checkInstruction(const TextLine &text);
     extern std::vector<TextLine> lines;
 }
 
