@@ -32,6 +32,7 @@ namespace token {
     void token_DisplaySymbol(std::vector<lex::Token> &tokens);
     void token_Unsym(std::vector<lex::Token> &tokens);
     void token_Execute(std::vector<lex::Token> &tokens);
+    void token_Help(std::vector<lex::Token> &tokens);
 }
 
 #endif
