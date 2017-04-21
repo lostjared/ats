@@ -9,6 +9,8 @@
 #include"code.hpp"
 #include"function.hpp"
 #include<unordered_map>
+#include<readline/readline.h>
+#include<readline/history.h>
 
 int main() {
     code.symbols["pi"].create("pi", symbol::Value("INF", 0));
@@ -18,9 +20,12 @@ int main() {
         
     while(1) {
         try {
-            std::cout << "$> ";
+            //std::cout << "$> ";
             std::string input_line;
-            std::getline(std::cin, input_line);
+            //std::getline(std::cin, input_line);
+            char *input = readline("$>");
+            add_history(input);
+            input_line = input;
             std::istringstream stream(input_line);
             lex::Scanner scan(stream);
             std::vector<lex::Token> v;

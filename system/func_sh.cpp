@@ -60,9 +60,14 @@ namespace token {
     
     void token_sh(const std::string &command, std::vector<lex::Token> &tokens) {
         int rt_value = 0;
-        if(tokens.size() >= 1)
-            rt_value = System(tokens[1].getToken());
-        
+        if(tokens.size() >= 1) {
+            if(tokens[1].getTokenType() == lex::TOKEN_STRING)
+            	rt_value = System(tokens[1].getToken());
+            else {
+                std::cerr << "Error: sh requires one string argument in quotes\n";
+                return;
+            }
+        }
         std::cout << "sh: returns " << rt_value << "\n";
     }
 }
