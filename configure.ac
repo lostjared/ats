@@ -9,9 +9,14 @@ AC_PROG_CXX
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_RANLIB
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
+AC_TYPE_PID_T
+AC_FUNC_FORK
+
+AC_CHECK_LIB([readline], [readline])
 
 enable_dbg=no
 

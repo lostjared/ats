@@ -20,9 +20,7 @@ int main() {
         
     while(1) {
         try {
-            //std::cout << "$> ";
             std::string input_line;
-            //std::getline(std::cin, input_line);
             char *input = readline("$>");
             add_history(input);
             input_line = input;
