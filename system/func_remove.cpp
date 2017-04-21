@@ -1,7 +1,7 @@
 #include "function.hpp"
 
 namespace token {
-    void token_Remove(std::vector<lex::Token> &v) {
+    void token_Remove(const std::string &command, std::vector<lex::Token> &v) {
         if(v[1].getTokenType() != lex::TOKEN_DIGIT) {
             std::cerr << "remove requires line number.\n";
             return;

@@ -17,6 +17,7 @@ namespace lex {
     }
     
     std::ostream &operator<<(std::ostream &out, const Token &t) {
+        if(t.getTokenType() == lex::TOKEN_EOF) return out;
         if(t.getSymbolType() != -1) {
             out << "[" << t.getToken() << "] of type: [" << t.getType() << " #: " << t.getSymbolType() << " ] Line:" << t.line <<":" << t.offset;
         }

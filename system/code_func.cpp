@@ -30,7 +30,8 @@ namespace interp {
             while(scan.valid()) {
                 lex::Token token;
                 scan >> token;
-                tokens.push_back(token);
+                if(token.getTokenType() != lex::TOKEN_EOF)
+                	tokens.push_back(token);
             }
             inputText(tokens, in);
         }
@@ -95,7 +96,9 @@ namespace interp {
         while(scan.valid()) {
             lex::Token token;
             scan >> token;
-            tokens.push_back(token);
+            if(token.getTokenType() != lex::TOKEN_EOF)
+            	tokens.push_back(token);
+            
         }
         // for now output each token
         std::cout << "Code Line: ["<<text.index <<"] - [" << text.text << "] = {\n";

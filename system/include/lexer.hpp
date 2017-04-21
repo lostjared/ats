@@ -31,7 +31,7 @@ namespace lex {
 
     class Token {
     public:
-        Token() {}
+        Token() : text(""), line(0), offset(0), type(TOKEN_NOTHING), keyword_type(-1), symbol_type(-1) {}
         Token(std::string txt, Token_type t) : text(txt), type(t), line(0), offset(0) {}
         std::string getToken() const { return text; }
         Token_type getType() const { return type; }

@@ -27,7 +27,8 @@ int main() {
             while(scan.valid()) {
                 lex::Token s;
                 scan >> s;
-                v.push_back(s);
+                if(s.getTokenType() != lex::TOKEN_EOF)
+                	v.push_back(s);
             }
             if(v.size()==0) continue;
             std::string first_token;
@@ -38,8 +39,9 @@ int main() {
                 interp::inputText(v, input_line);
                 continue;
             }
+            
             int token_count = v.size()-1;
-            if(token_count == rt->second.args) rt->second.func(v);
+            if(token_count == rt->second.args) rt->second.func(input_line, v);
             else {
                 std::cout << "Error " << first_token << " requires: " << rt->second.args << " arguments. You gave " << token_count << "\n";
             }
