@@ -87,18 +87,16 @@ namespace interp {
             } else {
                 // check operands
                 if(tokens.size()>=3) {
-                    if(tokens[2].getTokenType() == lex::TOKEN_DIGIT) {
-                    }
-                    else
                     if(tokens[2].getToken()=="#") {
                         if(tokens.size()>=4) {
-                            if(tokens[3].getTokenType() != lex::TOKEN_DIGIT && tokens[3].getTokenType() != lex::TOKEN_HEX) {
+                            if(tokens[3].getTokenType() == lex::TOKEN_DIGIT) {}
+                            else if(tokens[3].getTokenType() != lex::TOKEN_DIGIT && tokens[3].getTokenType() != lex::TOKEN_HEX) {
                                 std::cerr << "Syntax Error: requires either digit or $.\n";
+                                return false;
                                 
-                            } else if(tokens[3].getToken() == "$") {
-                                if(tokens.size() >= 5 && tokens[4].getTokenType() != lex::TOKEN_HEX) {
-                                    std::cout << "Syntax Error: $ is followed by a Hex value\n";
-                                }
+                            } else if(tokens[3].getTokenType() != lex::TOKEN_HEX) {
+                                std::cerr << "Syntax Error: $ is followed by a Hex value\n";
+                                return false;
                             }
                         } else {
                             std::cerr << "Syntax Error: Missing value after #\n";

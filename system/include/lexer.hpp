@@ -317,7 +317,7 @@ namespace lex {
                     if(characterToType(cc) != TOKEN_DIGIT && !(toupper(cc) >= 'A' && toupper(cc) <= 'F')) {
                         std::string ch;
                         ch += cc;
-                        throw Scanner_Error(std::string("Scanner Error: Invalid Hex value: ") +ch+ std::string("\n"));
+                        throw Scanner_Error(std::string("Scanner Error:  Token [") + tok + std::string("] contains Invalid Hex value: ") +ch+ std::string("\n"));
                     }
                     tok += cc;
                     cc = getChar();
