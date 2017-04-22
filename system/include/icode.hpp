@@ -4,6 +4,7 @@
 #include<iostream>
 #include<string>
 #include<cstdint>
+#include<bitset>
 
 namespace icode {
     
@@ -19,8 +20,10 @@ namespace icode {
         unsigned int op1, op2;
     };
     
+    enum proc_Flags { FLAG_CARRY=0, FLAG_ZERO, FLAG_INTERRUPT, FLAG_DECIMAL, FLAG_BREAK, FLAG_EXPANSION, FLAG_OVERFLOW, FLAG_NEGATIVE };
+    
     class Processor {
-        bool flags[8];
+        std::bitset<8> flags;
         /* 
          0 - carry bit
          1 - zero bit
@@ -35,9 +38,10 @@ namespace icode {
     public:
         Processor();
         
-        void setFlag(uint8_t flag, bool set);
-        bool getFlag(uint8_t flag);
+        void setFlag(proc_Flags flag, bool set);
+        bool getFlag(proc_Flags flag);
         void clrFlags();
+        uint8_t valFlags();
         void reset();
         
         uint8_t reg_x, reg_y, reg_a;

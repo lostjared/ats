@@ -26,24 +26,28 @@ namespace icode {
         reset();
     }
     
-    void Processor::setFlag(unsigned char flag, bool set) {
+    void Processor::setFlag(proc_Flags flag, bool set) {
         flags[flag] = set;
     }
     
-    bool Processor::getFlag(unsigned char flag) {
-        return flags[flag];
+    bool Processor::getFlag(proc_Flags flag) {
+        return (flags[flag] == 1);
     }
     
     void Processor::clrFlags() {
-        for(uint8_t i = 0; i < 8; ++i) {
-            flags[i] = false;
-        }
+        for(uint8_t i = 0; i < 8; ++i)
+            setFlag(proc_Flags(i), false);
+        
+    }
+    
+    uint8_t Processor::valFlags() {
+        return static_cast<uint8_t>(flags.to_ulong());
     }
     
     void Processor::reset() {
-        for(uint8_t i = 0; i < 8; ++i) {
-            setFlag(i, false);
-        }
+        for(uint8_t i = 0; i < 8; ++i)
+            setFlag(proc_Flags(i), false);
+        
         reg_x = reg_y = reg_a = 0;
     }
     
