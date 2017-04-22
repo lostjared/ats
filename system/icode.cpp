@@ -22,4 +22,29 @@ namespace icode {
         return opc::NOTINC;
     }
     
+    Processor::Processor() {
+        reset();
+    }
+    
+    void Processor::setFlag(unsigned char flag, bool set) {
+        flags[flag] = set;
+    }
+    
+    bool Processor::getFlag(unsigned char flag) {
+        return flags[flag];
+    }
+    
+    void Processor::clrFlags() {
+        for(uint8_t i = 0; i < 8; ++i) {
+            flags[i] = false;
+        }
+    }
+    
+    void Processor::reset() {
+        for(uint8_t i = 0; i < 8; ++i) {
+            setFlag(i, false);
+        }
+        reg_x = reg_y = reg_a = 0;
+    }
+    
 }

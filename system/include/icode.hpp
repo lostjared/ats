@@ -3,6 +3,7 @@
 
 #include<iostream>
 #include<string>
+#include<cstdint>
 
 namespace icode {
     
@@ -15,7 +16,31 @@ namespace icode {
     
     class Instruction {
         opc opcode;
+        unsigned int op1, op2;
+    };
+    
+    class Processor {
+        bool flags[8];
+        /* 
+         0 - carry bit
+         1 - zero bit
+         2 - interrupt disable bit
+         3 - decimal mode bit
+         4 - break command bit
+         5 - expansion bit
+         6 - overflow bit
+         7 - negative bit
+        */
         
+    public:
+        Processor();
+        
+        void setFlag(uint8_t flag, bool set);
+        bool getFlag(uint8_t flag);
+        void clrFlags();
+        void reset();
+        
+        uint8_t reg_x, reg_y, reg_a;
     };
 }
 
