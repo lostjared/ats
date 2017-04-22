@@ -72,13 +72,11 @@ namespace interp {
         }
     }
     
-    
     bool checkInstruction(std::vector<lex::Token> &tokens, const TextLine &text) {
         if(tokens.size()<= 1) {
             std::cerr << "Error: Statement requires instruction.\n";
             return false;
         }
-        
         if(tokens.size()>=2) {
             icode::opc op = icode::strtoInc(tokens[1].getToken());
             if(op == icode::opc::NOTINC) {
