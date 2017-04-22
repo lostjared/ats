@@ -9,17 +9,17 @@ AC_PROG_CXX
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
 AC_TYPE_PID_T
 AC_FUNC_FORK
 
-AC_CHECK_LIB([readline], [readline])
-AC_CHECK_LIB([readline], [add_history])
-enable_dbg=no
 
+AC_SEARCH_LIBS([readline], [readline], [], [
+  AC_MSG_ERROR([unable to find the readline() function install libreadline])
+])
+enable_dbg=no
 AC_ARG_ENABLE(debug,
 [   --enable-debug              DebugMode ],enable_dbg=yes)
 
