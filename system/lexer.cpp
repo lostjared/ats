@@ -9,9 +9,9 @@ namespace lex {
 	Token_map LexInput::token_map;
     
     std::ostream &operator<<(std::ostream &out, const Token_type &t) {
-        static const char *strz[] = {"Nothing","Id Token","Whitespace","String","Character", "Digit","Symbol","Identifier", "\\"};
+        static const char *strz[] = {"Nothing","Id Token","Whitespace","String","Character", "Digit","Symbol","Identifier", "Print", "Hex", "\\"};
         signed int num = static_cast<signed int>(t);
-        if(num >= 0 && num <= TOKEN_IDENTIFIER)
+        if(num >= 0 && num <=  TOKEN_HEX)
             out << strz[num];
         return out;
     }

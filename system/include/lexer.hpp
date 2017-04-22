@@ -23,10 +23,17 @@ namespace lex {
     
     enum Symbol_type { SYM_EEQUAL, SYM_NOTEQUAL, SYM_STREAM_LEFT, SYM_STREAM_RIGHT, SYM_PLUS_EQUAL, SYM_MINUS_EQUAL,SYM_MUL_EQUAL, SYM_DIV_EQUAL, SYM_AND_EUAL, SYM_OR_EQUAL, SYM_XOR_EQUAL,SYM_SEMICOLON, SYM_COLON, SYM_DOT, SYM_MINUS, SYM_POPEN, SYM_PCLOSE, SYM_BOPEN, SYM_BCLOSE, SYM_COPEN, SYM_CCLOSE, SYM_EXCLAMATION, SYM_AT, SYM_POUND, SYM_DOLLAR, SYM_MOD, SYM_XOR, SYM_AND, SYM_MUL, SYM_EQUAL, SYM_PLUS, SYM_TIDLE, SYM_QUOTE, SYM_ANGLE, SYM_CLASS_POINTER, SYM_NULL };
     
-    enum Token_type { TOKEN_NOTHING=0, TOKEN_CHAR, TOKEN_WHITESPACE, TOKEN_STRING, TOKEN_SINGLE,TOKEN_DIGIT, TOKEN_OPERATOR, TOKEN_IDENTIFIER, TOKEN_PRINT, TOKEN_EOF };
+    enum Token_type { TOKEN_NOTHING=0, TOKEN_CHAR, TOKEN_WHITESPACE, TOKEN_STRING, TOKEN_SINGLE,TOKEN_DIGIT, TOKEN_OPERATOR, TOKEN_IDENTIFIER, TOKEN_PRINT, TOKEN_HEX, TOKEN_EOF };
     
     class Scanner_EOF {};
-    class Scanner_Error {};
+    
+    class Scanner_Error {
+    public:
+        std::string error_text;
+        Scanner_Error() = default;
+        Scanner_Error(const std::string &text) : error_text(text) {};
+    };
+    
     class Exit_Exception {};
 
     class Token {
@@ -124,6 +131,7 @@ namespace lex {
             for(i = '0'; i <= '9'; ++i)
                 token_map[i] = TOKEN_DIGIT;
             
+            setToken('$', TOKEN_HEX);
             setToken('\'', TOKEN_SINGLE);
             setToken('"', TOKEN_STRING);
             setToken(' ', TOKEN_WHITESPACE);
@@ -141,7 +149,7 @@ namespace lex {
         }
         
         bool isOperator(char c) {
-            static const char ch[] = ";:.-()[]{}!@#$%^&*=+~\"`,\\/<>";
+            static const char ch[] = ";:.-()[]{}!@#%^&*=+~\"`,\\/<>";
             
             for(unsigned int i = 0; ch[i] != 0; ++i)
                 if(ch[i] == c)
@@ -243,6 +251,7 @@ namespace lex {
                     return GetToken();
                 }
                     break;
+                case TOKEN_HEX:
                 case TOKEN_DIGIT:
                     GetDigitToken(tok);
                     break;
@@ -302,17 +311,35 @@ namespace lex {
             unsigned int sline = line, soffset = offset;
             signed int count = 0;
             bool trunc = false;
-            while(((characterToType(cc) == TOKEN_DIGIT) || cc == '.') && *input) {
-                if(cc == '.') ++count;
-                if(count < 2)
-                tok += cc;
-                else { trunc = true; }
+            if(characterToType(cc) == TOKEN_HEX) {
                 cc = getChar();
+                while((characterToType(cc) == TOKEN_DIGIT || (toupper(cc) >= 'A' && toupper(cc) <= 'Z'))) {
+                    if(characterToType(cc) != TOKEN_DIGIT && !(toupper(cc) >= 'A' && toupper(cc) <= 'F')) {
+                        std::string ch;
+                        ch += cc;
+                        throw Scanner_Error(std::string("Scanner Error: Invalid Hex value: ") +ch+ std::string("\n"));
+                    }
+                    tok += cc;
+                    cc = getChar();
+                }
+                
+                if(characterToType(cc) != TOKEN_CHAR)
+                    putBack(cc);
+                
+                token.setToken(tok,TOKEN_HEX, soffset, sline);
+            } else {
+                while(((characterToType(cc) == TOKEN_DIGIT) || cc == '.') && *input) {
+                    if(cc == '.') ++count;
+                    if(count < 2)
+                        tok += cc;
+                    else { trunc = true; }
+                    cc = getChar();
+                }
+                if(characterToType(cc) !=  TOKEN_CHAR)
+                    putBack(cc);
+                if(trunc == true) std::cout << tok << " truncated.\n";
+                token.setToken(tok, TOKEN_DIGIT, soffset, sline);
             }
-            if(characterToType(cc) !=  TOKEN_CHAR)
-            putBack(cc);
-            if(trunc == true) std::cout << tok << " truncated.\n";
-            token.setToken(tok, TOKEN_DIGIT, soffset, sline);
         }
         
         void GetIdToken(Token &token) {

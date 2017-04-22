@@ -72,11 +72,13 @@ namespace interp {
         }
     }
     
+    
     bool checkInstruction(std::vector<lex::Token> &tokens, const TextLine &text) {
         if(tokens.size()<= 1) {
             std::cerr << "Error: Statement requires instruction.\n";
             return false;
         }
+        
         if(tokens.size()>=2) {
             icode::opc op = icode::strtoInc(tokens[1].getToken());
             if(op == icode::opc::NOTINC) {
@@ -84,6 +86,29 @@ namespace interp {
                 return false;
             } else {
                 // check operands
+                if(tokens.size()>=3) {
+                    if(tokens[2].getTokenType() == lex::TOKEN_DIGIT) {
+                    }
+                    else
+                    if(tokens[2].getToken()=="#") {
+                        if(tokens.size()>=4) {
+                            if(tokens[3].getTokenType() != lex::TOKEN_DIGIT && tokens[3].getTokenType() != lex::TOKEN_HEX) {
+                                std::cerr << "Syntax Error: requires either digit or $.\n";
+                                
+                            } else if(tokens[3].getToken() == "$") {
+                                if(tokens.size() >= 5 && tokens[4].getTokenType() != lex::TOKEN_HEX) {
+                                    std::cout << "Syntax Error: $ is followed by a Hex value\n";
+                                }
+                            }
+                        } else {
+                            std::cerr << "Syntax Error: Missing value after #\n";
+                            return false;
+                        }
+                    }
+                } else {
+                    std::cerr << "Syntax Error: Instruction requires operand\n";
+                }
+            
             }
         }
         return true;
