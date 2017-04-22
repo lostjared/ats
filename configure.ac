@@ -17,7 +17,7 @@ AC_TYPE_PID_T
 AC_FUNC_FORK
 
 AC_CHECK_LIB([readline], [readline])
-
+AC_CHECK_LIB([readline], [add_history])
 enable_dbg=no
 
 AC_ARG_ENABLE(debug,
