@@ -49,6 +49,10 @@ namespace icode {
             setFlag(proc_Flags(i), false);
         
         reg_x = reg_y = reg_a = 0;
+        ip = 0;
     }
     
+    void Processor::setIp(const unsigned int ip_val) {
+        ip = ip_val;
+    }
 }

@@ -72,6 +72,8 @@ namespace interp {
         }
     }
     
+    // should have used recursive functions
+    // will do for translating
     bool checkInstruction(std::vector<lex::Token> &tokens, const TextLine &text) {
         if(tokens.size()<= 1) {
             std::cerr << "Error: Statement requires instruction.\n";

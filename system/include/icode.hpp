@@ -34,7 +34,7 @@ namespace icode {
          6 - overflow bit
          7 - negative bit
         */
-        
+        unsigned int ip;
     public:
         Processor();
         
@@ -43,6 +43,7 @@ namespace icode {
         void clrFlags();
         uint8_t valFlags();
         void reset();
+        void setIp(const unsigned int ip_val);
         
         uint8_t reg_x, reg_y, reg_a;
     };

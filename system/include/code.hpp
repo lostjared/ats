@@ -26,12 +26,16 @@ namespace interp {
         std::string text;
     };
     
+    
     class Code {
     public:
         Code() {}
         void clear();
         
         symbol::Symbol symbols;
+    private:
+        icode::Processor proc;
+        std::vector<icode::Instruction> instruct;
     };
 
     void inputText(std::vector<lex::Token> &tokens, std::string text);
