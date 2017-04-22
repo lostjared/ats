@@ -96,6 +96,13 @@ namespace interp {
                                 std::cerr << "Syntax Error: $ is followed by a Hex value\n";
                                 return false;
                             }
+                            
+                            if(tokens.size()>=5 && tokens[4].getToken() == ",") {
+                                if(tokens.size()>=6 && tokens[5].getTokenType() == lex::TOKEN_CHAR) {
+                                    // check if register
+                                }
+                            }
+                            
                         } else {
                             std::cerr << "Syntax Error: Missing value after #\n";
                             return false;
