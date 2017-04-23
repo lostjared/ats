@@ -31,15 +31,15 @@ PEEK / POKE
 
 	The Processor Flags
 
-	0 = Negative Result Flag
-	1 = Overflow Flag
-	2 = Expansion Flag (Not Labeled)
-	3 = Break Command Flag
-	4 = Decimal Mode Flag
-	5 = Intereupt disable flag
-	6 = Zero result flag
-	7 = Carry Flag
-	
+         C = Bit 0 - carry bit
+         Z = Bit 1 - zero bit
+         I = Bit 2 - interrupt disable bit
+         D = Bit 3 - decimal mode bit
+         B = Bit 4 - break command bit
+         5 = Bit 5 -[expansion bit [not used]
+         Z = Bit 6 - overflow bit
+         N = Bit 7 - negative bit
+        
 Instructions:
 
 	ADC - Add Memory to Accumulator with Carry
