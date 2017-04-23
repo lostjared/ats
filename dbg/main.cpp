@@ -13,10 +13,10 @@
 #include<readline/history.h>
 
 int main() {
-    code.symbols["pi"].create("pi", symbol::Value("INF", 0));
+    code.symbols["pi"].create("pi", symbol::Value("", 3.14159265359));
     
-    double &pi = code.symbols["pi"].get_double();
-    pi = 3.14159265359;
+    //double &pi = code.symbols["pi"].get_double();
+    //pi = 3.14159265359;
         
     while(1) {
         try {

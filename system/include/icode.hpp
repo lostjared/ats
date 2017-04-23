@@ -15,9 +15,17 @@ namespace icode {
     opc strtoInc(const std::string &inc);
     std::string lcase(std::string text);
     
+    enum class op_type { NULL_TYPE=0, OP_MEMORY, OP_DECIMAL, OP_REGISTER };
+    
     class Instruction {
+    public:
         opc opcode;
-        unsigned int op1, op2;
+        uint32_t op1, op2;
+        op_type op1_t, op2_t;
+        Instruction();
+        Instruction(opc op_code, op_type op1_type, uint32_t op1_val, op_type op2_type, uint32_t op2_val);
+        Instruction(const Instruction &i);
+        Instruction &operator=(const Instruction &i);
     };
     
     enum proc_Flags { FLAG_CARRY=0, FLAG_ZERO, FLAG_INTERRUPT, FLAG_DECIMAL, FLAG_BREAK, FLAG_EXPANSION, FLAG_OVERFLOW, FLAG_NEGATIVE };
@@ -44,7 +52,6 @@ namespace icode {
         uint8_t valFlags();
         void reset();
         void setIp(const unsigned int ip_val);
-        
         uint8_t reg_x, reg_y, reg_a;
     };
 }

@@ -3,6 +3,7 @@
 #include<iostream>
 #include<string>
 #include<cstdlib>
+#include<cstring>
 #include<vector>
 #include<algorithm>
 #include<fstream>
@@ -29,12 +30,13 @@ namespace interp {
     
     class Code {
     public:
-        Code() {}
+        Code();
         void clear();
-        
         symbol::Symbol symbols;
     private:
         icode::Processor proc;
+        std::vector<uint8_t> stack;
+        uint8_t mem[1024 * 64];
         std::vector<icode::Instruction> instruct;
     };
 
