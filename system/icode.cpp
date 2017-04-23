@@ -57,11 +57,11 @@ namespace icode {
         reset();
     }
     
-    void Processor::setFlag(proc_Flags flag, bool set) {
+    void Processor::setFlag(proc_Flags flag, unsigned int set) {
         flags[flag] = set;
     }
     
-    bool Processor::getFlag(proc_Flags flag) {
+    unsigned int Processor::getFlag(proc_Flags flag) {
         return (flags[flag] == 1);
     }
     
@@ -85,5 +85,9 @@ namespace icode {
     
     void Processor::setIp(const unsigned int ip_val) {
         ip = ip_val;
+    }
+    
+    void Processor::printFlags() {
+        std::cout << "C:" << getFlag(FLAG_CARRY) << " Z:" << getFlag(FLAG_ZERO) << " I:" << getFlag(FLAG_INTERRUPT) << " D:" << getFlag(FLAG_DECIMAL) << " B:" << getFlag(FLAG_BREAK) << " E:" << getFlag(FLAG_EXPANSION) << " Z:" << getFlag(FLAG_OVERFLOW) << " N:" << getFlag(FLAG_NEGATIVE) << " ";
     }
 }

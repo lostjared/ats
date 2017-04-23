@@ -32,6 +32,7 @@ namespace interp {
     public:
         Code();
         void clear();
+        void printFlags();
         symbol::Symbol symbols;
     private:
         icode::Processor proc;

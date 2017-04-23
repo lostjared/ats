@@ -44,26 +44,27 @@ namespace icode {
     class Processor {
         std::bitset<8> flags;
         /* 
-         0 - carry bit
-         1 - zero bit
-         2 - interrupt disable bit
-         3 - decimal mode bit
-         4 - break command bit
-         5 - expansion bit
-         6 - overflow bit
-         7 - negative bit
+         C = 0 - carry bit
+         Z = 1 - zero bit
+         I = 2 - interrupt disable bit
+         D = 3 - decimal mode bit
+         B = 4 - break command bit
+         5 = [expansion bit [not used]
+         Z = 6 - overflow bit
+         N = 7 - negative bit
         */
         unsigned int ip;
     public:
         Processor();
         
-        void setFlag(proc_Flags flag, bool set);
-        bool getFlag(proc_Flags flag);
+        void setFlag(proc_Flags flag, unsigned int set);
+        unsigned int getFlag(proc_Flags flag);
         void clrFlags();
         uint8_t valFlags();
         void reset();
         void setIp(const unsigned int ip_val);
         uint8_t reg_x, reg_y, reg_a;
+        void printFlags();
     };
 }
 
