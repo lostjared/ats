@@ -17,7 +17,7 @@ $ make
 
 This project is based on 6502 Instructions 
 with added functionality and new instructions / features to
-allow this program to be used on modern computers.
+allow this old code to be used on modern computers. Emulation of original hardware is not purpose of this project.
 
 Base instruction set:
 
@@ -45,114 +45,112 @@ PEEK / POKE
 
 Instructions:
 
-ADC - Add Memory to Accumulator with Carry
+	ADC - Add Memory to Accumulator with Carry
+	AND - And Memory to Accumulator with Carry
 
-AND - And Memory to Accumulator with Carry
+	ASL - Shift Left One Bit (memory or accumulator)
 
-ASL - Shift Left One Bit (memory or accumulator)
+	BCC - Branch if Carry Flag is clear
 
-BCC - Branch if Carry Flag is clear
+	BCS - Branch if Carry Flag is set
 
-BCS - Branch if Carry Flag is set
+	BEQ - Branch on result Zero
 
-BEQ - Branch on result Zero
+	BIT - Test bits in accumulator with memory
 
-BIT - Test bits in accumulator with memory
+	BMI - Branch on result minus
 
-BMI - Branch on result minus
+	BNE - Branch if result not zero
 
-BNE - Branch if result not zero
+	BPL - Branch on result plus
 
-BPL - Branch on result plus
+	BRK - Unconditional break
 
-BRK - Unconditional break
+	BVC - Branch on overflow clear
 
-BVC - Branch on overflow clear
+	BVS - Branch on overflow set
 
-BVS - Branch on overflow set
+	CLC - Clear Carry Flag
 
-CLC - Clear Carry Flag
+	CLD - Clear Decimal Flag
 
-CLD - Clear Decimal Flag
+	CLI - Clear Interupt Flag
 
-CLI - Clear Interupt Flag
+	CLV - Clear overflow Flag
 
-CLV - Clear overflow Flag
+	CMP - Compare memory and accumulator
 
-CMP - Compare memory and accumulator
+	CPX - Compare Memory and Register X
 
-CPX - Compare Memory and Register X
+	CPY - Compare Memory and Reigster Y
 
-CPY - Compare Memory and Reigster Y
+	DEC - Decrement Memory or accumulator
 
-DEC - Decrement Memory or accumulator
+	DEX - Decrement X Register
 
-DEX - Decrement X Register
+	DEY - Decrement Y Register
 
-DEY - Decrement Y Register
+	EOR - Exculsive Or memory or accumulator
 
-EOR - Exculsive Or memory or accumulator
+	INC - Incrmeent Memory or accumulator
+	
+	INX - Increment register X
 
-INC - Incrmeent Memory or accumulator
+	INY - Increment register Y
 
-INX - Increment register X
+	JMP - Unconditonal Jump to Code label or address
 
-INY - Increment register Y
+	JSR - Jump To Subroutine
 
-JMP - Unconditonal Jump to Code label or address
+	LDA - Load accumulator with constant or memory
 
-JSR - Jump To Subroutine
+	LDX - Load X register with constant or memory
 
-LDA - Load accumulator with constant or memory
+	LDY - Load Y register with constant or memory
 
-LDX - Load X register with constant or memory
+	LSR - Shift right one bit
 
-LDY - Load Y register with constant or memory
+	NOP - No operation 
 
-LSR - Shift right one bit
+	ORA - Or accumulator with constant or memory
 
-NOP - No operation 
+	PHA - Push accumulator onto the stack
 
-ORA - Or accumulator with constant or memory
+	PHP - Push proccesscor flags onto the stack
 
-PHA - Push accumulator onto the stack
+	PLA - Pull (pop) accumulator from the stack
 
-PHP - Push proccesscor flags onto the stack
+	PLP - Pull (pop) proccesscor flags from the stack
 
-PLA - Pull (pop) accumulator from the stack
+	ROL - Rotate bits one left
 
-PLP - Pull (pop) proccesscor flags from the stack
+	ROR - Rotate bits one right
 
-ROL - Rotate bits one left
+	RTI - Return from interupt
 
-ROR - Rotate bits one right
+	RTS - Return from subroutine
 
-RTI - Return from interupt
+	SBC - Subtract memory and borrow from accum
 
-RTS - Return from subroutine
+	SEC - Set carry flag
 
-SBC - Subtract memory and borrow from accum
+	SED - Set decimal flag
 
-SEC - Set carry flag
+	SEI - Set interupt flag
 
-SED - Set decimal flag
+	STA - Store accumulator in memory
 
-SEI - Set interupt flag
+	STX - Store register X in memory
 
-STA - Store accumulator in memory
+	STY - Store register Y in memory
 
-STX - Store register X in memory
+	TAX - Transfer accumulator to X register
 
-STY - Store register Y in memory
+	TAY - Transfer accumulator to Y register
 
-TAX - Transfer accumulator to X register
+	TSX - Transfer stack pointer to Index X
 
-TAY - Transfer accumulator to Y register
+	TXA - Transfer register X to accumulator
 
-TSX - Transfer stack pointer to Index X
-
-TXA - Transfer register X to accumulator
-
-TYA - Transfer register Y to accumulator
-
+	TYA - Transfer register Y to accumulator
 
