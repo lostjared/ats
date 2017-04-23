@@ -17,15 +17,26 @@ namespace icode {
     
     enum class op_type { NULL_TYPE=0, OP_MEMORY, OP_DECIMAL, OP_REGISTER };
     
+    class Operand {
+    public:
+        uint32_t op;
+        op_type  op_t;
+        Operand();
+        Operand(const uint32_t operand, const op_type operand_type);
+        Operand(const Operand &o);
+        Operand &operator=(const Operand &o);
+    };
+    
     class Instruction {
     public:
         opc opcode;
-        uint32_t op1, op2;
-        op_type op1_t, op2_t;
+        Operand op1, op2;
         Instruction();
-        Instruction(opc op_code, op_type op1_type, uint32_t op1_val, op_type op2_type, uint32_t op2_val);
+        Instruction(const opc op_code, const Operand i_op1, const Operand i_op2);
         Instruction(const Instruction &i);
         Instruction &operator=(const Instruction &i);
+        void set(const opc c, const Operand o1, const Operand o2);
+        
     };
     
     enum proc_Flags { FLAG_CARRY=0, FLAG_ZERO, FLAG_INTERRUPT, FLAG_DECIMAL, FLAG_BREAK, FLAG_EXPANSION, FLAG_OVERFLOW, FLAG_NEGATIVE };
