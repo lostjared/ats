@@ -15,6 +15,7 @@ namespace icode {
     opc strtoInc(const std::string &inc);
     std::string lcase(const std::string &text);
     
+    
     enum class op_type { NULL_TYPE=0, OP_MEMORY, OP_DECIMAL, OP_REGISTER };
     
     class Operand {
