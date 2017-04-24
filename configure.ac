@@ -19,6 +19,12 @@ AC_FUNC_FORK
 AC_SEARCH_LIBS([readline], [readline], [], [
   AC_MSG_ERROR([unable to find the readline() function install libreadline])
 ])
+
+AC_SEARCH_LIBS([add_history], [history], [], [
+  AC_MSG_ERROR([unable to find the readline() function install libreadline])
+])
+
+
 enable_dbg=no
 AC_ARG_ENABLE(debug,
 [   --enable-debug              DebugMode ],enable_dbg=yes)
