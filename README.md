@@ -17,7 +17,7 @@ $ make
 
 This project is based on 6502 Instructions 
 with added functionality and new instructions / features to
-allow this old code to be used on modern computers. Emulation of original hardware is not purpose of this project.
+allow this old code to be used on modern computers. Emulation of original hardware is not the goal of this project.
 
 Registers: 
 
