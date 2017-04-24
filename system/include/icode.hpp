@@ -55,16 +55,17 @@ namespace icode {
         */
         unsigned int ip;
     public:
-        Processor();
+        uint8_t reg_x, reg_y, reg_a;
         
+        Processor();
         void setFlag(proc_Flags flag, unsigned int set);
         unsigned int getFlag(proc_Flags flag);
         void clrFlags();
         uint8_t valFlags();
         void reset();
         void setIp(const unsigned int ip_val);
-        uint8_t reg_x, reg_y, reg_a;
         void printFlags();
+        void printRegisters();
     };
 }
 

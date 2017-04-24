@@ -16,6 +16,7 @@ int main() {
     code.symbols["version"].create("version", symbol::Value("1.0", 1.0));
     code.symbols["author"].create("author", symbol::Value("lostjared", 0));
     
+    
     while(1) {
         try {
             std::string input_line;

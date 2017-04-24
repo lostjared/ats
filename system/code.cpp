@@ -8,8 +8,11 @@ namespace interp {
         memset(mem, 0, sizeof(mem));
     }
     
-    void Code::printFlags() {
+    void Code::print() {
+        std::cout << "{ ";
+        proc.printRegisters();
         proc.printFlags();
+        std::cout << "}\n";
     }
     
 }

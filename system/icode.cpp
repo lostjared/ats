@@ -90,4 +90,8 @@ namespace icode {
     void Processor::printFlags() {
         std::cout << "C:" << getFlag(FLAG_CARRY) << " Z:" << getFlag(FLAG_ZERO) << " I:" << getFlag(FLAG_INTERRUPT) << " D:" << getFlag(FLAG_DECIMAL) << " B:" << getFlag(FLAG_BREAK) << " E:" << getFlag(FLAG_EXPANSION) << " Z:" << getFlag(FLAG_OVERFLOW) << " N:" << getFlag(FLAG_NEGATIVE) << " ";
     }
+    
+    void Processor::printRegisters() {
+        std::cout << "[ X:" << static_cast<int>(reg_x) << " Y:" << static_cast<int>(reg_y) << " A:" << static_cast<int>(reg_a) << " ] ";
+    }
 }
