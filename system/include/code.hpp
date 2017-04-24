@@ -34,7 +34,7 @@ namespace interp {
         void clear();
         void print();
         symbol::Symbol symbols;
-    private:
+    //private:
         icode::Processor proc;
         std::vector<uint8_t> stack;
         uint8_t mem[1024 * 64];

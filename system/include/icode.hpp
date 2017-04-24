@@ -13,7 +13,7 @@ namespace icode {
     enum class opc { ADC=0, AND, ASL, BCC, BCS, BEQ, BIT, BMI, BNE, BPL, BRK, BVC, BVS, CLC, CLD, CLI, CLV, CMP, CPX, CPY, DEC, DEX, DEY, EOR, INC, INT, INX, INY, JMP, JSR, LDA, LDM, LDX, LDY, LSR, NOP, ORA, PEEK, PHA, PHP, PLA, PLP,POKE,ROL, ROR, RTI, RTS, SBC, SEC, SED, SEI, STA, STX, STY, TAX, TAY, TSX, TXA, TXS, TYA, NOTINC };
     
     opc strtoInc(const std::string &inc);
-    std::string lcase(std::string text);
+    std::string lcase(const std::string &text);
     
     enum class op_type { NULL_TYPE=0, OP_MEMORY, OP_DECIMAL, OP_REGISTER };
     
@@ -22,7 +22,7 @@ namespace icode {
         uint32_t op;
         op_type  op_t;
         Operand();
-        Operand(const uint32_t operand, const op_type operand_type);
+        Operand(const uint32_t &operand, const op_type &operand_type);
         Operand(const Operand &o);
         Operand &operator=(const Operand &o);
     };
@@ -32,10 +32,10 @@ namespace icode {
         opc opcode;
         Operand op1, op2;
         Instruction();
-        Instruction(const opc op_code, const Operand i_op1, const Operand i_op2);
+        Instruction(const opc &op_code, const Operand &i_op1, const Operand &i_op2);
         Instruction(const Instruction &i);
         Instruction &operator=(const Instruction &i);
-        void set(const opc c, const Operand o1, const Operand o2);
+        void set(const opc &c, const Operand &o1, const Operand &o2);
         
     };
     
@@ -63,7 +63,7 @@ namespace icode {
         void clrFlags();
         uint8_t valFlags();
         void reset();
-        void setIp(const unsigned int ip_val);
+        void setIp(const unsigned int &ip_val);
         void printFlags();
         void printRegisters();
     };
