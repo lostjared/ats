@@ -14,6 +14,9 @@
 
 namespace interp {
     
+    // address modes
+    enum { IMMEDIATE=1,ZEROPAGE,ZEROPAGE_X,ZEROPAGE_Y,ABSOULTE,ABSOULTE_X,ABSOULTE_Y,IMPLIED,RELATIVE,INDIRECT_I,INDEXED_I,ACCUMULATOR,INDIRECT };
+    
     class TextLine {
     public:
         TextLine();
@@ -41,9 +44,18 @@ namespace interp {
 
     typedef void (*call)(Code &c);
     
+    struct at_code {
+        unsigned char op_code;
+        int address_mode;
+        icode::opc p_code;
+    };
+    
+    extern at_code m_code[];
+    
     struct iCodeInstruction {
         icode::opc opcode;
         call call_back;
+        icode::address_mode mode;
     };
     
     void i_adc(Code &c);
