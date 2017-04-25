@@ -27,20 +27,90 @@ namespace interp {
         std::string text;
     };
     
-    
     class Code {
     public:
         Code();
         void clear();
         void print();
         symbol::Symbol symbols;
-    private:
         icode::Processor proc;
         std::vector<uint8_t> stack;
         uint8_t mem[1024 * 64];
         std::vector<icode::Instruction> instruct;
     };
 
+    typedef void (*call)(Code &c);
+    
+    struct iCodeInstruction {
+        icode::opc opcode;
+        call call_back;
+    };
+    
+    void i_adc(Code &c);
+    void i_and(Code &c);
+    void i_asl(Code &c);
+    void i_bcc(Code &c);
+    void i_bcs(Code &c);
+    void i_beq(Code &c);
+    void i_bit(Code &c);
+    void i_bmi(Code &c);
+    void i_bne(Code &c);
+    void i_bpl(Code &c);
+    void i_brk(Code &c);
+    void i_bvc(Code &c);
+    void i_bvs(Code &c);
+    void i_clc(Code &c);
+    void i_cld(Code &c);
+    void i_cli(Code &c);
+    void i_clv(Code &c);
+    void i_cmp(Code &c);
+    void i_cpx(Code &c);
+    void i_cpy(Code &c);
+    void i_dec(Code &c);
+    void i_dex(Code &c);
+    void i_dey(Code &c);
+    void i_eor(Code &c);
+    void i_inc(Code &c);
+    void i_int(Code &c);
+    void i_inx(Code &c);
+    void i_iny(Code &c);
+    void i_jmp(Code &c);
+    void i_jsr(Code &c);
+    void i_lda(Code &c);
+    void i_ldm(Code &c);
+    void i_ldx(Code &c);
+    void i_ldy(Code &c);
+    void i_lsr(Code &c);
+    void i_nop(Code &c);
+    void i_ora(Code &c);
+    void i_peek(Code &c);
+    void i_pha(Code &c);
+    void i_php(Code &c);
+    void i_pla(Code &c);
+    void i_plp(Code &c);
+    void i_poke(Code &c);
+    void i_rol(Code &c);
+    void i_ror(Code &c);
+    void i_rti(Code &c);
+    void i_rts(Code &c);
+    void i_sbc(Code &c);
+    void i_sec(Code &c);
+    void i_sed(Code &c);
+    void i_sei(Code &c);
+    void i_sta(Code &c);
+    void i_stx(Code &c);
+    void i_sty(Code &c);
+    void i_tax(Code &c);
+    void i_tay(Code &c);
+    void i_tsx(Code &c);
+    void i_txa(Code &c);
+    void i_txs(Code &c);
+    void i_tya(Code &c);
+    
+    extern iCodeInstruction inst[];
+    void testcodes();
+    
+    
     void inputText(std::vector<lex::Token> &tokens, std::string text);
     bool saveLineSource(const std::string &text);
     bool openLineSource(const std::string &text);
