@@ -67,7 +67,7 @@ namespace icode {
     
     void Processor::clrFlags() {
         for(uint8_t i = 0; i < 8; ++i)
-            setFlag(proc_Flags(i), false);
+            setFlag(proc_Flags(i), 0);
         
     }
     
@@ -77,16 +77,18 @@ namespace icode {
     
     void Processor::reset() {
         for(uint8_t i = 0; i < 8; ++i)
-            setFlag(proc_Flags(i), false);
+            setFlag(proc_Flags(i), 0);
         
         reg_x = reg_y = reg_a = 0;
         ip = 0;
         sp = 0;
     }
     
-    void Processor::setIp(const unsigned int &ip_val) {
+    void Processor::setIp(const address_size &ip_val) {
         ip = ip_val;
     }
+    
+    address_size Processor::getIp() const { return ip; }
     
     void Processor::printFlags() {
         std::cout << "C:" << getFlag(FLAG_CARRY) << " Z:" << getFlag(FLAG_ZERO) << " I:" << getFlag(FLAG_INTERRUPT) << " D:" << getFlag(FLAG_DECIMAL) << " B:" << getFlag(FLAG_BREAK) << " E:" << getFlag(FLAG_EXPANSION) << " Z:" << getFlag(FLAG_OVERFLOW) << " N:" << getFlag(FLAG_NEGATIVE) << " ";

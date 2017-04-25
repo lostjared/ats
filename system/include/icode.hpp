@@ -69,7 +69,8 @@ namespace icode {
         void clrFlags();
         uint8_t valFlags();
         void reset();
-        void setIp(const unsigned int &ip_val);
+        void setIp(const address_size &ip_val);
+        address_size getIp() const;
         void printFlags();
         void printRegisters();
     };
