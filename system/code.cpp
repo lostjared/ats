@@ -6,7 +6,7 @@ namespace interp {
     
     using icode::opc;
     
-    iCodeInstruction inst[] = { {opc::ADC, i_adc}, {opc::AND, i_adc}, {opc::ASL, i_asl},
+    iCodeInstruction inst[] = { {opc::ADC, i_adc}, {opc::AND, i_and}, {opc::ASL, i_asl},
         {opc::BCC, i_bcc}, {opc::BCS, i_bcs}, {opc::BEQ, i_beq}, {opc::BIT, i_bit},
         {opc::BMI, i_bmi}, {opc::BNE, i_bne}, {opc::BPL, i_bpl}, {opc::BRK, i_brk},
         {opc::BVC, i_bvc}, {opc::BVS, i_bvs}, {opc::CLC, i_clc}, {opc::CLD, i_cld},
