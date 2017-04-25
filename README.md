@@ -1,6 +1,7 @@
 # ats
 
 Work in progress. In early stages still, but the goal of this project is to teach myself more about interpreters.
+This program just plays around with a few different concepts, but borrows a lot of the instructions and concepts from the book "the Atari Assembler".
 
 to build:
 
