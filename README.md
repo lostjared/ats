@@ -96,6 +96,7 @@ Instructions:
 	TAX - Transfer accumulator to X register
 	TAY - Transfer accumulator to Y register
 	TSX - Transfer stack pointer to Index X
+	TXS - Transfer register X to stack pointer
 	TXA - Transfer register X to accumulator
 	TYA - Transfer register Y to accumulator
 
