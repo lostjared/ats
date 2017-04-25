@@ -57,6 +57,7 @@ namespace icode {
         unsigned int ip;
     public:
         uint8_t reg_x, reg_y, reg_a;
+        uint8_t sp;
         
         Processor();
         void setFlag(proc_Flags flag, unsigned int set);

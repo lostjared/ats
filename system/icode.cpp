@@ -81,6 +81,7 @@ namespace icode {
         
         reg_x = reg_y = reg_a = 0;
         ip = 0;
+        sp = 0;
     }
     
     void Processor::setIp(const unsigned int &ip_val) {

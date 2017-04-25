@@ -55,17 +55,17 @@ namespace interp {
     }
     
     void i_clc(Code &c) {
-        
+        c.proc.setFlag(icode::FLAG_CARRY, 0);
     }
     void i_cld(Code &c) {
-        
+        c.proc.setFlag(icode::FLAG_DECIMAL, 0);
     }
     void i_cli(Code &c) {
-        
+        c.proc.setFlag(icode::FLAG_INTERRUPT, 0);
     }
     
     void i_clv(Code &c) {
-        
+        c.proc.setFlag(icode::FLAG_OVERFLOW, 0);
     }
     void i_cmp(Code &c) {
         
@@ -215,27 +215,27 @@ namespace interp {
     }
     
     void i_tax(Code &c) {
-        
+        c.proc.reg_x = c.proc.reg_a;
     }
     
     void i_tay(Code &c) {
-        
+        c.proc.reg_y = c.proc.reg_a;
         
     }
     void i_tsx(Code &c) {
-        
-    }
-    
-    void i_txa(Code &c) {
-        
+        c.proc.reg_x = c.proc.sp;
     }
     
     void i_txs(Code &c) {
-        
+        c.proc.sp = c.proc.reg_x;
+    }
+    
+    void i_txa(Code &c) {
+        c.proc.reg_a = c.proc.reg_x;
     }
     
     void i_tya(Code &c) {
-        
+        c.proc.reg_a = c.proc.reg_y;
     }
     
 }
