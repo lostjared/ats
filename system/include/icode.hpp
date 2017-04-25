@@ -43,7 +43,7 @@ namespace icode {
     enum proc_Flags { FLAG_CARRY=0, FLAG_ZERO, FLAG_INTERRUPT, FLAG_DECIMAL, FLAG_BREAK, FLAG_EXPANSION, FLAG_OVERFLOW, FLAG_NEGATIVE };
     
     
-    typedef uint32_t reg_size;
+    typedef uint8_t reg_size;
     typedef uint32_t address_size;
     
     class Processor {
