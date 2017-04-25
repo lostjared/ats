@@ -191,15 +191,15 @@ namespace interp {
     }
     
     void i_sec(Code &c) {
-        
+        c.proc.setFlag(icode::FLAG_CARRY, 1);
     }
     
     void i_sed(Code &c) {
-        
+        c.proc.setFlag(icode::FLAG_DECIMAL, 1);
     }
     
     void i_sei(Code &c) {
-        
+        c.proc.setFlag(icode::FLAG_INTERRUPT, 1);
     }
     
     void i_sta(Code &c) {
