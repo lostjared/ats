@@ -107,6 +107,6 @@ namespace icode {
     }
     
     void Processor::printRegisters() {
-        std::cout << "[ X:" << std::hex << static_cast<int>(reg_x) << " Y:" << std::hex <<  static_cast<int>(reg_y) << " A:" << std::hex << static_cast<int>(reg_a) << " P:" << std::hex << static_cast<int>(valFlags()) << " ] ";
+        std::cout << "[ X:" << std::hex << std::uppercase << static_cast<int>(reg_x) << " Y:" << std::hex << std::uppercase <<  static_cast<int>(reg_y) << " A:" << std::hex << std::uppercase << static_cast<int>(reg_a) << " P:" << std::hex << std::uppercase << static_cast<int>(valFlags()) << " ] ";
     }
 }

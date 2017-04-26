@@ -35,10 +35,19 @@ namespace interp {
         Code();
         void clear();
         void print();
+        
+        inline uint8_t peek(uint16_t address) {
+            return mem[address];
+        }
+        
+        inline void poke(uint16_t address, uint8_t value) {
+            mem[address] = value;
+        }
+        
         symbol::Symbol symbols;
         icode::Processor proc;
         std::vector<uint8_t> stack;
-        uint8_t mem[1024 * 64];
+        uint8_t mem[0xFFFF+1];
         std::vector<icode::Instruction> instruct;
     };
 

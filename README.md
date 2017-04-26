@@ -20,15 +20,16 @@ This project is based on 6502 Instructions
 with added functionality and new instructions / features to
 allow this old code to be used on modern computers. Emulation of original hardware is not the goal of this project.
 
+in the shell program dbg use help command to print list of accepted commands
+and use PEEK/POKE commands to manipulate memory
+
 Registers: 
 
 	X
 	Y
 	Accumulator
 
-Base instruction set:
-
-PEEK / POKE
+Base instruction set
 
 	The Processor Flags
 

@@ -34,7 +34,7 @@ int main() {
             }
             if(v.size()==0) continue;
             std::string first_token;
-            first_token = v[0].getToken();
+            first_token = icode::lcase(v[0].getToken());
             if(first_token == "quit") break;
             auto rt = function_map.find(first_token);
             if(rt == function_map.end()) {
