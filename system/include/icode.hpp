@@ -5,6 +5,7 @@
 #include<string>
 #include<cstdint>
 #include<bitset>
+#include<sstream>
 
 namespace icode {
     
@@ -14,7 +15,7 @@ namespace icode {
     
     opc strtoInc(const std::string &inc);
     std::string lcase(const std::string &text);
-    
+    uint32_t toHex(const std::string &text);
     
     enum class op_type { NULL_TYPE=0, OP_MEMORY, OP_DECIMAL, OP_REGISTER };
     
@@ -48,7 +49,7 @@ namespace icode {
     
     
     typedef uint8_t reg_size;
-    typedef uint32_t address_size;
+    typedef uint16_t address_size;
     
     class Processor {
         std::bitset<8> flags;
@@ -69,6 +70,7 @@ namespace icode {
         
         Processor();
         void setFlag(proc_Flags flag, unsigned int set);
+        void setFlags(uint8_t flag);
         unsigned int getFlag(proc_Flags flag);
         void clrFlags();
         uint8_t valFlags();

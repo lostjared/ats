@@ -46,6 +46,13 @@ namespace icode {
         return n;
     }
     
+    uint32_t toHex(const std::string &text) {
+        std::istringstream stream(text);
+        uint32_t val = 0;
+        stream >> std::hex >> val;
+        return val;
+    }
+    
     opc strtoInc(const std::string &inc) {
         std::string in = lcase(inc);
         for(unsigned int i = 0; op_array[i] != 0; ++i) {
@@ -60,6 +67,10 @@ namespace icode {
     
     void Processor::setFlag(proc_Flags flag, unsigned int set) {
         flags[flag] = set;
+    }
+    
+    void Processor::setFlags(uint8_t b) {
+        flags = b;
     }
     
     unsigned int Processor::getFlag(proc_Flags flag) {
@@ -96,6 +107,6 @@ namespace icode {
     }
     
     void Processor::printRegisters() {
-        std::cout << "[ X:" << static_cast<int>(reg_x) << " Y:" << static_cast<int>(reg_y) << " A:" << static_cast<int>(reg_a) << " ] ";
+        std::cout << "[ X:" << std::hex << static_cast<int>(reg_x) << " Y:" << std::hex <<  static_cast<int>(reg_y) << " A:" << std::hex << static_cast<int>(reg_a) << " P:" << std::hex << static_cast<int>(valFlags()) << " ] ";
     }
 }

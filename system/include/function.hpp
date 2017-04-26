@@ -36,6 +36,7 @@ namespace token {
     void token_sh(const std::string &command, std::vector<lex::Token> &tokens);
     void token_HTML(const std::string &command, std::vector<lex::Token> &tokens);
     void token_ProcInfo(const std::string &command, std::vector<lex::Token> &tokens);
+    void token_SetReg(const std::string &command, std::vector<lex::Token> &tokens);
 }
 
 #endif
