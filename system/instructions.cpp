@@ -146,10 +146,6 @@ namespace interp {
         
     }
     
-    void i_peek(Code &c) {
-        
-    }
-    
     void i_pha(Code &c) {
         
     }
@@ -163,10 +159,6 @@ namespace interp {
     }
     
     void i_plp(Code &c) {
-        
-    }
-    
-    void i_poke(Code &c) {
         
     }
     

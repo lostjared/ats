@@ -15,13 +15,12 @@ namespace interp {
         {opc::EOR, i_eor}, {opc::INC, i_inc}, {opc::INT, i_int}, {opc::INX, i_inx},
         {opc::INY, i_iny}, {opc::JMP, i_jmp}, {opc::JSR, i_jsr}, {opc::LDA, i_lda},
         {opc::LDM, i_ldm}, {opc::LDX, i_ldx}, {opc::LDY, i_ldy}, {opc::LSR, i_lsr},
-        {opc::NOP, i_nop}, {opc::ORA, i_ora}, {opc::PEEK, i_peek}, {opc::PHA, i_pha},
-        {opc::PHP, i_php}, {opc::PLA, i_pla}, {opc::PLP, i_plp}, {opc::POKE, i_poke},
-        {opc::ROL, i_rol}, {opc::ROR, i_ror}, {opc::RTI, i_rti}, {opc::RTS, i_rts},
-        {opc::SBC, i_sbc}, {opc::SEC, i_sec}, {opc::SED, i_sed}, {opc::SEI, i_sei},
-        {opc::STA, i_sta}, {opc::STX, i_stx}, {opc::STY, i_sty}, {opc::TAX, i_tax},
-        {opc::TAY, i_tay}, {opc::TSX, i_tsx}, {opc::TXA, i_txa}, {opc::TXS, i_txs},
-        {opc::TYA, i_tya}
+        {opc::NOP, i_nop}, {opc::ORA, i_ora}, {opc::PHA, i_pha}, {opc::PHP, i_php},
+        {opc::PLA, i_pla}, {opc::PLP, i_plp}, {opc::ROL, i_rol}, {opc::ROR, i_ror},
+        {opc::RTI, i_rti}, {opc::RTS, i_rts}, {opc::SBC, i_sbc}, {opc::SEC, i_sec},
+        {opc::SED, i_sed}, {opc::SEI, i_sei}, {opc::STA, i_sta}, {opc::STX, i_stx},
+        {opc::STY, i_sty}, {opc::TAX, i_tax}, {opc::TAY, i_tay}, {opc::TSX, i_tsx},
+        {opc::TXA, i_txa}, {opc::TXS, i_txs}, {opc::TYA, i_tya}
     };
     
     at_code m_code[] = {
@@ -151,7 +150,6 @@ namespace interp {
         }
     }
     
-    
     Code::Code() {
         memset(mem, 0, sizeof(mem));
     }
@@ -163,5 +161,11 @@ namespace interp {
         std::cout << "}\n";
     }
     
+    uint8_t Code::peek(uint16_t address) {
+        return mem[address];
+    }
     
+    void Code::poke(uint16_t address, uint8_t value) {
+        mem[address] = value;
+    }
 }

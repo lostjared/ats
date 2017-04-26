@@ -13,10 +13,8 @@
 #include<readline/history.h>
 
 int main() {
-    
     code.symbols["version"].create("version", symbol::Value("1.0", 1.0));
     code.symbols["author"].create("author", symbol::Value("lostjared", 0));
-    
     while(1) {
         try {
             std::string input_line;
@@ -45,7 +43,7 @@ int main() {
             int token_count = v.size()-1;
             if(token_count == rt->second.args) rt->second.func(input_line, v);
             else {
-                std::cout << "Error " << first_token << " requires: " << rt->second.args << " arguments. You gave " << token_count << "\n";
+                std::cout << "Error: " << first_token << " requires: " << rt->second.args << " arguments. You gave " << token_count << "\n";
             }
         }
         catch(lex::Scanner_EOF) {
