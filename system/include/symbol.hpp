@@ -29,6 +29,8 @@ namespace symbol {
         void createArray(const std::string &n, const unsigned long arr_size);
         void create(const std::string &n, const Value &v);
         void free();
+        void setValue(const Value &v);
+        Value &getValue() const;
         std::string &get_text();
         std::string &get_text(unsigned long index);
         double &get_double();

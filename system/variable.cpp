@@ -44,6 +44,17 @@ namespace symbol {
         return false;
     }
     
+    void Variable::setValue(const Value &v) {
+        if(values != nullptr && is_array == false) {
+            values->text = v.text;
+            values->value = v.value;
+        }
+    }
+    
+    Value &Variable::getValue() const {
+        return *values;
+    }
+    
     void Variable::createArray(const std::string &n, const unsigned long arr_size) {
         free();
         array_size = arr_size;
