@@ -23,7 +23,7 @@ namespace lex {
     
     enum Symbol_type { SYM_EEQUAL, SYM_NOTEQUAL, SYM_STREAM_LEFT, SYM_STREAM_RIGHT, SYM_PLUS_EQUAL, SYM_MINUS_EQUAL,SYM_MUL_EQUAL, SYM_DIV_EQUAL, SYM_AND_EUAL, SYM_OR_EQUAL, SYM_XOR_EQUAL,SYM_SEMICOLON, SYM_COLON, SYM_DOT, SYM_MINUS, SYM_POPEN, SYM_PCLOSE, SYM_BOPEN, SYM_BCLOSE, SYM_COPEN, SYM_CCLOSE, SYM_EXCLAMATION, SYM_AT, SYM_POUND, SYM_DOLLAR, SYM_MOD, SYM_XOR, SYM_AND, SYM_MUL, SYM_EQUAL, SYM_PLUS, SYM_TIDLE, SYM_QUOTE, SYM_ANGLE, SYM_CLASS_POINTER, SYM_NULL };
     
-    enum Token_type { TOKEN_NOTHING=0, TOKEN_CHAR, TOKEN_WHITESPACE, TOKEN_STRING, TOKEN_SINGLE,TOKEN_DIGIT, TOKEN_OPERATOR, TOKEN_IDENTIFIER, TOKEN_PRINT, TOKEN_HEX, TOKEN_EOF };
+    enum Token_type { TOKEN_NOTHING=0, TOKEN_CHAR, TOKEN_WHITESPACE, TOKEN_STRING, TOKEN_SINGLE,TOKEN_DIGIT, TOKEN_OPERATOR, TOKEN_IDENTIFIER, TOKEN_PRINT, TOKEN_HEX, TOKEN_MINUS, TOKEN_EOF };
     
     class Scanner_EOF {};
     
@@ -101,8 +101,9 @@ namespace lex {
         friend std::ostream &operator<<(std::ostream &, const Token &);
         
         unsigned int line, offset;
-    private:
         std::string text;
+    private:
+        
         Token_type type;
         int keyword_type;
         int symbol_type;
@@ -131,6 +132,7 @@ namespace lex {
             for(i = '0'; i <= '9'; ++i)
                 token_map[i] = TOKEN_DIGIT;
             
+            setToken('-', TOKEN_MINUS);
             setToken('$', TOKEN_HEX);
             setToken('\'', TOKEN_SINGLE);
             setToken('"', TOKEN_STRING);
@@ -239,16 +241,31 @@ namespace lex {
             c = getChar();
             if(c == 0) return Token("", TOKEN_EOF);
             Token_type type = characterToType(c);
+            
             switch(type) {
                 case TOKEN_WHITESPACE: {
                     unsigned char cc = c;
-                    
                     while(cc == ' ' || cc =='\r' || cc == '\t') {
                         cc = getChar();
                     }
                     
                     putBack(cc);
                     return GetToken();
+                }
+                    break;
+                case TOKEN_MINUS: {
+                    char ch = getChar();
+                    if(characterToType(ch) == TOKEN_DIGIT) {
+                        GetDigitToken(tok);
+                        tok.text="-"+tok.text;
+                    } else {
+                        if(ch == '-') {
+                            tok.setToken("--", TOKEN_OPERATOR, line, offset);
+                        } else {
+                            tok.setToken("-", TOKEN_OPERATOR, line, offset);
+                            putBack(ch);
+                        }
+                    }
                 }
                     break;
                 case TOKEN_HEX:
@@ -311,6 +328,7 @@ namespace lex {
             unsigned int sline = line, soffset = offset;
             signed int count = 0;
             bool trunc = false;
+
             if(characterToType(cc) == TOKEN_HEX) {
                 cc = getChar();
                 if(characterToType(cc) != TOKEN_DIGIT && !(toupper(cc) >= 'A' && toupper(cc) <= 'F')) {
@@ -360,7 +378,7 @@ namespace lex {
             }
             putBack(cc);
             token.setToken(tok, TOKEN_CHAR, soffset, sline);
-         }
+        }
         
         void GetStringToken(Token &token) {
             std::string tok;
