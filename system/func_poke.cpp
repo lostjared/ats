@@ -10,12 +10,23 @@ namespace token {
             return;
         }
         
-        if(tokens[2].getTokenType() != lex::TOKEN_HEX) {
+        std::string var_value = tokens[2].getToken();
+        uint32_t val1, val2;
+        bool var_set = false;
+        
+        if(tokens[2].getTokenType() == lex::TOKEN_CHAR) {
+            if(!code.symbols.exisits(var_value)) {
+                std::cerr << "Error: variable doesn't exisit.\n";
+                return;
+            }
+            
+            val2 = static_cast<uint32_t>(code.symbols[var_value].get_double());
+            var_set = true;
+        }
+        else if(tokens[2].getTokenType() != lex::TOKEN_HEX) {
             std::cerr << "Error: command requires hex value as second argument\n";
             return;
         }
-        
-        uint32_t val1, val2;
         
         val1 = icode::toHex(tokens[1].getToken());
         
@@ -24,7 +35,7 @@ namespace token {
             return;
         }
         
-        val2 = icode::toHex(tokens[2].getToken());
+        if(var_set == false) val2 = icode::toHex(tokens[2].getToken());
         
         if(val2 > 0xFF) {
             std::cerr << "Error: second argument must be 8 bit value\n";
