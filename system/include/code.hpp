@@ -17,6 +17,8 @@ namespace interp {
     // address modes
     enum { IMMEDIATE=1,ZEROPAGE,ZEROPAGE_X,ZEROPAGE_Y,ABSOULTE,ABSOULTE_X,ABSOULTE_Y,IMPLIED,RELATIVE,INDIRECT_I,INDEXED_I,ACCUMULATOR,INDIRECT };
     
+    extern const char *add_mode[];
+    
     class TextLine {
     public:
         TextLine();

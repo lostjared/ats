@@ -3,9 +3,12 @@
 namespace interp {
     
     std::vector<TextLine> lines;
+    
+    const char *add_mode[] = { "Non mode", "Immediate", "Zero Page", "Zero Page X", "Zero Page Y", "Absoulte", "Absoulte X", "Absoulte Y", "Implied", "Relative", "Indirect Indexed", "Indexed Indirect", "Accumulator", "Indirect", 0 };
+    
 
     using namespace icode;
-    
+
     iCodeInstruction inst[] = { {opc::ADC, i_adc }, {opc::AND, i_and}, {opc::ASL, i_asl},
         {opc::BCC, i_bcc}, {opc::BCS, i_bcs}, {opc::BEQ, i_beq}, {opc::BIT, i_bit},
         {opc::BMI, i_bmi}, {opc::BNE, i_bne}, {opc::BPL, i_bpl}, {opc::BRK, i_brk},
