@@ -50,7 +50,7 @@ int main() {
             
         }
         catch(lex::Scanner_Error &e) {
-            std::cerr << "Scanner Error has occured: " << e.error_text << "\n";
+            std::cerr << "Error: " << e.error_text << "\n";
         }
         catch(std::exception &e) {
             std::cerr << "System Exception thrown: " << e.what() << "\n";

@@ -161,7 +161,7 @@ namespace interp {
         std::cout << "}\n";
     }
     
-    uint8_t Code::peek(uint16_t address) {
+    uint8_t Code::peek(uint16_t address) const {
         return mem[address];
     }
     

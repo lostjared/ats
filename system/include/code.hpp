@@ -35,7 +35,7 @@ namespace interp {
         Code();
         void clear();
         void print();
-        uint8_t peek(uint16_t address);
+        uint8_t peek(uint16_t address) const;
         void poke(uint16_t address, uint8_t value);
 
         symbol::Symbol symbols;

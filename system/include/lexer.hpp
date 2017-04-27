@@ -313,6 +313,12 @@ namespace lex {
             bool trunc = false;
             if(characterToType(cc) == TOKEN_HEX) {
                 cc = getChar();
+                if(characterToType(cc) != TOKEN_DIGIT && !(toupper(cc) >= 'A' && toupper(cc) <= 'F')) {
+                    tok = "$";
+                    token.setToken(tok, TOKEN_OPERATOR, soffset, sline);
+                    putBack(cc);
+                    return;
+                }
                 while((characterToType(cc) == TOKEN_DIGIT || (toupper(cc) >= 'A' && toupper(cc) <= 'Z'))) {
                     if(characterToType(cc) != TOKEN_DIGIT && !(toupper(cc) >= 'A' && toupper(cc) <= 'F')) {
                         std::string ch;
