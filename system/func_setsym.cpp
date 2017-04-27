@@ -33,12 +33,12 @@ namespace token {
                 code.symbols[var_name].setValue(symbol::Value(var_value, icode::toHex(var_value)));
                 break;
             case lex::TOKEN_DIGIT:
-                code.symbols[var_name].setValue(symbol::Value(var_value, atoi(tokens[2].getToken().c_str())));
+                code.symbols[var_name].setValue(symbol::Value(var_value, atof(tokens[2].getToken().c_str())));
                 break;
             case lex::TOKEN_OPERATOR:
                 if(tokens.size()==4 && var_value == "-" && tokens[3].getTokenType() == lex::TOKEN_DIGIT) {
                     std::string tok_value = "-"+tokens[3].getToken();
-                    code.symbols[var_name].setValue(symbol::Value(tok_value, atoi(tok_value.c_str())));
+                    code.symbols[var_name].setValue(symbol::Value(tok_value, atof(tok_value.c_str())));
                     return;
                 }
             default:
