@@ -41,7 +41,7 @@ int main() {
             }
             
             int token_count = v.size()-1;
-            if(token_count == rt->second.args) rt->second.func(input_line, v);
+            if(token_count == rt->second.args || rt->second.args == -1) rt->second.func(input_line, v);
             else {
                 std::cout << "Error: " << first_token << " requires: " << rt->second.args << " arguments. You gave " << token_count << "\n";
             }

@@ -40,6 +40,8 @@ namespace token {
     void token_Peek(const std::string &command, std::vector<lex::Token> &tokens);
     void token_Poke(const std::string &command, std::vector<lex::Token> &tokens);
     void token_SetSym(const std::string &command, std::vector<lex::Token> &tokens);
+    void token_Tokenize(const std::string &command, std::vector<lex::Token> &tokens);
+    
 }
 
 #endif
