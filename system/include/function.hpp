@@ -11,11 +11,17 @@ extern interp::Code code;
 typedef void (*tokenFunc)(const std::string &command, std::vector<lex::Token> &tokens);
 struct Command {
     int args;
+    bool greater;
     tokenFunc func;
-    Command() = default;
     Command(tokenFunc ifunc, int iargs) {
         args = iargs;
         func = ifunc;
+        greater = false;
+    }
+    Command(tokenFunc ifunc, int iargs, bool g) {
+        args = iargs;
+        func = ifunc;
+        greater = g;
     }
 };
 extern std::unordered_map<std::string, Command> function_map;

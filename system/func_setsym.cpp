@@ -12,6 +12,12 @@ namespace token {
         }
         std::string var_value = tokens[2].getToken();
         
+        if(!(tokens[2].getTokenType() == lex::TOKEN_OPERATOR && var_value == "-") && tokens.size()>=4) {
+            std::cerr << "Error: Requires two arguments: var value..\n";
+            return;
+        }
+        
+        
         switch(tokens[2].getTokenType()) {
             case lex::TOKEN_CHAR:
                 if(!code.symbols.exisits(tokens[2].getToken())) {
@@ -30,6 +36,11 @@ namespace token {
                 code.symbols[var_name].setValue(symbol::Value(var_value, atoi(tokens[2].getToken().c_str())));
                 break;
             case lex::TOKEN_OPERATOR:
+                if(tokens.size()==4 && var_value == "-" && tokens[3].getTokenType() == lex::TOKEN_DIGIT) {
+                    std::string tok_value = "-"+tokens[3].getToken();
+                    code.symbols[var_name].setValue(symbol::Value(tok_value, atoi(tok_value.c_str())));
+                    return;
+                }
             default:
                 std::cerr << "Error: requires variable/digit/string.\n";
                 return;
