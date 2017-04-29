@@ -14,6 +14,10 @@ namespace token {
             std::cerr << "Error: Expression is terminated with semi-colon\n";
             return;
         }
+        if(text.find("$") != std::string::npos) {
+            std::cerr << "Error: Hex value not valid in expression.\n";
+            return;
+        }
         text = text.substr(5, text.length()-5);
         std::istringstream stream(text);
         lex::Parser p(stream);
