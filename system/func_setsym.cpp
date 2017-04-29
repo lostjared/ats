@@ -16,8 +16,6 @@ namespace token {
             std::cerr << "Error: Requires two arguments: var value..\n";
             return;
         }
-        
-        
         switch(tokens[2].getTokenType()) {
             case lex::TOKEN_CHAR:
                 if(!code.symbols.exisits(tokens[2].getToken())) {

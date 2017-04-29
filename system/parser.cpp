@@ -1,0 +1,186 @@
+#include "parser.hpp"
+#include "code.hpp"
+#include "function.hpp"
+
+namespace lex {
+    std::unordered_map<std::string, lex::Func> function;
+    
+    double app_exit(double d) {
+        exit(static_cast<int>(d));
+        return 0;
+    }
+    
+    double app_clear(double d) {
+        return system("clear");
+    }
+    
+    bool Parser::eval() {
+        try {
+            while(1) {
+                Token t = input.GetToken();
+                if(t.getType() == TOKEN_EOF) {
+                    return true;
+                }
+                
+                std::cout << "Expression  Value: " << expr(false) << "\n";
+                
+                if(input.GetCurrent().getToken() == ";")
+                    continue;// eat token
+                
+            }
+        }
+        catch (Scanner_EOF) {
+            std::cout << "end of evalulation.\n";
+        }
+        catch(Scanner_Error) {
+            std::cout << " A error has occoured.\n";
+        }
+        return false;
+    }
+    
+    
+    
+    double Parser::prim(bool get) {
+        
+        if(get) input.GetToken();
+        switch(input.GetCurrent().getType()) {
+            case TOKEN_EOF:
+                throw lex::Scanner_EOF();
+                break;
+            case TOKEN_DIGIT: {
+                double v = atof(input.GetCurrent().getToken().c_str());
+                input.GetToken();
+                return v;
+            }
+                break;
+            case TOKEN_CHAR: {
+                std::string var_name = input.GetCurrent().getToken();
+                input.GetToken();
+                if(input.GetCurrent().getToken() == "(") {
+                    
+                    if (function.find(var_name) != function.end()) {
+                        double d = expr(true);
+                        if(input.GetCurrent().getToken() != ")") {
+                            err("missing closing ).");
+                            
+                        }
+                        input.GetToken();
+                        if(function[var_name].func != 0)
+                            return function[var_name].func(d);
+                        
+                        err("Error function not found.\n");
+                    } else err("Unknown function");
+                }
+                
+                if(!code.symbols.exisits(var_name)) {
+                    code.symbols[var_name].create(var_name, symbol::Value("", 0));
+                }
+                
+                
+                double &v = code.symbols[var_name].get_double();
+                if(input.GetCurrent().getToken() == "=")  {
+                    v = expr(true);
+                } else if(input.GetCurrent().getToken() == "+=") {
+                    v += expr(true);
+                    
+                } else if(input.GetCurrent().getToken() == "-=") {
+                    v -= expr(true);
+                } else if(input.GetCurrent().getToken() == "*=") {
+                    v *= expr(true);
+                } else if(input.GetCurrent().getToken() == "/=") {
+                    double d = expr(true);
+                    if(d == 0) err("Divide by zero");
+                    v /= d;
+                }
+                return v;
+                
+            }
+                break;
+            case TOKEN_OPERATOR: {
+                if(input.GetCurrent().getToken() == "-") {
+                    return -prim(true);
+                    
+                } else if (input.GetCurrent().getToken() == "(") {
+                    auto e = expr(true);
+                    if(input.GetCurrent().getToken() != ")") err("Expected )");
+                    input.GetToken();
+                    return e;
+                }
+            }
+                break;
+            default:
+                return 0;
+        }
+        
+        
+        if(input.GetCurrent().getToken() == ")")
+            err("No argument");
+        return 0;
+    }
+
+    double Parser::term(bool get) {
+        double left = prim(get);
+        while(1) {
+            std::string temp=input.GetCurrent().getToken();
+            Token_type tok_type = input.GetCurrent().getType();
+            if(tok_type == TOKEN_CHAR || tok_type == TOKEN_DIGIT) {
+                err("Invalid type expected operator");
+            }
+            switch(tok_type) {
+                case TOKEN_OPERATOR: {
+                    switch(temp[0]) {
+                        case '*':
+                            left *= prim(true);
+                            break;
+                        case '/':
+                            if(auto d = prim(true)) {
+                                left /= d;
+                                break;
+                            }
+                            err("Divide by Zero");
+                            break;
+                        default:
+                            return left;
+                    }
+                    break;
+                default:
+                    break;
+                    
+                }
+            }
+        }
+        return 0;
+    }
+    
+    double Parser::expr(bool get) {
+        double left = term(get);
+        while(1) {
+            switch(input.GetCurrent().getType()) {
+                case TOKEN_EOF:
+                    throw lex::Scanner_EOF();
+                    break;
+                case TOKEN_OPERATOR:
+                {
+                    std::string temp=input.GetCurrent().getToken();
+                    
+                    if(temp == "++") err("No ++ right now\n");
+                    if(temp == "--") err("No -- right now\n");
+                    
+                    switch(temp[0]) {
+                        case '+':
+                            left += term(true);
+                            break;
+                        case '-':
+                            left -= term(true);
+                            break;
+                        default:
+                            return left;
+                    }
+                }
+                    break;
+                default:
+                    return 0;
+            }
+        }
+    }
+}

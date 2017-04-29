@@ -28,4 +28,5 @@ namespace lex {
                 out << "[" << t.getToken() << "] of type: [ keyword #: " << t.getKeywordType() << "] Line: " << t.line << ":" << t.offset;;
         return out;
     }
+    
 }
