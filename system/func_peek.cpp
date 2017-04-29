@@ -15,6 +15,6 @@ namespace token {
             return;
         }
         
-        std::cout << "[" << std::hex << std::uppercase << val << "] = " << std::hex << std::uppercase << static_cast<int>(code.peek(val)) << "\n";
+        std::cout << "[ $" << std::hex << std::uppercase << val << " ] = $" << std::hex << std::uppercase << static_cast<int>(code.peek(val)) << "\n";
     }
 }
