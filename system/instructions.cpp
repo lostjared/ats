@@ -120,7 +120,18 @@ namespace interp {
     }
     
     void i_lda(Code &c) {
-        
+        // todo check X,Y to see if offset by register
+        int in = c.proc.getIp();
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_MEMORY:
+                c.proc.reg_a = c.mem[c.instruct[in].op1.op];
+                break;
+            case icode::op_type::OP_DECIMAL:
+                c.proc.reg_a = c.instruct[in].op1.op;
+                break;
+            default:
+                break;
+        }
     }
     
     void i_ldm(Code &c) {
@@ -195,15 +206,36 @@ namespace interp {
     }
     
     void i_sta(Code &c) {
-        
+        int in = c.proc.getIp();
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_MEMORY:
+                c.mem[c.instruct[in].op1.op] = c.proc.reg_a;
+                break;
+            default:
+                break;
+        }
     }
     
     void i_stx(Code &c) {
-        
+        int in = c.proc.getIp();
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_MEMORY:
+                c.mem[c.instruct[in].op1.op] = c.proc.reg_x;
+                break;
+            default:
+                break;
+        }
     }
     
     void i_sty(Code &c) {
-        
+        int in = c.proc.getIp();
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_MEMORY:
+                c.mem[c.instruct[in].op1.op] = c.proc.reg_y;
+                break;
+            default:
+                break;
+        }
     }
     
     void i_tax(Code &c) {
