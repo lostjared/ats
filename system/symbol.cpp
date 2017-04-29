@@ -3,13 +3,14 @@
 namespace symbol {
     
     Symbol::Symbol() {
-        
+        var["hex"].create("hex", symbol::Value("0", 0));
     }
     
     Symbol::Symbol(const Symbol &s) : var(s.var) {
         
     }
     Symbol::Symbol(const Symbol &&s) : var(std::move(s.var)) {
+        
         
     }
     Symbol &Symbol::operator=(const Symbol &s) {

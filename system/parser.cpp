@@ -24,7 +24,14 @@ namespace lex {
                 if(t.getType() == TOKEN_EOF) {
                     return true;
                 }
-                std::cout << "expr: " << expr(false) << "\n";
+                
+                bool ohex = code.symbols["hex"].get_double()==1;
+                
+                if(ohex == false)
+                    std::cout << "expr: " << expr(false) << "\n";
+                else
+                    std::cout << "expr: $" << std::uppercase << std::hex << static_cast<int>(expr(false)) << "\n";
+                
                 if(input.GetCurrent().getToken() == ";")
                     continue;// eat token
             }
