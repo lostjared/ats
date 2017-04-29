@@ -6,9 +6,15 @@
 namespace lex {
     
     typedef double (*call_function)(double d);
-    struct Func {
+    class Func {
+    public:
         std::string name;
         call_function func;
+        Func() = default;
+        Func(std::string n, call_function f) {
+            name = n;
+            func = f;
+        }
     };
 
     double app_exit(double d);

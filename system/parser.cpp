@@ -3,7 +3,10 @@
 #include "function.hpp"
 
 namespace lex {
-    std::unordered_map<std::string, lex::Func> function;
+    std::unordered_map<std::string, lex::Func> function = {
+        {"exit", Func("exit",app_exit) }, {"clear", Func("clear",app_clear)}
+        
+    };
     
     double app_exit(double d) {
         exit(static_cast<int>(d));
@@ -21,12 +24,9 @@ namespace lex {
                 if(t.getType() == TOKEN_EOF) {
                     return true;
                 }
-                
-                std::cout << "Expression  Value: " << expr(false) << "\n";
-                
+                std::cout << "expr: " << expr(false) << "\n";
                 if(input.GetCurrent().getToken() == ";")
                     continue;// eat token
-                
             }
         }
         catch (Scanner_EOF) {
