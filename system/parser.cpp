@@ -26,11 +26,14 @@ namespace lex {
                 }
                 
                 bool ohex = code.symbols["hex"].get_double()==1;
-                
+                double e = expr(false);
+    
                 if(ohex == false)
-                    std::cout << "expr: " << expr(false) << "\n";
+                    std::cout << "expr: " << e << "\n";
+                else if(ohex == true && e < 0)
+                    std::cout << "expr: " << e << "\n";
                 else
-                    std::cout << "expr: $" << std::uppercase << std::hex << static_cast<int>(expr(false)) << "\n";
+                    std::cout << "expr: $" << std::uppercase << std::hex << static_cast<unsigned int>(e) << "\n";
                 
                 if(input.GetCurrent().getToken() == ";")
                     continue;// eat token
