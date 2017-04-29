@@ -52,7 +52,11 @@ namespace lex {
                 input.GetToken();
                 return v;
             }
-                break;
+            case TOKEN_HEX: {
+                double v = icode::toHex(input.GetCurrent().getToken());
+                input.GetToken();
+                return v;
+            }
             case TOKEN_CHAR: {
                 std::string var_name = input.GetCurrent().getToken();
                 input.GetToken();
