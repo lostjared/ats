@@ -92,10 +92,10 @@ namespace symbol {
         bool ohex = code.symbols["hex"].get_double()==1;
         
         if(v.isArray() == false)
-            if(ohex == false || v.get_double() < 0)
+            if(ohex == false)
             	out << v.name << " = { \"" << v.get_text() << "\" : " << v.get_double() << " } ";
         	else
-                out << v.name << " = { \"" << v.get_text() << "\" : $" << std::uppercase << std::hex << static_cast<unsigned int>(v.get_double()) << " } ";
+                out << v.name << " = { \"" << v.get_text() << "\" : $" << std::uppercase << std::hex << static_cast<int>(v.get_double()) << " } ";
         else {
             for(unsigned int i = 0; i < v.arraySize(); ++i) {
                 
