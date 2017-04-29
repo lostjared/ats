@@ -89,7 +89,7 @@ namespace symbol {
     }
     
     std::ostream &operator<<(std::ostream &out, Variable &v) {
-        bool ohex = code.symbols["hex"].get_double()==1;
+        bool ohex = code.symbols["hex"].get_double()!=0;
         
         if(v.isArray() == false)
             if(ohex == false)
