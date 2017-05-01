@@ -1,6 +1,16 @@
 #include "translate.hpp"
+#include "function.hpp"
+
 
 namespace translate {
+    
+    bool confirm_mode(const icode::opc code, unsigned int mode) {
+        for(unsigned int i = 0; interp::m_code[i].p_code != icode::opc::NOTINC; ++i) {
+            if(interp::m_code[i].p_code == code && interp::m_code[i].address_mode == mode)
+                return true;
+        }
+        return false;
+    }
     
     bool build_code() {
         try {
@@ -19,7 +29,7 @@ namespace translate {
             return true;
         }
         catch(const cExcep &e) {
-            
+            std::cerr << e.err;
         }
         
         return false;
@@ -33,11 +43,9 @@ namespace translate {
         match(tokens[0], lex::TOKEN_CHAR);
         icode::opc op;
         op = icode::strtoInc(tokens[0].getToken());
-        unsigned int code_offset = 0;
         if(op == icode::opc::NOTINC) {
             inst.label = true;
             inst.label_text = tokens[0].getToken();
-            code_offset = 1;
             match(tokens[1], lex::TOKEN_CHAR);
             icode::opc op_code;
             op_code = icode::strtoInc(tokens[1].getToken());
@@ -45,6 +53,7 @@ namespace translate {
                 std::ostringstream stream;
                 stream << "Error: Line: " << line_value << "Expected instruction instead found: " << tokens[1].getToken() << "\n";
                 throw cExcep(stream.str());
+                
             } else {
                 inst.opcode = op_code;
             }
@@ -52,6 +61,40 @@ namespace translate {
             inst.opcode = op;
         }
         
+        
+        if(inst.label == true) {
+            tokens.erase(tokens.begin());
+        }
+        
+        unsigned int tok_size = tokens.size()-1;
+        
+        switch(tok_size) {
+            case 0: {
+                if(confirm_mode(inst.opcode, interp::IMPLIED)==false) {
+                    std::ostringstream stream;
+                    stream << "Error on Line: " << line_value << " instruction " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " not valid in implied address mode.\n";
+                    throw cExcep(stream.str());
+                }
+            }
+                break;
+            case 1:
+                std::cout << "1: " << tokens[1] << "\n";
+                break;
+            case 2:
+                std::cout << "2: " << tokens[2] << "\n";
+                break;
+            case 3:
+                std::cout << "3: " << tokens[3] << "\n";
+                break;
+            case 4:
+                std::cout << "4: " << tokens[4] << "\n";
+                break;
+            default:
+                std::cout << "Default: " << tok_size << "\n";
+                break;
+        }
+        
+        code.instruct.push_back(inst);
         return true;
     }
     

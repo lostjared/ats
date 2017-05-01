@@ -139,7 +139,7 @@ namespace interp {
         { 0x9A, IMPLIED, opc::TXS},
         // TYA
         { 0x98, IMPLIED, opc::TYA},
-        0
+        { 0x0, 0x0, opc::NOTINC }
     };
     
     void testcodes() {
@@ -167,6 +167,17 @@ namespace interp {
     
     void Code::pause() {
         
+    }
+    
+    void Code::reset() {
+        if(!instruct.empty())
+            instruct.erase(instruct.begin(), instruct.end());
+        
+        memset(mem, 0, sizeof(mem));
+        proc.clrFlags();
+        
+        /*if(!stack.empty())
+            stack.erase(stack.begin(), stack.end()); */
     }
 
     void Code::print() {

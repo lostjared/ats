@@ -40,6 +40,7 @@ namespace interp {
         void pause();
         void clear();
         void print();
+        void reset();
         uint8_t peek(uint16_t address) const;
         void poke(uint16_t address, uint8_t value);
 

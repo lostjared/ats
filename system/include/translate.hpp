@@ -17,7 +17,7 @@ namespace translate {
     void tokenize_line(const std::string &text, std::vector<lex::Token> &tokens);
     void match(const lex::Token &token, const lex::Token_type &type);
     void match(const lex::Token &token, const std::string &text);
-    
+    bool confirm_mode(const icode::opc code, unsigned int mode);
 }
 
 #endif
