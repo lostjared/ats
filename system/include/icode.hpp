@@ -30,22 +30,19 @@ namespace icode {
         Operand &operator=(const Operand &o);
     };
     
-    
-    typedef unsigned int address_mode;
-    
     class Instruction {
     public:
         unsigned int line_num;
         opc opcode;
         Operand op1, op2;
-        address_mode mode;
+        unsigned int mode;
         bool label;
         std::string label_text;
         Instruction();
-        Instruction(unsigned int iline, const opc &op_code, address_mode m, const Operand &i_op1, const Operand &i_op2);
+        Instruction(unsigned int iline, const opc &op_code, unsigned int m, const Operand &i_op1, const Operand &i_op2);
         Instruction(const Instruction &i);
         Instruction &operator=(const Instruction &i);
-        void set(unsigned int iline, const opc &c, address_mode m, const Operand &o1, const Operand &o2);
+        void set(unsigned int iline, const opc &c, unsigned int m, const Operand &o1, const Operand &o2);
         
     };
     

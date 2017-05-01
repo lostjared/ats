@@ -64,7 +64,7 @@ namespace interp {
     struct iCodeInstruction {
         icode::opc opcode;
         call call_back;
-        icode::address_mode mode;
+        unsigned int mode;
     };
     
     void i_adc(Code &c);

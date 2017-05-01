@@ -75,6 +75,7 @@ namespace translate {
                     stream << "Error on Line: " << line_value << " instruction " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " not valid in implied address mode.\n";
                     throw cExcep(stream.str());
                 }
+                inst.mode = interp::IMPLIED;
             }
                 break;
             case 1:

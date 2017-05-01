@@ -30,7 +30,7 @@ namespace icode {
         
     }
     
-    Instruction::Instruction(unsigned int iline, const opc &op_code, address_mode m, const Operand &i_op1, const Operand &i_op2) : line_num(iline), opcode(op_code), mode(m), op1(i_op1), op2(i_op2) {}
+    Instruction::Instruction(unsigned int iline, const opc &op_code, unsigned int m, const Operand &i_op1, const Operand &i_op2) : line_num(iline), opcode(op_code), mode(m), op1(i_op1), op2(i_op2) {}
     
     Instruction::Instruction(const Instruction &i) : opcode(i.opcode), op1(i.op1), op2(i.op2) {}
     
@@ -41,7 +41,7 @@ namespace icode {
         return *this;
     }
     
-    void Instruction::set(unsigned int iline, const opc &c, address_mode m, const Operand &o1, const Operand &o2) {
+    void Instruction::set(unsigned int iline, const opc &c, unsigned int m, const Operand &o1, const Operand &o2) {
         opcode = c;
         op1 = o1;
         op2 = o2;
