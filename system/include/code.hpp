@@ -35,6 +35,9 @@ namespace interp {
     class Code {
     public:
         Code();
+        void start();
+        void stop();
+        void pause();
         void clear();
         void print();
         uint8_t peek(uint16_t address) const;

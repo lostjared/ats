@@ -157,12 +157,26 @@ namespace interp {
         memset(mem, 0, sizeof(mem));
     }
     
+    void Code::start() {
+        
+    }
+    
+    void Code::stop() {
+        
+    }
+    
+    void Code::pause() {
+        
+    }
+
     void Code::print() {
         std::cout << "{ ";
         proc.printRegisters();
         proc.printFlags();
         std::cout << "}\n";
     }
+    
+    
     
     uint8_t Code::peek(uint16_t address) const {
         return mem[address];

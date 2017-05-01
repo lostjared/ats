@@ -43,7 +43,7 @@ namespace interp {
     }
     
     void i_brk(Code &c) {
-        
+        c.pause();
     }
     
     void i_bvc(Code &c) {
