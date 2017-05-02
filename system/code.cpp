@@ -154,7 +154,7 @@ namespace interp {
     }
     
     Code::Code() {
-        memset(mem, 0, sizeof(mem));
+        reset_memory();
     }
     
     void Code::start() {
@@ -173,11 +173,15 @@ namespace interp {
         if(!instruct.empty())
             instruct.erase(instruct.begin(), instruct.end());
         
-        memset(mem, 0, sizeof(mem));
+        //memset(mem, 0, sizeof(mem));
         proc.clrFlags();
         
         /*if(!stack.empty())
             stack.erase(stack.begin(), stack.end()); */
+    }
+    
+    void Code::reset_memory() {
+        memset(mem, 0, sizeof(mem));
     }
 
     void Code::print() {

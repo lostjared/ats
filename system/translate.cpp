@@ -78,6 +78,7 @@ namespace translate {
                 inst.mode = interp::IMPLIED;
             }
                 break;
+            //todo fill in each case:
             case 1:
                 std::cout << "1: " << tokens[1] << "\n";
                 break;
