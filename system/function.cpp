@@ -23,7 +23,8 @@ std::unordered_map<std::string, Command> function_map = {
     { "poke", Command(token::token_Poke, 2) },
     { "setsym", Command(token::token_SetSym, 2, true) },
     { "tokenize", Command(token::token_Tokenize, -1) },
-    { "expr", Command(token::token_Expression, -1) }
+    { "expr", Command(token::token_Expression, -1) },
+    { "build", Command(token::token_Build, 0) }
 };
 
 namespace token {

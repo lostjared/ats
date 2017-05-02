@@ -48,7 +48,7 @@ namespace token {
     void token_SetSym(const std::string &command, std::vector<lex::Token> &tokens);
     void token_Tokenize(const std::string &command, std::vector<lex::Token> &tokens);
     void token_Expression(const std::string &command, std::vector<lex::Token> &tokens);
-    
+    void token_Build(const std::string &cmd, std::vector<lex::Token> &tokens);
 }
 
 #endif
