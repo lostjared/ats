@@ -18,12 +18,13 @@ namespace icode {
     uint32_t toHex(const std::string &text);
     std::ostream &operator<<(std::ostream &out, opc c);
     
-    enum class op_type { NULL_TYPE=0, OP_MEMORY, OP_DECIMAL, OP_REGISTER };
+    enum class op_type { NULL_TYPE=0, OP_MEMORY, OP_DECIMAL, OP_REGISTER, OP_LABEL, OP_LABELTEXT };
     
     class Operand {
     public:
         uint32_t op;
         op_type  op_t;
+        std::string label_text;
         Operand();
         Operand(const uint32_t &operand, const op_type &operand_type);
         Operand(const Operand &o);

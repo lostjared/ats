@@ -82,9 +82,14 @@ namespace translate {
             case 1:
                 switch(tokens[1].getTokenType()) {
                     case lex::TOKEN_DIGIT: {
-                        std::ostringstream stream;
-                        stream << "Error on Line: " << line_value << " constant decimal values must use the # operator.\n";
-                        throw cExcep(stream.str());
+                        if(confirm_mode(inst.opcode, interp::RELATIVE) == false) {
+                            std::ostringstream stream;
+                            stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " not supported in relative addressing mode.\n";
+                            throw cExcep(stream.str());
+                        } else {
+                            unsigned int label_value = atoi(tokens[1].getToken().c_str());
+                            inst.op1 = icode::Operand(label_value, icode::op_type::OP_LABEL);
+                        }
                     }
                         break;
                     case lex::TOKEN_HEX: {
@@ -107,6 +112,10 @@ namespace translate {
                             std::ostringstream stream;
                             stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " does not support relative addressing mode.\n";
                         }
+                        
+                        inst.op1 = icode::Operand(0, icode::op_type::OP_LABELTEXT);
+                        inst.op1.label_text = tokens[1].getToken();
+                        
                         break;
                     default:
                         break;
