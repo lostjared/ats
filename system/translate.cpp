@@ -80,10 +80,83 @@ namespace translate {
                 break;
             //todo fill in each case:
             case 1:
-                std::cout << "1: " << tokens[1] << "\n";
+                switch(tokens[1].getTokenType()) {
+                    case lex::TOKEN_DIGIT: {
+                        std::ostringstream stream;
+                        stream << "Error on Line: " << line_value << " constant decimal values must use the # operator.\n";
+                        throw cExcep(stream.str());
+                    }
+                        break;
+                    case lex::TOKEN_HEX: {
+                        if(confirm_mode(inst.opcode, interp::ABSOULTE) == false) {
+                            
+                            std::ostringstream stream;
+                            stream << "Error on Line: " << line_value << " " << inst.opcode << " not supported in absoulte addressing mode.\n";
+                            throw cExcep(stream.str());
+                        }
+                        
+                        unsigned int hex_address = icode::toHex(tokens[1].getToken());
+                        
+                        inst.op1 = icode::Operand(hex_address, icode::op_type::OP_MEMORY);
+                        
+                    }
+                        break;
+                    case lex::TOKEN_CHAR:
+                        // check if label exisits
+                        if(confirm_mode(inst.opcode, interp::RELATIVE) == false) {
+                            std::ostringstream stream;
+                            stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " does not support relative addressing mode.\n";
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                
                 break;
             case 2:
-                std::cout << "2: " << tokens[2] << "\n";
+                
+                switch(tokens[1].getTokenType()) {
+                    case lex::TOKEN_OPERATOR: {
+                        if(tokens[1].getToken() == "#") {
+                         
+                            unsigned int numeric_value = 0;
+                            
+                            if(tokens[2].getTokenType() == lex::TOKEN_DIGIT) {
+                                numeric_value = atoi(tokens[2].getToken().c_str());
+                                
+                            } else if(tokens[2].getTokenType() == lex::TOKEN_HEX) {
+                                numeric_value = icode::toHex(tokens[2].getToken());
+                            } else {
+                                std::ostringstream stream;
+                                stream << "Error on Line: " << line_value << " Deicmal or Hex value expected..\n";
+                                throw cExcep(stream.str());
+                            }
+                            
+                            if(confirm_mode(inst.opcode, interp::IMMEDIATE) == false) {
+                                std::ostringstream stream;
+                                stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " not supported in immediate addressing mode.\n";
+                                throw cExcep(stream.str());
+                            }
+                            
+                            if(numeric_value > 255) {
+                                std::ostringstream stream;
+                                stream << "Error on Line: " << line_value << " operand is a single byte (no greater than 255).\n";
+                                throw cExcep(stream.str());
+                            }
+                            
+                            inst.op1 = icode::Operand(numeric_value, icode::op_type::OP_DECIMAL);
+                            
+                            
+                        } else {
+                            std::ostringstream stream;
+                            stream << "Error on Line: " << line_value << " Expected # operator..\n";
+                            throw cExcep(stream.str());
+                        }
+                    }
+                        break;
+                    default:
+                        break;
+                }
                 break;
             case 3:
                 std::cout << "3: " << tokens[3] << "\n";
