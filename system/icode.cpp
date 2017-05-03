@@ -59,6 +59,33 @@ namespace icode {
         line_num = iline;
     }
     
+    std::string instructionToHex(Instruction &i) {
+        if(i.mode <= 0 ||i.mode > interp::INDIRECT) {
+            return "invalid address mode";
+        }
+        std::ostringstream stream;
+        stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<unsigned int>(i.op_byte);
+        switch(i.op1.op_t) {
+            case icode::op_type::OP_MEMORY:
+                stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op;
+                break;
+            case icode::op_type::OP_DECIMAL:
+                stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op;
+                break;
+            case icode::op_type::OP_REGISTER:
+                break;
+            case icode::op_type::OP_LABEL:
+                stream << std::setfill('0') << std::setw(2) << i.op1.op;
+                break;
+            case icode::op_type::OP_LABELTEXT:
+                //out << "Branch Label: " << i.op1.label_text << " "; // calculate label
+                break;
+            default:
+                break;
+        }
+        return stream.str();
+    }
+    
     std::ostream &operator<<(std::ostream &out, Instruction &i) {
         
         std::ostringstream stream;

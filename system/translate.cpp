@@ -21,20 +21,17 @@ namespace translate {
                 std::cerr << "Error: No code to build...\n";
                 return false;
             }
-            
             for(unsigned int i = 0; i < interp::lines.size(); ++i) {
                 if(build_line(i)==false) {
                     std::cout << "Error on line: " << interp::lines[i].index << "\n";
                     return false;
                 }
             }
-            
             return true;
         }
         catch(const cExcep &e) {
             std::cerr << e.err;
         }
-        
         return false;
     }
     
@@ -168,8 +165,46 @@ namespace translate {
                         break;
                 }
                 break;
-            case 3:
-                std::cout << "3: " << tokens[3] << "\n";
+            case 3: {
+                std::string reg = icode::lcase(tokens[3].getToken());
+                switch(tokens[1].getTokenType()) {
+                    case lex::TOKEN_HEX: {
+                        
+                        match(tokens[2], lex::TOKEN_OPERATOR);
+                        match(tokens[2], ",");
+                        
+                        if(tokens[2].getToken() == "," && reg == "x") {
+                            if(confirm_mode(inst.opcode, interp::ABSOULTE_X, inst.op_byte)==false) {
+                                std::ostringstream stream;
+                                stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " has X register but not supported in absoulte x address mode.\n";
+                                throw cExcep(stream.str());
+                                
+                            }
+                            inst.mode = interp::ABSOULTE_X;
+                        }
+                        if(tokens[2].getToken() == "," && reg == "y") {
+                            if(confirm_mode(inst.opcode, interp::ABSOULTE_Y,inst.op_byte)==false) {
+                                std::ostringstream stream;
+                                stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " has Y register but not supported in absoulte y address mode.\n";
+                                throw cExcep(stream.str());
+                            }
+                            inst.mode = interp::ABSOULTE_Y;
+                        }
+                        unsigned int hex_value = icode::toHex(tokens[1].getToken());
+                        inst.op1 = icode::Operand(hex_value, icode::op_type::OP_MEMORY);
+                    }
+                        break;
+                    default: {
+                        
+                        std::ostringstream stream;
+                        stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " requires address value.\n";
+                        throw cExcep(stream.str());
+                        
+                    }
+                        break;
+                }
+                
+            }
                 break;
             case 4:
                 std::cout << "4: " << tokens[4] << "\n";

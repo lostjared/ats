@@ -25,7 +25,8 @@ std::unordered_map<std::string, Command> function_map = {
     { "tokenize", Command(token::token_Tokenize, -1) },
     { "expr", Command(token::token_Expression, -1) },
     { "build", Command(token::token_Build, 0) },
-    { "print", Command(token::token_Print, 0) }
+    { "print", Command(token::token_Print, 0) },
+    { "code", Command(token::token_Code, 0) }
 };
 
 namespace token {

@@ -50,6 +50,7 @@ namespace token {
     void token_Expression(const std::string &command, std::vector<lex::Token> &tokens);
     void token_Build(const std::string &cmd, std::vector<lex::Token> &tokens);
     void token_Print(const std::string &cmd, std::vector<lex::Token> &tokens);
+    void token_Code(const std::string &cmd, std::vector<lex::Token> &tokens);
 }
 
 #endif
