@@ -64,22 +64,22 @@ namespace icode {
             out << "address mode unknown value: " << i.mode << "..\n";
             return out;
         }
-        out << "Line: " << std::dec << i.line_num << " Address Mode: " << interp::add_mode[i.mode] << "  Opcode: " << std::hex << std::uppercase << static_cast<unsigned int>(i.op_byte) << " ";
+        out << "Line: " << std::dec << i.line_num << " Address Mode: " << interp::add_mode[i.mode] << "  Opcode: " << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<unsigned int>(i.op_byte) << " ";
         switch(i.op1.op_t) {
             case icode::op_type::OP_MEMORY:
-                out << "Operand 1 [Memory Address]: " << std::hex << std::uppercase << i.op1.op << " ";
+                out << "Operand 1 [Memory Address]: " << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op << " ";
                 break;
             case icode::op_type::OP_DECIMAL:
-                out << "Operand 1 [Byte Constant]: " << std::hex << std::uppercase << i.op1.op << " ";
+                out << "Operand 1 [Byte Constant]: " << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op << " ";
                 break;
             case icode::op_type::OP_REGISTER:
                 out << "Operand 1 [Register]: "; // register here
                 break;
             case icode::op_type::OP_LABEL:
-                out << "Branch value: " << i.op1.op << " ";
+                out << "Branch value: " << std::setfill('0') << std::setw(2) << i.op1.op << " ";
                 break;
             case icode::op_type::OP_LABELTEXT:
-                out << "Branch Label: " << i.op1.op << " ";
+                out << "Branch Label: " << i.op1.label_text << " ";
                 break;
             default:
                 break;

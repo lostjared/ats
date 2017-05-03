@@ -1,6 +1,7 @@
 #ifndef __CODE_HPP__
 #define __CODE_HPP__
 #include<iostream>
+#include<iomanip>
 #include<string>
 #include<cstdlib>
 #include<cstring>
