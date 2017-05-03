@@ -12,7 +12,7 @@ namespace token {
         int in = atoi(index.c_str());
         for(unsigned int i = 0; i < interp::lines.size(); ++i) {
             if(interp::lines[i].index == in) {
-                std::cout << interp::lines[i].index << " " << interp::lines[i].text << "\n";
+                std::cout << std::dec << interp::lines[i].index << " " << interp::lines[i].text << "\n";
                 found = true;
                 break;
             }

@@ -95,6 +95,7 @@ namespace icode {
         // output operand 2
         std::cout << "\nHex for Machine code: " << stream.str() << "\n";
         
+        
         return out;
     }
     

@@ -15,6 +15,8 @@
 int main() {
     code.symbols["version"].create("version", symbol::Value("1.0", 1.0));
     code.symbols["author"].create("author", symbol::Value("lostjared", 0));
+    std::ios state(0);
+    state.copyfmt(std::cout);
     while(1) {
         try {
             std::string input_line;
@@ -43,8 +45,11 @@ int main() {
             int token_count = v.size()-1;
             if((rt->second.greater == false && token_count == rt->second.args) || (rt->second.args == -1) || (rt->second.greater == true && token_count >= rt->second.args)) rt->second.func(input_line, v);
             else {
+                std::cout.copyfmt(state);
                 std::cout << "Error: " << first_token << " requires: " << rt->second.args << " arguments. You gave " << token_count << "\n";
+                continue;
             }
+            std::cout.copyfmt(state);
         }
         catch(lex::Scanner_EOF) {
             
