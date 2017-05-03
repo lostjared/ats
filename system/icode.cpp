@@ -60,6 +60,11 @@ namespace icode {
     }
     
     std::ostream &operator<<(std::ostream &out, Instruction &i) {
+        
+        std::ostringstream stream;
+        stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<unsigned int>(i.op_byte);
+        
+        
         if(i.mode <= 0 ||i.mode > interp::INDIRECT) {
             out << "address mode unknown value: " << i.mode << "..\n";
             return out;
@@ -68,15 +73,18 @@ namespace icode {
         switch(i.op1.op_t) {
             case icode::op_type::OP_MEMORY:
                 out << "Operand 1 [Memory Address]: " << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op << " ";
+                stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op;
                 break;
             case icode::op_type::OP_DECIMAL:
                 out << "Operand 1 [Byte Constant]: " << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op << " ";
+                stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op;
                 break;
             case icode::op_type::OP_REGISTER:
                 out << "Operand 1 [Register]: "; // register here
                 break;
             case icode::op_type::OP_LABEL:
                 out << "Branch value: " << std::setfill('0') << std::setw(2) << i.op1.op << " ";
+                stream << std::setfill('0') << std::setw(2) << i.op1.op;
                 break;
             case icode::op_type::OP_LABELTEXT:
                 out << "Branch Label: " << i.op1.label_text << " ";
@@ -85,6 +93,7 @@ namespace icode {
                 break;
         }
         // output operand 2
+        std::cout << "\nHex for Machine code: " << stream.str() << "\n";
         
         return out;
     }
