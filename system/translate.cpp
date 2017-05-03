@@ -4,11 +4,14 @@
 
 namespace translate {
     
-    bool confirm_mode(const icode::opc code, unsigned int mode) {
+    bool confirm_mode(const icode::opc code, unsigned int mode, unsigned char &op_byte) {
         for(unsigned int i = 0; interp::m_code[i].p_code != icode::opc::NOTINC; ++i) {
-            if(interp::m_code[i].p_code == code && interp::m_code[i].address_mode == mode)
+            if(interp::m_code[i].p_code == code && interp::m_code[i].address_mode == mode) {
+                op_byte = interp::m_code[i].op_code;
                 return true;
+            }
         }
+        op_byte = 0;
         return false;
     }
     
@@ -40,6 +43,7 @@ namespace translate {
         unsigned int line_value = interp::lines[line].index;
         tokenize_line(interp::lines[line].text, tokens);
         icode::Instruction inst;
+        inst.line_num = line_value;
         match(tokens[0], lex::TOKEN_CHAR);
         icode::opc op;
         op = icode::strtoInc(tokens[0].getToken());
@@ -70,7 +74,7 @@ namespace translate {
         
         switch(tok_size) {
             case 0: {
-                if(confirm_mode(inst.opcode, interp::IMPLIED)==false) {
+                if(confirm_mode(inst.opcode, interp::IMPLIED, inst.op_byte)==false) {
                     std::ostringstream stream;
                     stream << "Error on Line: " << line_value << " instruction " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " not valid in implied address mode.\n";
                     throw cExcep(stream.str());
@@ -78,44 +82,41 @@ namespace translate {
                 inst.mode = interp::IMPLIED;
             }
                 break;
-            //todo fill in each case:
             case 1:
                 switch(tokens[1].getTokenType()) {
                     case lex::TOKEN_DIGIT: {
-                        if(confirm_mode(inst.opcode, interp::RELATIVE) == false) {
+                        if(confirm_mode(inst.opcode, interp::RELATIVE, inst.op_byte) == false) {
                             std::ostringstream stream;
                             stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " not supported in relative addressing mode.\n";
                             throw cExcep(stream.str());
                         } else {
                             unsigned int label_value = atoi(tokens[1].getToken().c_str());
                             inst.op1 = icode::Operand(label_value, icode::op_type::OP_LABEL);
+                            inst.mode = interp::RELATIVE;
                         }
                     }
                         break;
                     case lex::TOKEN_HEX: {
-                        if(confirm_mode(inst.opcode, interp::ABSOULTE) == false) {
+                        if(confirm_mode(inst.opcode, interp::ABSOULTE, inst.op_byte) == false) {
                             
                             std::ostringstream stream;
                             stream << "Error on Line: " << line_value << " " << inst.opcode << " not supported in absoulte addressing mode.\n";
                             throw cExcep(stream.str());
                         }
-                        
                         unsigned int hex_address = icode::toHex(tokens[1].getToken());
-                        
                         inst.op1 = icode::Operand(hex_address, icode::op_type::OP_MEMORY);
-                        
+                        inst.mode = interp::ABSOULTE;
                     }
                         break;
                     case lex::TOKEN_CHAR:
                         // check if label exisits
-                        if(confirm_mode(inst.opcode, interp::RELATIVE) == false) {
+                        if(confirm_mode(inst.opcode, interp::RELATIVE, inst.op_byte) == false) {
                             std::ostringstream stream;
                             stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " does not support relative addressing mode.\n";
                         }
-                        
                         inst.op1 = icode::Operand(0, icode::op_type::OP_LABELTEXT);
                         inst.op1.label_text = tokens[1].getToken();
-                        
+                        inst.mode = interp::RELATIVE;
                         break;
                     default:
                         break;
@@ -141,7 +142,7 @@ namespace translate {
                                 throw cExcep(stream.str());
                             }
                             
-                            if(confirm_mode(inst.opcode, interp::IMMEDIATE) == false) {
+                            if(confirm_mode(inst.opcode, interp::IMMEDIATE, inst.op_byte) == false) {
                                 std::ostringstream stream;
                                 stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " not supported in immediate addressing mode.\n";
                                 throw cExcep(stream.str());
@@ -154,7 +155,7 @@ namespace translate {
                             }
                             
                             inst.op1 = icode::Operand(numeric_value, icode::op_type::OP_DECIMAL);
-                            
+                            inst.mode = interp::IMMEDIATE;
                             
                         } else {
                             std::ostringstream stream;

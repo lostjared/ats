@@ -1,4 +1,4 @@
-#include "icode.hpp"
+#include "code.hpp"
 #include<cctype>
 
 namespace icode {
@@ -16,11 +16,12 @@ namespace icode {
     
     Operand::Operand(const uint32_t &operand, const op_type &operand_type) : op(operand), op_t(operand_type) {}
     
-    Operand::Operand(const Operand &o) :op(o.op), op_t(o.op_t) {}
+    Operand::Operand(const Operand &o) :op(o.op), op_t(o.op_t), label_text(o.label_text) {}
     
     Operand &Operand::operator=(const Operand &o) {
         op = o.op;
         op_t = o.op_t;
+        label_text = o.label_text;
         return *this;
     }
     
@@ -32,12 +33,21 @@ namespace icode {
     
     Instruction::Instruction(unsigned int iline, const opc &op_code, unsigned int m, const Operand &i_op1, const Operand &i_op2) : line_num(iline), opcode(op_code), mode(m), op1(i_op1), op2(i_op2) {}
     
-    Instruction::Instruction(const Instruction &i) : opcode(i.opcode), op1(i.op1), op2(i.op2) {}
+    Instruction::Instruction(const Instruction &i) : op_byte(i.op_byte), line_num(i.line_num), opcode(i.opcode),
+    op1(i.op1), op2(i.op2), mode(i.mode), label(i.label), label_text(i.label_text)
+    
+    {
+    }
     
     Instruction &Instruction::operator=(const Instruction &i) {
         opcode = i.opcode;
         op1 = i.op1;
         op2 = i.op2;
+        line_num = i.line_num;
+        label_text = i.label_text;
+        op_byte = i.op_byte;
+        mode = i.mode;
+        label = i.label;
         return *this;
     }
     
@@ -48,6 +58,37 @@ namespace icode {
         mode = m;
         line_num = iline;
     }
+    
+    std::ostream &operator<<(std::ostream &out, Instruction &i) {
+        if(i.mode <= 0 ||i.mode > interp::INDIRECT) {
+            out << "address mode unknown value: " << i.mode << "..\n";
+            return out;
+        }
+        out << "Line: " << std::dec << i.line_num << " Address Mode: " << interp::add_mode[i.mode] << "  Opcode: " << std::hex << std::uppercase << static_cast<unsigned int>(i.op_byte) << " ";
+        switch(i.op1.op_t) {
+            case icode::op_type::OP_MEMORY:
+                out << "Operand 1 [Memory Address]: " << std::hex << std::uppercase << i.op1.op << " ";
+                break;
+            case icode::op_type::OP_DECIMAL:
+                out << "Operand 1 [Byte Constant]: " << std::hex << std::uppercase << i.op1.op << " ";
+                break;
+            case icode::op_type::OP_REGISTER:
+                out << "Operand 1 [Register]: "; // register here
+                break;
+            case icode::op_type::OP_LABEL:
+                out << "Branch value: " << i.op1.op << " ";
+                break;
+            case icode::op_type::OP_LABELTEXT:
+                out << "Branch Label: " << i.op1.op << " ";
+                break;
+            default:
+                break;
+        }
+        // output operand 2
+        
+        return out;
+    }
+    
     
     std::string lcase(const std::string &text) {
         std::string n;

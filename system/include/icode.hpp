@@ -33,6 +33,7 @@ namespace icode {
     
     class Instruction {
     public:
+        unsigned char op_byte;
         unsigned int line_num;
         opc opcode;
         Operand op1, op2;
@@ -46,6 +47,8 @@ namespace icode {
         void set(unsigned int iline, const opc &c, unsigned int m, const Operand &o1, const Operand &o2);
         
     };
+    
+    std::ostream &operator<<(std::ostream &out, Instruction &i);
     
     enum proc_Flags { FLAG_CARRY=0, FLAG_ZERO, FLAG_INTERRUPT, FLAG_DECIMAL, FLAG_BREAK, FLAG_EXPANSION, FLAG_OVERFLOW, FLAG_NEGATIVE };
     
