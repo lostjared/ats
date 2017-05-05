@@ -109,6 +109,7 @@ namespace icode {
                 	stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op;
                 } else {
                     out << "Operand 1 [Zero Page Memory Address]: " << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op << " ";
+                    stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op;
                 }
                 break;
             case icode::op_type::OP_DECIMAL:
