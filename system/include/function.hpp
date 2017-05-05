@@ -13,15 +13,33 @@ struct Command {
     int args;
     bool greater;
     tokenFunc func;
-    Command(tokenFunc ifunc, int iargs) {
+    std::string help_text;
+    
+    Command() {
+        args = 0;
+        func = 0;
+        greater = false;
+    }
+    
+    Command(tokenFunc ifunc, int iargs, const std::string &text) {
         args = iargs;
         func = ifunc;
         greater = false;
+        help_text = text;
     }
-    Command(tokenFunc ifunc, int iargs, bool g) {
+    Command(tokenFunc ifunc, int iargs, bool g, const std::string &text) {
         args = iargs;
         func = ifunc;
         greater = g;
+        help_text = text;
+    }
+    Command(const Command &c) : args(c.args), greater(c.greater), func(c.func), help_text(c.help_text) { }
+    Command &operator=(const Command &c) {
+        args = c.args;
+        func = c.func;
+        greater = c.greater;
+        help_text = c.help_text;
+        return *this;
     }
 };
 extern std::unordered_map<std::string, Command> function_map;
