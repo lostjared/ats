@@ -66,8 +66,13 @@ namespace icode {
         std::ostringstream stream;
         stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<unsigned int>(i.op_byte);
         switch(i.op1.op_t) {
-            case icode::op_type::OP_MEMORY:
+            case icode::op_type::OP_MEMORY: {
+                
+                if(i.mode != interp::ZEROPAGE)
                 stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op;
+                else
+                    stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op;
+            }
                 break;
             case icode::op_type::OP_DECIMAL:
                 stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op;
@@ -99,8 +104,12 @@ namespace icode {
         out << "Line: " << std::dec << i.line_num << " Address Mode: " << interp::add_mode[i.mode] << "  Opcode: " << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<unsigned int>(i.op_byte) << " ";
         switch(i.op1.op_t) {
             case icode::op_type::OP_MEMORY:
-                out << "Operand 1 [Memory Address]: " << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op << " ";
-                stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op;
+                if(i.mode != interp::ZEROPAGE) {
+                	out << "Operand 1 [Memory Address]: " << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op << " ";
+                	stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op;
+                } else {
+                    out << "Operand 1 [Zero Page Memory Address]: " << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op << " ";
+                }
                 break;
             case icode::op_type::OP_DECIMAL:
                 out << "Operand 1 [Byte Constant]: " << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op << " ";

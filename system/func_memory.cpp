@@ -25,6 +25,9 @@ namespace token {
                 std::cout << "Memory Address: [" << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i << "] = [" << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<unsigned int>(code.peek(i)) << "]\n";
             }
         }
+        else {
+            std::cerr << "Error: out of range.\n";
+        }
     }
     
 }

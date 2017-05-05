@@ -95,14 +95,19 @@ namespace translate {
                         break;
                     case lex::TOKEN_HEX: {
                         if(confirm_mode(inst.opcode, interp::ABSOULTE, inst.op_byte) == false) {
-                            
                             std::ostringstream stream;
                             stream << "Error on Line: " << line_value << " " << inst.opcode << " not supported in absoulte addressing mode.\n";
                             throw cExcep(stream.str());
                         }
                         unsigned int hex_address = icode::toHex(tokens[1].getToken());
-                        inst.op1 = icode::Operand(hex_address, icode::op_type::OP_MEMORY);
-                        inst.mode = interp::ABSOULTE;
+                        if(hex_address <= 255) {
+                            inst.op1 = icode::Operand(hex_address, icode::op_type::OP_MEMORY);
+                            inst.mode = interp::ZEROPAGE;
+                            
+                        } else {
+                        	inst.op1 = icode::Operand(hex_address, icode::op_type::OP_MEMORY);
+                        	inst.mode = interp::ABSOULTE;
+                        }
                     }
                         break;
                     case lex::TOKEN_CHAR:
@@ -170,6 +175,7 @@ namespace translate {
                 switch(tokens[1].getTokenType()) {
                     case lex::TOKEN_HEX: {
                         
+                        unsigned int hex_value = icode::toHex(tokens[1].getToken());
                         match(tokens[2], lex::TOKEN_OPERATOR);
                         match(tokens[2], ",");
                         
@@ -180,7 +186,10 @@ namespace translate {
                                 throw cExcep(stream.str());
                                 
                             }
-                            inst.mode = interp::ABSOULTE_X;
+                            if(hex_value >= 0xFF)
+                            	inst.mode = interp::ABSOULTE_X;
+                            else
+                                inst.mode = interp::ZEROPAGE_X;
                         }
                         if(tokens[2].getToken() == "," && reg == "y") {
                             if(confirm_mode(inst.opcode, interp::ABSOULTE_Y,inst.op_byte)==false) {
@@ -188,9 +197,13 @@ namespace translate {
                                 stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " has Y register but not supported in absoulte y address mode.\n";
                                 throw cExcep(stream.str());
                             }
-                            inst.mode = interp::ABSOULTE_Y;
+                            
+                            if(hex_value <= 255)
+                                inst.mode = interp::ZEROPAGE_Y;
+                            else
+                            	inst.mode = interp::ABSOULTE_Y;
+                            
                         }
-                        unsigned int hex_value = icode::toHex(tokens[1].getToken());
                         inst.op1 = icode::Operand(hex_value, icode::op_type::OP_MEMORY);
                     }
                         break;
