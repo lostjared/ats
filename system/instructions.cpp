@@ -161,10 +161,6 @@ namespace interp {
                     case interp::ZEROPAGE:
                         c.proc.reg_x = c.peek(c.instruct[in].op1.op);
                         break;
-                    /*case interp::ABSOULTE_X:
-                    case interp::ZEROPAGE_X:
-                        c.proc.reg_a = c.peek(c.instruct[in].op1.op+c.proc.reg_x);
-                        break;*/
                     case interp::ABSOULTE_Y:
                     case interp::ZEROPAGE_Y:
                         c.proc.reg_x = c.peek(c.instruct[in].op1.op+c.proc.reg_y);
@@ -195,10 +191,6 @@ namespace interp {
                     case interp::ZEROPAGE_X:
                         c.proc.reg_y = c.peek(c.instruct[in].op1.op+c.proc.reg_x);
                         break;
-                    /*case interp::ABSOULTE_Y:
-                    case interp::ZEROPAGE_Y:
-                        c.proc.reg_a = c.peek(c.instruct[in].op1.op+c.proc.reg_y);
-                        break;*/
                     default:
                         return;
                 }

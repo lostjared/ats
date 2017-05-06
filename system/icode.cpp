@@ -68,7 +68,7 @@ namespace icode {
         switch(i.op1.op_t) {
             case icode::op_type::OP_MEMORY: {
                 
-                if(i.mode != interp::ZEROPAGE)
+                if(i.mode != interp::ZEROPAGE && i.mode != interp::ZEROPAGE_X && i.mode != interp::ZEROPAGE_Y)
                 stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op;
                 else
                     stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op;
@@ -104,7 +104,7 @@ namespace icode {
         out << "Line: " << std::dec << i.line_num << " Address Mode: " << interp::add_mode[i.mode] << "  Opcode: " << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<unsigned int>(i.op_byte) << " ";
         switch(i.op1.op_t) {
             case icode::op_type::OP_MEMORY:
-                if(i.mode != interp::ZEROPAGE) {
+                if(i.mode != interp::ZEROPAGE && i.mode != interp::ZEROPAGE_X && i.mode != interp::ZEROPAGE_Y) {
                 	out << "Operand 1 [Memory Address]: " << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op << " ";
                 	stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op;
                 } else {

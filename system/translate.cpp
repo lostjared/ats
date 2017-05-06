@@ -105,8 +105,8 @@ namespace translate {
                             inst.mode = interp::ZEROPAGE;
                             
                         } else {
-                        	inst.op1 = icode::Operand(hex_address, icode::op_type::OP_MEMORY);
-                        	inst.mode = interp::ABSOULTE;
+                            inst.op1 = icode::Operand(hex_address, icode::op_type::OP_MEMORY);
+                            inst.mode = interp::ABSOULTE;
                         }
                     }
                         break;
@@ -130,7 +130,7 @@ namespace translate {
                 switch(tokens[1].getTokenType()) {
                     case lex::TOKEN_OPERATOR: {
                         if(tokens[1].getToken() == "#") {
-                         
+                            
                             unsigned int numeric_value = 0;
                             
                             if(tokens[2].getTokenType() == lex::TOKEN_DIGIT) {
@@ -180,28 +180,37 @@ namespace translate {
                         match(tokens[2], ",");
                         
                         if(tokens[2].getToken() == "," && reg == "x") {
+                            
                             if(confirm_mode(inst.opcode, interp::ABSOULTE_X, inst.op_byte)==false) {
-                                std::ostringstream stream;
-                                stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " has X register but not supported in absoulte x address mode.\n";
-                                throw cExcep(stream.str());
-                                
+                                if(confirm_mode(inst.opcode, interp::ZEROPAGE_X, inst.op_byte)) {
+                                    inst.mode = interp::ZEROPAGE_X;
+                                } else {
+                                    std::ostringstream stream;
+                                    stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " has X register but not supported in absoulte X address mode.\n";
+                                    throw cExcep(stream.str());
+                                }
                             }
-                            if(hex_value >= 0xFF)
-                            	inst.mode = interp::ABSOULTE_X;
+                            
+                            if(hex_value > 0xFF)
+                                inst.mode = interp::ABSOULTE_X;
                             else
                                 inst.mode = interp::ZEROPAGE_X;
                         }
                         if(tokens[2].getToken() == "," && reg == "y") {
                             if(confirm_mode(inst.opcode, interp::ABSOULTE_Y,inst.op_byte)==false) {
-                                std::ostringstream stream;
-                                stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " has Y register but not supported in absoulte y address mode.\n";
-                                throw cExcep(stream.str());
+                                if(confirm_mode(inst.opcode, interp::ZEROPAGE_Y, inst.op_byte)) {
+                                    inst.mode = interp::ZEROPAGE_Y;
+                                } else {
+                                    std::ostringstream stream;
+                                    stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " has Y register but not supported in absoulte y address mode.\n";
+                                    throw cExcep(stream.str());
+                                }
                             }
                             
                             if(hex_value <= 255)
                                 inst.mode = interp::ZEROPAGE_Y;
                             else
-                            	inst.mode = interp::ABSOULTE_Y;
+                                inst.mode = interp::ABSOULTE_Y;
                             
                         }
                         inst.op1 = icode::Operand(hex_value, icode::op_type::OP_MEMORY);
