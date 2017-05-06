@@ -40,6 +40,7 @@ namespace icode {
         unsigned int mode;
         bool label;
         std::string label_text;
+        std::string text;
         Instruction();
         Instruction(unsigned int iline, const opc &op_code, unsigned int m, const Operand &i_op1, const Operand &i_op2);
         Instruction(const Instruction &i);

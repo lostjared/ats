@@ -34,7 +34,7 @@ namespace icode {
     Instruction::Instruction(unsigned int iline, const opc &op_code, unsigned int m, const Operand &i_op1, const Operand &i_op2) : line_num(iline), opcode(op_code), mode(m), op1(i_op1), op2(i_op2) {}
     
     Instruction::Instruction(const Instruction &i) : op_byte(i.op_byte), line_num(i.line_num), opcode(i.opcode),
-    op1(i.op1), op2(i.op2), mode(i.mode), label(i.label), label_text(i.label_text)
+    op1(i.op1), op2(i.op2), mode(i.mode), label(i.label), label_text(i.label_text), text(i.text)
     
     {
     }
@@ -48,6 +48,7 @@ namespace icode {
         op_byte = i.op_byte;
         mode = i.mode;
         label = i.label;
+        text = i.text;
         return *this;
     }
     

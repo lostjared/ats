@@ -40,6 +40,7 @@ namespace translate {
         unsigned int line_value = interp::lines[line].index;
         tokenize_line(interp::lines[line].text, tokens);
         icode::Instruction inst;
+        inst.text = interp::lines[line].text;
         inst.line_num = line_value;
         match(tokens[0], lex::TOKEN_CHAR);
         icode::opc op;
