@@ -6,12 +6,10 @@ namespace token {
             std::cerr << "Error command requires string with filename.\n";
             return;
         }
-        
         if(code.instruct.size()==0) {
             std::cerr << "Error: Must run build command first.\n";
             return;
         }
-        
         std::string fname = tokens[1].getToken();
         std::fstream file;
         file.open(fname, std::ios::out);

@@ -127,14 +127,17 @@ namespace interp {
                     case interp::ABSOULTE:
                     case interp::ZEROPAGE:
                         c.proc.reg_a = c.peek(c.instruct[in].op1.op);
+                        if(c.proc.reg_a == 0) c.proc.setFlag(icode::FLAG_ZERO, 1);
                         break;
                     case interp::ABSOULTE_X:
                     case interp::ZEROPAGE_X:
                         c.proc.reg_a = c.peek(c.instruct[in].op1.op+c.proc.reg_x);
+                        if(c.proc.reg_a == 0) c.proc.setFlag(icode::FLAG_ZERO, 1);
                         break;
                     case interp::ABSOULTE_Y:
                     case interp::ZEROPAGE_Y:
                         c.proc.reg_a = c.peek(c.instruct[in].op1.op+c.proc.reg_y);
+                        if(c.proc.reg_a == 0) c.proc.setFlag(icode::FLAG_ZERO, 1);
                         break;
                     default:
                         return;
@@ -143,6 +146,7 @@ namespace interp {
                 break;
             case icode::op_type::OP_DECIMAL:
                 c.proc.reg_a = c.instruct[in].op1.op;
+                if(c.proc.reg_a == 0) c.proc.setFlag(icode::FLAG_ZERO, 1);
                 break;
             default:
                 break;
@@ -160,10 +164,12 @@ namespace interp {
                     case interp::ABSOULTE:
                     case interp::ZEROPAGE:
                         c.proc.reg_x = c.peek(c.instruct[in].op1.op);
+                        if(c.proc.reg_x == 0) c.proc.setFlag(icode::FLAG_ZERO, 1);
                         break;
                     case interp::ABSOULTE_Y:
                     case interp::ZEROPAGE_Y:
                         c.proc.reg_x = c.peek(c.instruct[in].op1.op+c.proc.reg_y);
+                        if(c.proc.reg_x == 0) c.proc.setFlag(icode::FLAG_ZERO, 1);
                         break;
                     default:
                         return;
@@ -172,6 +178,7 @@ namespace interp {
                 break;
             case icode::op_type::OP_DECIMAL:
                 c.proc.reg_x = c.instruct[in].op1.op;
+                if(c.proc.reg_x == 0) c.proc.setFlag(icode::FLAG_ZERO, 1);
                 break;
             default:
                 break;
@@ -186,10 +193,12 @@ namespace interp {
                     case interp::ABSOULTE:
                     case interp::ZEROPAGE:
                         c.proc.reg_y = c.peek(c.instruct[in].op1.op);
+                        if(c.proc.reg_y == 0) c.proc.setFlag(icode::FLAG_ZERO, 1);
                         break;
                     case interp::ABSOULTE_X:
                     case interp::ZEROPAGE_X:
                         c.proc.reg_y = c.peek(c.instruct[in].op1.op+c.proc.reg_x);
+                        if(c.proc.reg_y == 0) c.proc.setFlag(icode::FLAG_ZERO, 1);
                         break;
                     default:
                         return;
@@ -197,7 +206,8 @@ namespace interp {
             }
                 break;
             case icode::op_type::OP_DECIMAL:
-                c.proc.reg_a = c.instruct[in].op1.op;
+                c.proc.reg_y = c.instruct[in].op1.op;
+                if(c.proc.reg_y == 0) c.proc.setFlag(icode::FLAG_ZERO, 1);
                 break;
             default:
                 break;
