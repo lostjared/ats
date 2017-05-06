@@ -177,6 +177,7 @@ namespace interp {
             if(proc.ip >= instruct.size()) {
                 std::cout << "Program finished executing..\n";
                 run = false;
+                proc.ip = 0;
             }
         }
     }
