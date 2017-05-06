@@ -9,6 +9,7 @@
 #include<algorithm>
 #include<fstream>
 #include<sstream>
+#include<bitset>
 #include "lexer.hpp"
 #include "symbol.hpp"
 #include "icode.hpp"

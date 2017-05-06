@@ -50,6 +50,7 @@ namespace icode {
     
     std::ostream &operator<<(std::ostream &out, Instruction &i);
     std::string instructionToHex(Instruction &i);
+    std::string instructionToBinary(Instruction &i);
     
     enum proc_Flags { FLAG_CARRY=0, FLAG_ZERO, FLAG_INTERRUPT, FLAG_DECIMAL, FLAG_BREAK, FLAG_EXPANSION, FLAG_OVERFLOW, FLAG_NEGATIVE };
     

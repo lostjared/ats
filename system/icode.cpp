@@ -91,6 +91,37 @@ namespace icode {
         return stream.str();
     }
     
+    std::string instructionToBinary(Instruction &i) {
+        if(i.mode <= 0 || i.mode > interp::INDIRECT) {
+            return "invalid address mode";
+        }
+        std::ostringstream stream;
+        stream << std::bitset<8>(i.op_byte);
+        switch(i.op1.op_t) {
+            case icode::op_type::OP_MEMORY: {
+                if(i.mode != interp::ZEROPAGE && i.mode != interp::ZEROPAGE_X && i.mode != interp::ZEROPAGE_Y)
+                    stream << std::bitset<16>(static_cast<uint16_t>(i.op1.op));
+                else
+                    stream << std::bitset<8>(i.op1.op);
+            }
+                break;
+            case icode::op_type::OP_DECIMAL:
+                stream << std::bitset<8>(i.op1.op);
+                break;
+            case icode::op_type::OP_REGISTER:
+                break;
+            case icode::op_type::OP_LABEL:
+                stream << std::bitset<8>(i.op1.op);
+                break;
+            case icode::op_type::OP_LABELTEXT:
+                //out << "Branch Label: " << i.op1.label_text << " "; // calculate label
+                break;
+            default:
+                break;
+        }
+        return stream.str();
+    }
+    
     std::ostream &operator<<(std::ostream &out, Instruction &i) {
         
         std::ostringstream stream;

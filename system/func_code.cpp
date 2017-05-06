@@ -7,9 +7,16 @@ namespace token {
             std::cerr << "Error: you must use build command first.\n";
             return;
         }
-        for(unsigned int i = 0; i < code.instruct.size(); ++i) {
+        std::cout << "Hex: ";
+        unsigned int i;
+        for(i = 0; i < code.instruct.size(); ++i) {
             std::string hextext = icode::instructionToHex(code.instruct[i]);
             std::cout << hextext;
+        }
+        std::cout << "\nBinary: ";
+        for(i = 0; i < code.instruct.size(); ++i) {
+            std::string bintext = icode::instructionToBinary(code.instruct[i]);
+            std::cout << bintext;
         }
         std::cout << "\n";
     }
