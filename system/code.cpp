@@ -158,24 +158,35 @@ namespace interp {
     }
     
     void Code::start() {
-        
+        run = true;
+        proc.ip = 0;
     }
     
     void Code::stop() {
-        
+        run = false;
     }
     
     void Code::pause() {
-        
+        run = false;
     }
+    
+    void Code::step() {
+        if(proc.ip >= 0) {
+            procInstruct(instruct[proc.ip]);
+            ++proc.ip;
+            if(proc.ip >= instruct.size()) {
+                std::cout << "Program finished executing..\n";
+                run = false;
+            }
+        }
+    }
+    
     
     void Code::reset() {
         if(!instruct.empty())
             instruct.erase(instruct.begin(), instruct.end());
         
-        //memset(mem, 0, sizeof(mem));
         proc.clrFlags();
-        
         /*if(!stack.empty())
             stack.erase(stack.begin(), stack.end()); */
     }
@@ -191,6 +202,10 @@ namespace interp {
         std::cout << "}\n";
     }
     
+    void Code::procInstruct(icode::Instruction &i) {
+        unsigned int op_code = static_cast<unsigned int>(i.opcode);
+        inst[op_code].call_back(*this);
+    }
     
     
     uint8_t Code::peek(uint16_t address) const {

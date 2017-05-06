@@ -69,10 +69,11 @@ namespace icode {
          Z = 6 - overflow bit
          N = 7 - negative bit
         */
-        address_size ip;
+        
     public:
         reg_size reg_x, reg_y, reg_a;
         address_size sp;
+        address_size ip;
         
         Processor();
         void setFlag(proc_Flags flag, unsigned int set);

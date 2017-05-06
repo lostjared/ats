@@ -120,11 +120,26 @@ namespace interp {
     }
     
     void i_lda(Code &c) {
-        // todo check X,Y to see if offset by register
         int in = c.proc.getIp();
         switch(c.instruct[in].op1.op_t) {
-            case icode::op_type::OP_MEMORY:
-                c.proc.reg_a = c.mem[c.instruct[in].op1.op];
+            case icode::op_type::OP_MEMORY: {
+                switch(c.instruct[in].mode) {
+                    case interp::ABSOULTE:
+                    case interp::ZEROPAGE:
+                        c.proc.reg_a = c.peek(c.instruct[in].op1.op);
+                        break;
+                    case interp::ABSOULTE_X:
+                    case interp::ZEROPAGE_X:
+                        c.proc.reg_a = c.peek(c.instruct[in].op1.op+c.proc.reg_x);
+                        break;
+                    case interp::ABSOULTE_Y:
+                    case interp::ZEROPAGE_Y:
+                        c.proc.reg_a = c.peek(c.instruct[in].op1.op+c.proc.reg_y);
+                        break;
+                    default:
+                        return;
+                }
+            }
                 break;
             case icode::op_type::OP_DECIMAL:
                 c.proc.reg_a = c.instruct[in].op1.op;
@@ -138,11 +153,63 @@ namespace interp {
         
     }
     void i_ldx(Code &c) {
-        
+        int in = c.proc.getIp();
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_MEMORY: {
+                switch(c.instruct[in].mode) {
+                    case interp::ABSOULTE:
+                    case interp::ZEROPAGE:
+                        c.proc.reg_x = c.peek(c.instruct[in].op1.op);
+                        break;
+                    /*case interp::ABSOULTE_X:
+                    case interp::ZEROPAGE_X:
+                        c.proc.reg_a = c.peek(c.instruct[in].op1.op+c.proc.reg_x);
+                        break;*/
+                    case interp::ABSOULTE_Y:
+                    case interp::ZEROPAGE_Y:
+                        c.proc.reg_x = c.peek(c.instruct[in].op1.op+c.proc.reg_y);
+                        break;
+                    default:
+                        return;
+                }
+            }
+                break;
+            case icode::op_type::OP_DECIMAL:
+                c.proc.reg_x = c.instruct[in].op1.op;
+                break;
+            default:
+                break;
+        }
     }
     
     void i_ldy(Code &c) {
-        
+        int in = c.proc.getIp();
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_MEMORY: {
+                switch(c.instruct[in].mode) {
+                    case interp::ABSOULTE:
+                    case interp::ZEROPAGE:
+                        c.proc.reg_y = c.peek(c.instruct[in].op1.op);
+                        break;
+                    case interp::ABSOULTE_X:
+                    case interp::ZEROPAGE_X:
+                        c.proc.reg_y = c.peek(c.instruct[in].op1.op+c.proc.reg_x);
+                        break;
+                    /*case interp::ABSOULTE_Y:
+                    case interp::ZEROPAGE_Y:
+                        c.proc.reg_a = c.peek(c.instruct[in].op1.op+c.proc.reg_y);
+                        break;*/
+                    default:
+                        return;
+                }
+            }
+                break;
+            case icode::op_type::OP_DECIMAL:
+                c.proc.reg_a = c.instruct[in].op1.op;
+                break;
+            default:
+                break;
+        }
     }
     
     void i_lsr(Code &c) {

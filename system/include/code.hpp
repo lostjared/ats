@@ -36,7 +36,9 @@ namespace interp {
     class Code {
     public:
         Code();
+        bool running() const { return run; }
         void start();
+        void step();
         void stop();
         void pause();
         void clear();
@@ -51,6 +53,9 @@ namespace interp {
         std::vector<uint8_t> stack;
         uint8_t mem[0xFFFF+1];
         std::vector<icode::Instruction> instruct;
+    private:
+        void procInstruct(icode::Instruction &i);
+        bool run;
     };
 
     typedef void (*call)(Code &c);
