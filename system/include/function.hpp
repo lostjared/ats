@@ -71,6 +71,7 @@ namespace token {
     void token_Code(const std::string &cmd, std::vector<lex::Token> &tokens);
     void token_Step(const std::string &cmd, std::vector<lex::Token> &tokens);
     void token_Memory(const std::string &cmd, std::vector<lex::Token> &tokens);
+    void token_Peek16(const std::string &cmd, std::vector<lex::Token> &tokens);
 }
 
 #endif
