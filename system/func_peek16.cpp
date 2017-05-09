@@ -10,7 +10,7 @@ namespace token {
         }
         uint8_t bytes[2] = {code.peek(address),code.peek(address+1)};
         
-        std::cout << "[ $" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << address << ":" << "$" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << address+1 << " = [ $" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << static_cast<unsigned int>(bytes[1]) << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << static_cast<unsigned int>(bytes[0])  << " ]\n";
+        std::cout << "[ $" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << address << ":" << "$" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << address+1 << " = [ $" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << static_cast<unsigned int>(bytes[0]) << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << static_cast<unsigned int>(bytes[1])  << " ]\n";
     }
     
 }
