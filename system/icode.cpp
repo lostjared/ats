@@ -3,7 +3,7 @@
 
 namespace icode {
     
-    const char *op_array[] = { "adc", "and", "asl", "bcc", "bcs", "beq", "bit", "bmi","bne", "bpl", "brk", "bvc","bvs", "clc", "cld", "cli", "clv", "cmp","cpx","cpy","dec","dex", "dey", "eor", "inc", "int", "inx", "iny", "jmp", "jsr","lda", "ldm","ldx", "ldy","lsr", "nop", "ora", "pha", "php", "pla", "plp", "rol", "ror","rti","rts", "sbc", "sec","sed", "sei", "sta", "stx", "sty", "tax", "tay", "tsx","txa","txs", "tya", 0 };
+    const char *op_array[] = { "adc", "and", "asl", "bcc", "bcs", "beq", "bit", "bmi","bne", "bpl", "brk", "bvc","bvs", "clc", "cld", "cli", "clv", "cmp","cpx","cpy","dec","dex", "dey", "end", "eor", "inc", "int", "inx", "iny", "jmp", "jsr","lda", "ldm","ldx", "ldy","lsr", "nop", "ora", "pha", "php", "pla", "plp", "rol", "ror","rti","rts", "sbc", "sec","sed", "sei", "sta", "stx", "sty", "tax", "tay", "tsx","txa","txs", "tya", 0 };
     
     std::ostream &operator<<(std::ostream &out, opc c) {
         if(c != opc::NOTINC)
@@ -133,7 +133,7 @@ namespace icode {
             out << "address mode unknown value: " << i.mode << "..\n";
             return out;
         }
-        out << "Line: " << std::dec << i.line_num << " Address Mode: " << interp::add_mode[i.mode] << "  Opcode: " << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<unsigned int>(i.op_byte) << " ";
+        out << "Line: " << std::dec << i.line_num << " " << i.opcode << " Address Mode: " << interp::add_mode[i.mode] << "  Opcode: " << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<unsigned int>(i.op_byte) << " ";
         switch(i.op1.op_t) {
             case icode::op_type::OP_MEMORY:
                 if(i.mode != interp::ZEROPAGE && i.mode != interp::ZEROPAGE_X && i.mode != interp::ZEROPAGE_Y) {
@@ -163,7 +163,6 @@ namespace icode {
         }
         // output operand 2
         std::cout << "\nHex for Machine code: " << stream.str() << "\n";
-        
         
         return out;
     }

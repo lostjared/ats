@@ -13,6 +13,16 @@ namespace interp {
         return true;
     }
     
+    std::string eatComment(std::string src) {
+        std::string text;
+        for(unsigned int i = 0; i < src.length(); ++i) {
+            if(src[i] == ';') return text;
+            else
+                text += src[i];
+        }
+        return text;
+    }
+    
     bool openLineSource(const std::string &text) {
         std::fstream file;
         file.open(text, std::ios::in);
@@ -21,9 +31,11 @@ namespace interp {
             lines.erase(lines.begin(), lines.end());
         }
         while(!file.eof() && file) {
-            std::string in;
-            std::getline(file,in);
+            std::string in,orig;
+            std::getline(file,orig);
+            in = eatComment(orig);
             if(in.length()==0) continue;
+            
             std::vector<lex::Token> tokens;
             std::istringstream stream(in);
             lex::Scanner scan(stream);
@@ -33,6 +45,8 @@ namespace interp {
                 if(token.getTokenType() != lex::TOKEN_EOF)
                 	tokens.push_back(token);
             }
+            
+            
             inputText(tokens, in);
         }
         file.close();

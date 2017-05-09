@@ -2,7 +2,7 @@
 
 namespace token {
     void token_Display(const std::string &command, std::vector<lex::Token> &v) {
-        if(v[1].getTokenType() != lex::TOKEN_DIGIT) {
+    	if(v[1].getTokenType() != lex::TOKEN_DIGIT) {
             std::cerr << "display requires line number.\n";
             return;
         }

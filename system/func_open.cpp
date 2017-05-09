@@ -10,6 +10,8 @@ namespace token {
         filename = v[1].getToken();
         if(interp::openLineSource(filename)) {
             std::cout << "Loaded: " << filename << "\n";
+        } else {
+            std::cout << "Could not load file: " << filename << "\n";
         }
     }
 }

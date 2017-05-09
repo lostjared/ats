@@ -46,6 +46,7 @@ namespace interp {
         void print();
         void reset();
         void reset_memory();
+        void printCurrent();
         uint8_t peek(uint16_t address) const;
         void poke(uint16_t address, uint8_t value);
 
@@ -98,6 +99,7 @@ namespace interp {
     void i_dec(Code &c);
     void i_dex(Code &c);
     void i_dey(Code &c);
+    void i_end(Code &c);
     void i_eor(Code &c);
     void i_inc(Code &c);
     void i_int(Code &c);
@@ -144,6 +146,7 @@ namespace interp {
     void insertText(std::vector<lex::Token> &tokens, const TextLine &in);
     bool procLine(const TextLine &text, Code &code);
     bool checkInstruction(std::vector<lex::Token> &tokens, const TextLine &text);
+    
     extern std::vector<TextLine> lines;
 }
 

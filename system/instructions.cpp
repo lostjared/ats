@@ -166,6 +166,10 @@ namespace interp {
         
     }
     
+    void i_end(Code &c) {
+        c.stop();
+    }
+    
     void i_eor(Code &c) {
         
     }

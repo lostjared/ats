@@ -15,6 +15,7 @@ namespace interp {
         {opc::BVC, i_bvc}, {opc::BVS, i_bvs}, {opc::CLC, i_clc}, {opc::CLD, i_cld},
         {opc::CLI, i_cli}, {opc::CLV, i_clv}, {opc::CMP, i_cmp}, {opc::CPX, i_cpx},
         {opc::CPY, i_cpy}, {opc::DEC, i_dec}, {opc::DEX, i_dex}, {opc::DEY, i_dey},
+        {opc::END, i_end},
         {opc::EOR, i_eor}, {opc::INC, i_inc}, {opc::INT, i_int}, {opc::INX, i_inx},
         {opc::INY, i_iny}, {opc::JMP, i_jmp}, {opc::JSR, i_jsr}, {opc::LDA, i_lda},
         {opc::LDM, i_ldm}, {opc::LDX, i_ldx}, {opc::LDY, i_ldy}, {opc::LSR, i_lsr},
@@ -73,6 +74,8 @@ namespace interp {
         { 0xCA, IMPLIED, opc::DEX},
         // DEY
         { 0x88, IMPLIED, opc::DEY},
+        // END
+        { 0x01, IMPLIED, opc::END},
         // EOR
         { 0x49, IMMEDIATE, opc::EOR}, {0x45, ZEROPAGE, opc::EOR}, {0x55, ZEROPAGE_X, opc::EOR}, {0x4D, ABSOULTE, opc::EOR},{ 0x5D, ABSOULTE_X, opc::EOR}, {0x59, ABSOULTE_Y, opc::EOR}, {0x41, INDEXED_I, opc::EOR}, {0x51, INDIRECT_I, opc::EOR},
         // INC
@@ -171,6 +174,7 @@ namespace interp {
     }
     
     void Code::step() {
+        if(instruct.size()==0) return;
         if(proc.ip >= 0) {
             procInstruct(instruct[proc.ip]);
             ++proc.ip;
@@ -182,6 +186,12 @@ namespace interp {
         }
     }
     
+    
+    void Code::printCurrent() {
+        if(instruct.size()==0) return;
+        if(proc.ip >= 0 && proc.ip < instruct.size())
+        	std::cout << instruct[proc.ip];
+    }
     
     void Code::reset() {
         if(!instruct.empty())

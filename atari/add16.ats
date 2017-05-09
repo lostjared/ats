@@ -1,0 +1,15 @@
+; add two 16 bit values together
+; poke $0 LSB for number 1
+; poke $1 MSB for number 1
+; poke $2 LSB for number 2
+; poke $4 MSB for number 2
+; stores value in $4
+; use peek16 $4 to view 16 bit value
+10 CLC
+20 LDA $0
+30 ADC $2
+40 STA $5
+50 LDA $1
+60 ADC $3
+70 STA $4
+80 END
