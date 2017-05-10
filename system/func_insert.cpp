@@ -19,7 +19,7 @@ namespace token {
                     }
                 }
                 else if(tokens[i].getTokenType() != lex::TOKEN_HEX) {
-                    std::cerr << "Error: list of values must all be in hex.\n";
+                    std::cerr << "Error: list of values must be either symbol or hex value.\n";
                     return;
                 }
             }
