@@ -163,6 +163,7 @@ namespace interp {
     void Code::start() {
         run = true;
         proc.ip = 0;
+        execute();
     }
     
     void Code::stop() {
@@ -171,6 +172,20 @@ namespace interp {
     
     void Code::pause() {
         run = false;
+    }
+    
+    void Code::execute() {
+        while(run == true) {
+            if(proc.ip >= 0) {
+                procInstruct(instruct[proc.ip]);
+                ++proc.ip;
+                if(proc.ip >= instruct.size()) {
+                    run = false;
+                    proc.ip = 0;
+                    break;
+                }
+            }
+        }
     }
     
     void Code::step() {

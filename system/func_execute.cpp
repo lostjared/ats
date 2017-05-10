@@ -7,8 +7,7 @@ namespace token {
             std::cerr << "Error you must build first.\n";
             return;
         }
-        
-        
+        code.start();
     }
     
 }

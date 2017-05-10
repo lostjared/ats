@@ -28,25 +28,6 @@ namespace interp {
                             c.proc.setFlag(icode::FLAG_ZERO, 0);
                     }
                         break;
-                        /*
-                         case interp::ABSOULTE_X:
-                         case interp::ZEROPAGE_X:
-                         uint8_t val = c.peek(c.instruct[in].op1.op+c.proc.reg_x)
-                         c.proc.reg_a = c.peek(c.instruct[in].op1.op+c.proc.reg_x);
-                         if(c.proc.reg_a == 0)
-                         c.proc.setFlag(icode::FLAG_ZERO, 1);
-                         else
-                         c.proc.setFlag(icode::FLAG_ZERO, 0);
-                         break;
-                         case interp::ABSOULTE_Y:
-                         case interp::ZEROPAGE_Y:
-                         c.proc.reg_a = c.peek(c.instruct[in].op1.op+c.proc.reg_y);
-                         if(c.proc.reg_a == 0)
-                         c.proc.setFlag(icode::FLAG_ZERO, 1);
-                         else
-                         c.proc.setFlag(icode::FLAG_ZERO, 0);
-                         break;
-                         */
                     default:
                         return;
                 }
@@ -168,6 +149,7 @@ namespace interp {
     
     void i_end(Code &c) {
         c.stop();
+        std::cout << "Program stopped, END reached.\n";
     }
     
     void i_eor(Code &c) {
