@@ -29,7 +29,8 @@ std::unordered_map<std::string, Command> function_map = {
     { "code", Command(token::token_Code, 0, "Print out Hex values for Machine lanauge\nUse:\ncode") },
     { "step", Command(token::token_Step, 0, "Make Step in debugger\nUse:\nstep") },
     { "memory", Command(token::token_Memory, 2, "Print memory range argument one is hex value starting value range argument two is hex value stop value range\nUse:\nmemory start stop") },
-    { "peek16", Command(token::token_Peek16, 1, "Peek 16 bit value from memory.\nUse:peek16 address value") }
+    { "peek16", Command(token::token_Peek16, 1, "Peek 16 bit value from memory.\nUse:peek16 address value") },
+    { "insert", Command(token::token_Insert, -1, "Insert a stream of bytes at a starting address\nUse: insert startaddress val1 val2 val3 ....") }
 };
 
 namespace token {
