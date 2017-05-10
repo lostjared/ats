@@ -35,7 +35,7 @@ namespace token {
                 else
                     hexValue = static_cast<uint8_t>(icode::toHex(tokens[i].getToken()));
                 
-                std::cout << "[ $" << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << address << " ] = $" << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<uint32_t>(hexValue) << "\n";
+                std::cout << "[ $" << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << address << " ] = $" << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<uint32_t>(hexValue) << "\n";
                 
                 code.poke(static_cast<uint16_t>(address),hexValue);
             }
