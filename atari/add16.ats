@@ -1,8 +1,5 @@
 ; add two 16 bit values together
-; poke $0 LSB for number 1
-; poke $1 MSB for number 1
-; poke $2 LSB for number 2
-; poke $4 MSB for number 2
+; insert $0 $A4 $55 $B3 $3C
 ; stores value in $4
 ; use peek16 $4 to view 16 bit value
 10 CLC

@@ -17,7 +17,6 @@ namespace token {
                         std::cerr << "Error: Symbol: " << tokens[i].getToken() << " not found in table..\n";
                         return;
                     }
-                    
                 }
                 else if(tokens[i].getTokenType() != lex::TOKEN_HEX) {
                     std::cerr << "Error: list of values must all be in hex.\n";
