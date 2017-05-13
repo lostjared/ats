@@ -7,14 +7,12 @@ namespace token {
             std::cerr << "Error: requires hex constant argumnet.\n";
             return;
         }
-        
         uint32_t val;
         val = icode::toHex(tokens[1].getToken());
         if(val > 0xFFFF) {
             std::cerr << "Error: constant must be 16 bit value.\n";
             return;
         }
-        
         std::cout << "[ $" << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << val << " ] = $" << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<unsigned int>(code.peek(val)) << "\n";
     }
 }

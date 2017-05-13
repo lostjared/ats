@@ -157,7 +157,45 @@ namespace interp {
     }
     
     void i_inc(Code &c) {
-        
+        int in = c.proc.getIp();
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_MEMORY:
+                switch(c.instruct[in].mode) {
+                    case interp::ABSOULTE:
+                    case interp::ZEROPAGE: {
+                        uint16_t val = c.peek(c.instruct[in].op1.op);
+                        ++val;
+                        if(val > 255)
+                            c.proc.setFlag(icode::FLAG_CARRY, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_CARRY, 0);
+                        if(val == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                        c.poke(c.instruct[in].op1.op, static_cast<uint8_t>(val));
+                    }
+                        break;
+                    case interp::ZEROPAGE_X:
+                    case interp::ABSOULTE_X: {
+                        uint16_t val = c.peek(c.instruct[in].op1.op+c.proc.reg_x);
+                        ++val;
+                        if(val > 255)
+                            c.proc.setFlag(icode::FLAG_CARRY, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_CARRY, 0);
+                        if(val == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                		c.poke(c.instruct[in].op1.op+c.proc.reg_x, static_cast<uint8_t>(val));
+                    }
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
     }
     
     void i_int(Code &c) {
@@ -165,11 +203,33 @@ namespace interp {
     }
     
     void i_inx(Code &c) {
-        
+        uint16_t total = c.proc.reg_x+1;
+        if(total > 255) {
+            c.proc.setFlag(icode::FLAG_CARRY, 1);
+        } else {
+            c.proc.setFlag(icode::FLAG_CARRY, 0);
+        }
+        ++c.proc.reg_x;
+        if(c.proc.reg_x == 0) {
+            c.proc.setFlag(icode::FLAG_ZERO, 1);
+        } else {
+            c.proc.setFlag(icode::FLAG_ZERO, 0);
+        }
     }
     
     void i_iny(Code &c) {
-        
+        uint16_t total = c.proc.reg_y+1;
+        if(total > 255) {
+            c.proc.setFlag(icode::FLAG_CARRY, 1);
+        } else {
+            c.proc.setFlag(icode::FLAG_CARRY, 0);
+        }
+        ++c.proc.reg_y;
+        if(c.proc.reg_y == 0) {
+            c.proc.setFlag(icode::FLAG_ZERO, 1);
+        } else {
+            c.proc.setFlag(icode::FLAG_ZERO, 0);
+        }
     }
     
     void i_jmp(Code &c) {
