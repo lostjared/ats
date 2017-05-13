@@ -3,6 +3,15 @@
 Work in progress. In early stages still, but the goal of this project is to teach myself more about interpreters.
 This program just plays around with a few different concepts, but borrows a lot of the instructions and concepts from the book "the Atari Assembler".
 
+First you need to install the GNU readline library
+if on OS X compile readline6 then install to /usr/local/
+
+and configure project with /usr/local prefix
+
+./configure --prefix=/usr/local
+
+on Linux just configure and compile as normal.
+
 to build:
 
 $ ./autogen.sh
