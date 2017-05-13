@@ -169,11 +169,12 @@ namespace interp {
                             c.proc.setFlag(icode::FLAG_CARRY, 1);
                         else
                             c.proc.setFlag(icode::FLAG_CARRY, 0);
-                        if(val == 0)
+                        uint8_t value=static_cast<uint8_t>(val);
+                        if(value == 0)
                             c.proc.setFlag(icode::FLAG_ZERO, 1);
                         else
                             c.proc.setFlag(icode::FLAG_ZERO, 0);
-                        c.poke(c.instruct[in].op1.op, static_cast<uint8_t>(val));
+                        c.poke(c.instruct[in].op1.op, value);
                     }
                         break;
                     case interp::ZEROPAGE_X:
@@ -184,11 +185,13 @@ namespace interp {
                             c.proc.setFlag(icode::FLAG_CARRY, 1);
                         else
                             c.proc.setFlag(icode::FLAG_CARRY, 0);
-                        if(val == 0)
+                        
+                        uint8_t value = static_cast<uint8_t>(val);
+                        if(value == 0)
                             c.proc.setFlag(icode::FLAG_ZERO, 1);
                         else
                             c.proc.setFlag(icode::FLAG_ZERO, 0);
-                		c.poke(c.instruct[in].op1.op+c.proc.reg_x, static_cast<uint8_t>(val));
+                		c.poke(c.instruct[in].op1.op+c.proc.reg_x,value);
                     }
                         break;
                 }
