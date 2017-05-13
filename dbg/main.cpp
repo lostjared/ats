@@ -11,12 +11,40 @@
 #include<unordered_map>
 #include<readline/readline.h>
 #include<readline/history.h>
+#include<unistd.h>
+#include<signal.h>
+
+
+void control_Handler(int sig) {
+    if(code.running()) {
+        code.stop();
+        std::cout << "Program break.\n";
+        code.print();
+    }
+    else std::cout << "Caught signal: SIGINT.\n";
+    rl_on_new_line();
+    rl_replace_line("", 0);
+    rl_redisplay();
+}
 
 int main() {
+    
+    struct sigaction sa;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sa.sa_handler = control_Handler;
+    
+    if(sigaction(SIGINT, &sa, 0) == -1) {
+        std::cerr << "Error on sigaction:\n";
+        exit(EXIT_FAILURE);
+    }
+    
+    
     code.symbols["version"].create("version", symbol::Value("1.0", 1.0));
     code.symbols["author"].create("author", symbol::Value("lostjared", 0));
     std::ios state(0);
     state.copyfmt(std::cout);
+    
     while(1) {
         try {
             std::string input_line;
