@@ -24,8 +24,9 @@ namespace lex {
                 if(t.getType() == TOKEN_EOF) {
                     return true;
                 }
-                bool ohex = code.symbols["hex"].get_double()!=0;
+                
                 double e = expr(false);
+                bool ohex = code.symbols["hex"].get_double()!=0;
                 if(ohex == false)
                     std::cout << "expr: " << e << "\n";
                 else
