@@ -149,8 +149,8 @@ namespace interp {
     }
     
     void i_end(Code &c) {
-        c.stop();
-        std::cout << "Program stopped, END reached.\n";
+        c.end();
+        std::cout << "Program stopped, END reached Program reset\n";
     }
     
     void i_eor(Code &c) {

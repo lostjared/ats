@@ -41,6 +41,7 @@ namespace interp {
         void start();
         void step();
         void stop();
+        void end();
         void pause();
         void cont();
         void execute();

@@ -170,6 +170,11 @@ namespace interp {
         run = false;
     }
     
+    void Code::end() {
+        run = false;
+        proc.ip = 0;
+    }
+    
     void Code::pause() {
         run = false;
     }
@@ -177,11 +182,11 @@ namespace interp {
     void Code::execute() {
         while(run == true) {
             if(proc.ip >= 0) {
-                procInstruct(instruct[proc.ip]);
-                ++proc.ip;
-                if(proc.ip >= instruct.size()) {
+                procInstruct(instruct[++proc.ip]);
+                if(proc.ip > instruct.size()) {
                     run = false;
                     proc.ip = 0;
+                    std::cout << "Program end reached without END, use END to terminate your program.\n";
                     break;
                 }
             }
@@ -190,6 +195,10 @@ namespace interp {
     
     
     void Code::cont() {
+        if(proc.ip == 0) {
+            std::cerr << "You must run your program first with execute.\n";
+            return;
+        }
         run = true;
         execute();
     }
