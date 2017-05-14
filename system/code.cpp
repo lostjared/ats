@@ -183,7 +183,7 @@ namespace interp {
         while(run == true) {
             if(proc.ip >= 0) {
                 procInstruct(instruct[++proc.ip]);
-                if(proc.ip > instruct.size()) {
+                if(proc.ip >= instruct.size()) {
                     run = false;
                     proc.ip = 0;
                     std::cout << "Program end reached without END, use END to terminate your program.\n";
