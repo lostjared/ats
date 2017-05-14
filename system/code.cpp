@@ -188,6 +188,12 @@ namespace interp {
         }
     }
     
+    
+    void Code::cont() {
+        run = true;
+        execute();
+    }
+    
     void Code::step() {
         if(instruct.size()==0) return;
         if(proc.ip >= 0) {

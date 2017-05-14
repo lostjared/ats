@@ -99,7 +99,8 @@ namespace interp {
     }
     
     void i_brk(Code &c) {
-        c.pause();
+        c.stop();
+        std::cout << "Breakpoint occured\n";
     }
     
     void i_bvc(Code &c) {

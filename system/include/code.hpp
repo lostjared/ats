@@ -42,6 +42,7 @@ namespace interp {
         void step();
         void stop();
         void pause();
+        void cont();
         void execute();
         void clear();
         void print();
