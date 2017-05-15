@@ -25,6 +25,7 @@ namespace icode {
         uint32_t op;
         op_type  op_t;
         std::string label_text;
+        int label_index;
         Operand();
         Operand(const uint32_t &operand, const op_type &operand_type);
         Operand(const Operand &o);
@@ -40,6 +41,7 @@ namespace icode {
         unsigned int mode;
         bool label;
         std::string label_text;
+        int label_index;
         std::string text;
         Instruction();
         Instruction(unsigned int iline, const opc &op_code, unsigned int m, const Operand &i_op1, const Operand &i_op2);

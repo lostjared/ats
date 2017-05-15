@@ -16,12 +16,13 @@ namespace icode {
     
     Operand::Operand(const uint32_t &operand, const op_type &operand_type) : op(operand), op_t(operand_type) {}
     
-    Operand::Operand(const Operand &o) :op(o.op), op_t(o.op_t), label_text(o.label_text) {}
+    Operand::Operand(const Operand &o) :op(o.op), op_t(o.op_t), label_text(o.label_text), label_index(o.label_index) {}
     
     Operand &Operand::operator=(const Operand &o) {
         op = o.op;
         op_t = o.op_t;
         label_text = o.label_text;
+        label_index = o.label_index;
         return *this;
     }
     
@@ -34,7 +35,7 @@ namespace icode {
     Instruction::Instruction(unsigned int iline, const opc &op_code, unsigned int m, const Operand &i_op1, const Operand &i_op2) : line_num(iline), opcode(op_code), mode(m), op1(i_op1), op2(i_op2) {}
     
     Instruction::Instruction(const Instruction &i) : op_byte(i.op_byte), line_num(i.line_num), opcode(i.opcode),
-    op1(i.op1), op2(i.op2), mode(i.mode), label(i.label), label_text(i.label_text), text(i.text)
+    op1(i.op1), op2(i.op2), mode(i.mode), label(i.label), label_text(i.label_text), label_index(i.label_index), text(i.text)
     
     {
     }
@@ -49,6 +50,7 @@ namespace icode {
         mode = i.mode;
         label = i.label;
         text = i.text;
+        label_index = i.label_index;
         return *this;
     }
     
@@ -70,7 +72,7 @@ namespace icode {
             case icode::op_type::OP_MEMORY: {
                 
                 if(i.mode != interp::ZEROPAGE && i.mode != interp::ZEROPAGE_X && i.mode != interp::ZEROPAGE_Y)
-                stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op;
+                    stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op;
                 else
                     stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op;
             }
@@ -81,10 +83,18 @@ namespace icode {
             case icode::op_type::OP_REGISTER:
                 break;
             case icode::op_type::OP_LABEL:
-                stream << std::setfill('0') << std::setw(2) << i.op1.op;
+                stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op;
                 break;
-            case icode::op_type::OP_LABELTEXT:
+            case icode::op_type::OP_LABELTEXT: {
+                
+                auto it = interp::label_table.find(i.op1.label_text);
+                if(it == interp::label_table.end()) {
+                    std::cerr << "Error: Could not find label.\n";
+                }
+                
                 //out << "Branch Label: " << i.op1.label_text << " "; // calculate label
+                stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << it->second+1;
+            }
                 break;
             default:
                 break;
@@ -115,6 +125,7 @@ namespace icode {
                 stream << std::bitset<8>(i.op1.op);
                 break;
             case icode::op_type::OP_LABELTEXT:
+                stream << std::bitset<16>(interp::label_table[i.op1.label_text]);
                 //out << "Branch Label: " << i.op1.label_text << " "; // calculate label
                 break;
             default:
@@ -137,8 +148,8 @@ namespace icode {
         switch(i.op1.op_t) {
             case icode::op_type::OP_MEMORY:
                 if(i.mode != interp::ZEROPAGE && i.mode != interp::ZEROPAGE_X && i.mode != interp::ZEROPAGE_Y) {
-                	out << "Operand 1 [Memory Address]: " << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op << " ";
-                	stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op;
+                    out << "Operand 1 [Memory Address]: " << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op << " ";
+                    stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << i.op1.op;
                 } else {
                     out << "Operand 1 [Zero Page Memory Address]: " << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op << " ";
                     stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op;
@@ -153,10 +164,20 @@ namespace icode {
                 break;
             case icode::op_type::OP_LABEL:
                 out << "Branch value: " << std::setfill('0') << std::setw(2) << i.op1.op << " ";
-                stream << std::setfill('0') << std::setw(2) << i.op1.op;
+                stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op;
                 break;
-            case icode::op_type::OP_LABELTEXT:
+            case icode::op_type::OP_LABELTEXT: {
                 out << "Branch Label: " << i.op1.label_text << " ";
+                
+                auto it = interp::label_table.find(i.op1.label_text);
+                if(it == interp::label_table.end()) {
+                    std::cerr << "Error: Could not find label.\n";
+                }
+                
+                //out << "Branch Label: " << i.op1.label_text << " "; // calculate label
+                stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << it->second+1;
+            }
+                
                 break;
             default:
                 break;

@@ -141,7 +141,8 @@ namespace interp {
     
     extern iCodeInstruction inst[];
     void testcodes();
-    
+    extern std::unordered_map<std::string, int> label_table;
+    extern std::unordered_map<int, int> label_line_table;
     
     void inputText(std::vector<lex::Token> &tokens, std::string text);
     bool saveLineSource(const std::string &text);

@@ -48,6 +48,9 @@ namespace translate {
         if(op == icode::opc::NOTINC) {
             inst.label = true;
             inst.label_text = tokens[0].getToken();
+            inst.label_index = line;
+            interp::label_table[inst.label_text] = line-1;
+            interp::label_line_table[line_value] = line-1;
             match(tokens[1], lex::TOKEN_CHAR);
             icode::opc op_code;
             op_code = icode::strtoInc(tokens[1].getToken());
@@ -113,13 +116,13 @@ namespace translate {
                         break;
                     case lex::TOKEN_CHAR:
                         // check if label exisits
-                        if(confirm_mode(inst.opcode, interp::RELATIVE, inst.op_byte) == false) {
+                        if(confirm_mode(inst.opcode, interp::ABSOULTE, inst.op_byte) == false) {
                             std::ostringstream stream;
                             stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " does not support relative addressing mode.\n";
                         }
                         inst.op1 = icode::Operand(0, icode::op_type::OP_LABELTEXT);
                         inst.op1.label_text = tokens[1].getToken();
-                        inst.mode = interp::RELATIVE;
+                        inst.mode = interp::ABSOULTE;
                         break;
                     default:
                         break;
