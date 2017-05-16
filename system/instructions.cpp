@@ -247,7 +247,7 @@ namespace interp {
                     std::cerr << "Break: Error Label: " << c.instruct[in].op1.label_text << " not found..\n";
                     c.stop();
                 }
-                c.proc.ip = it->second;
+                c.proc.ip = it->second-1;
                 return;
             }
             default:

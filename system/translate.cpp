@@ -49,8 +49,8 @@ namespace translate {
             inst.label = true;
             inst.label_text = tokens[0].getToken();
             inst.label_index = line;
-            interp::label_table[inst.label_text] = line-1;
-            interp::label_line_table[line_value] = line-1;
+            interp::label_table[inst.label_text] = line;
+            interp::label_line_table[line_value] = line;
             match(tokens[1], lex::TOKEN_CHAR);
             icode::opc op_code;
             op_code = icode::strtoInc(tokens[1].getToken());
