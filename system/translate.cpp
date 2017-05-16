@@ -15,6 +15,28 @@ namespace translate {
         return false;
     }
     
+    bool check_labels() {
+        for(unsigned int ix = 0; ix < code.instruct.size(); ++ix) {
+            icode::Instruction &i = code.instruct[ix];
+            if(i.op1.op_t == icode::op_type::OP_LABELTEXT) {
+                auto valid = interp::label_table.find(i.op1.label_text);
+                if(valid == interp::label_table.end()) {
+                    std::cerr << "Error could not find label: " << i.op1.label_text << "\n";
+                    return false;
+                }
+                i.op1.label_index = valid->second;
+            } if(i.op1.op_t == icode::op_type::OP_LABEL) {
+                auto valid = interp::label_line_table.find(i.op1.op);
+                if(valid == interp::label_line_table.end()) {
+                    std::cerr << "Error line number: " << i.op1.op << " does not exisit.\n";
+                    return false;
+                }
+                i.op1.label_index = valid->second;
+            }
+        }
+        return true;
+    }
+    
     bool build_code() {
         try {
             if(interp::lines.size()==0) {
@@ -27,6 +49,10 @@ namespace translate {
                     return false;
                 }
             }
+            
+            if(check_labels() == false)
+                return false;
+            
             return true;
         }
         catch(const cExcep &e) {
@@ -86,15 +112,19 @@ namespace translate {
             case 1:
                 switch(tokens[1].getTokenType()) {
                     case lex::TOKEN_DIGIT: {
+                        
                         if(confirm_mode(inst.opcode, interp::RELATIVE, inst.op_byte) == false) {
-                            std::ostringstream stream;
-                            stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " not supported in relative addressing mode.\n";
-                            throw cExcep(stream.str());
-                        } else {
-                            unsigned int label_value = atoi(tokens[1].getToken().c_str());
-                            inst.op1 = icode::Operand(label_value, icode::op_type::OP_LABEL);
-                            inst.mode = interp::RELATIVE;
-                        }
+                            if(confirm_mode(inst.opcode, interp::ABSOULTE, inst.op_byte) == true) {
+                                inst.mode = interp::ABSOULTE;
+                            } else {
+                                std::ostringstream stream;
+                                stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " not supported in relative addressing mode.\n";
+                                throw cExcep(stream.str());
+                            }
+                        } else
+                        inst.mode = interp::RELATIVE;
+                        unsigned int label_value = atoi(tokens[1].getToken().c_str());
+                        inst.op1 = icode::Operand(label_value, icode::op_type::OP_LABEL);
                     }
                         break;
                     case lex::TOKEN_HEX: {
@@ -117,12 +147,19 @@ namespace translate {
                     case lex::TOKEN_CHAR:
                         // check if label exisits
                         if(confirm_mode(inst.opcode, interp::ABSOULTE, inst.op_byte) == false) {
-                            std::ostringstream stream;
-                            stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " does not support relative addressing mode.\n";
+                            
+                            if(confirm_mode(inst.opcode, interp::RELATIVE, inst.op_byte) == true) {
+                                inst.mode = interp::RELATIVE;
+                            } else {
+                                
+                                std::ostringstream stream;
+                                stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " does not support addressing mode.\n";
+                            }
+                        } else {
+                            inst.mode = interp::ABSOULTE;
                         }
                         inst.op1 = icode::Operand(0, icode::op_type::OP_LABELTEXT);
                         inst.op1.label_text = tokens[1].getToken();
-                        inst.mode = interp::ABSOULTE;
                         break;
                     default:
                         break;

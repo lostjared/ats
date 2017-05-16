@@ -237,17 +237,11 @@ namespace interp {
     }
     
     void i_jmp(Code &c) {
-        
         int in = c.proc.getIp();
-        
         switch(c.instruct[in].op1.op_t) {
-            case icode::op_type::OP_LABELTEXT: {
-                auto it = label_table.find(c.instruct[in].op1.label_text);
-                if(it == label_table.end()) {
-                    std::cerr << "Break: Error Label: " << c.instruct[in].op1.label_text << " not found..\n";
-                    c.stop();
-                }
-                c.proc.ip = it->second-1;
+            case icode::op_type::OP_LABELTEXT:
+            case icode::op_type::OP_LABEL: {
+                c.proc.ip = c.instruct[in].op1.label_index-1;
                 return;
             }
             default:

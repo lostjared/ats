@@ -1,5 +1,7 @@
 #include "code.hpp"
 #include<cctype>
+#include "translate.hpp"
+#include "function.hpp"
 
 namespace icode {
     
@@ -86,14 +88,13 @@ namespace icode {
                 stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op;
                 break;
             case icode::op_type::OP_LABELTEXT: {
-                
                 auto it = interp::label_table.find(i.op1.label_text);
-                if(it == interp::label_table.end()) {
-                    std::cerr << "Error: Could not find label.\n";
+                if(it != interp::label_table.end()) {
+            	//out << "Branch Label: " << i.op1.label_text << " "; // calculate labe
+                	stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << it->second+1;
+                } else {
+                    code.stop();
                 }
-                
-                //out << "Branch Label: " << i.op1.label_text << " "; // calculate label
-                stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << it->second+1;
             }
                 break;
             default:
@@ -172,10 +173,11 @@ namespace icode {
                 auto it = interp::label_table.find(i.op1.label_text);
                 if(it == interp::label_table.end()) {
                     std::cerr << "Error: Could not find label.\n";
+                    code.stop();
+                } else {
+                	//out << "Branch Label: " << i.op1.label_text << " "; // calculate label
+                    stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << it->second+1;
                 }
-                
-                //out << "Branch Label: " << i.op1.label_text << " "; // calculate label
-                stream << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << it->second+1;
             }
                 
                 break;
