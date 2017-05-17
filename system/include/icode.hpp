@@ -70,7 +70,7 @@ namespace icode {
          D = 3 - decimal mode bit
          B = 4 - break command bit
          5 = [expansion bit [not used]
-         Z = 6 - overflow bit
+         V = 6 - overflow bit
          N = 7 - negative bit
         */
         

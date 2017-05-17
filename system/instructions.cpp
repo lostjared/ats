@@ -148,16 +148,83 @@ namespace interp {
     void i_clv(Code &c) {
         c.proc.setFlag(icode::FLAG_OVERFLOW, 0);
     }
+    // still need to add negative/ carry flag setting for cmp,cpx,cpy
     void i_cmp(Code &c) {
-        
+        int in = c.proc.getIp();
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_MEMORY:
+                switch(c.instruct[in].mode) {
+                    case interp::ABSOULTE:
+                    case interp::ZEROPAGE: {
+                        uint8_t compare = c.peek(c.instruct[in].op1.op);
+                        c.proc.setFlag(icode::FLAG_ZERO, (c.proc.reg_a == compare));
+                    }
+                        break;
+                    case interp::ABSOULTE_X:
+                    case interp::ZEROPAGE_X: {
+                        uint8_t val = c.peek(c.instruct[in].op1.op+c.proc.reg_x);
+                        c.proc.setFlag(icode::FLAG_ZERO, (c.proc.reg_a == val));
+                    }
+                        break;
+                    case interp::ABSOULTE_Y:
+                    case interp::ZEROPAGE_Y: {
+                        uint8_t val = c.peek(c.instruct[in].op1.op+c.proc.reg_y);
+                        c.proc.setFlag(icode::FLAG_ZERO, (c.proc.reg_a == val));
+                	}
+                        break;
+                }
+                break;
+            case icode::op_type::OP_DECIMAL: {
+                c.proc.setFlag(icode::FLAG_ZERO, (c.proc.reg_a == c.instruct[in].op1.op));
+            }
+                break;
+            default:
+                break;
+        }
     }
     
     void i_cpx(Code &c) {
-        
+        int in = c.proc.getIp();
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_MEMORY:
+                switch(c.instruct[in].mode) {
+                    case interp::ABSOULTE:
+                    case interp::ZEROPAGE: {
+                        uint8_t compare = c.peek(c.instruct[in].op1.op);
+                        c.proc.setFlag(icode::FLAG_ZERO, (c.proc.reg_y == compare));
+                    }
+                        break;
+                }
+                break;
+            case icode::op_type::OP_DECIMAL: {
+                c.proc.setFlag(icode::FLAG_ZERO, (c.proc.reg_y == c.instruct[in].op1.op));
+            }
+                break;
+            default:
+                break;
+        }
     }
     
     void i_cpy(Code &c) {
-        
+        int in = c.proc.getIp();
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_MEMORY:
+                switch(c.instruct[in].mode) {
+                    case interp::ABSOULTE:
+                    case interp::ZEROPAGE: {
+                        uint8_t compare = c.peek(c.instruct[in].op1.op);
+                        c.proc.setFlag(icode::FLAG_ZERO, (c.proc.reg_y == compare));
+                    }
+                        break;
+                }
+                break;
+            case icode::op_type::OP_DECIMAL: {
+                c.proc.setFlag(icode::FLAG_ZERO, (c.proc.reg_y == c.instruct[in].op1.op));
+            }
+                break;
+            default:
+                break;
+        }
     }
     
     void i_dec(Code &c) {
