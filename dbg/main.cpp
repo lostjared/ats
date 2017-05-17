@@ -22,7 +22,7 @@ void control_Handler(int sig) {
         std::cout << "Program break.\n";
         code.print();
     }
-    else std::cout << "Caught signal: SIGINT.\n";
+    else std::cout << "Caught Signal: Program not executing.\n";
     rl_on_new_line();
     rl_replace_line("", 0);
     rl_redisplay();
