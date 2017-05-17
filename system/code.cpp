@@ -237,6 +237,7 @@ namespace interp {
         proc.clrFlags();
         /*if(!stack.empty())
             stack.erase(stack.begin(), stack.end()); */
+        proc.reset();
     }
     
     void Code::reset_memory() {

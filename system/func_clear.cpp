@@ -5,5 +5,6 @@ namespace token {
         if(!interp::lines.empty()) {
             interp::lines.erase(interp::lines.begin(), interp::lines.end());
         }
+        code.reset();
     }
 }
