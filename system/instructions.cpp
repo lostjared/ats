@@ -467,7 +467,21 @@ namespace interp {
         int in = c.proc.getIp();
         switch(c.instruct[in].op1.op_t) {
             case icode::op_type::OP_MEMORY:
-                c.mem[c.instruct[in].op1.op] = c.proc.reg_a;
+                switch(c.instruct[in].mode) {
+                    case interp::ABSOULTE:
+                    case interp::ZEROPAGE:
+                        c.poke(c.instruct[in].op1.op, c.proc.reg_a);
+                        break;
+                    case interp::ABSOULTE_X:
+                    case interp::ZEROPAGE_X:
+                        c.poke(c.instruct[in].op1.op+c.proc.reg_x, c.proc.reg_a);
+                        break;
+                    case interp::ABSOULTE_Y:
+                    case interp::ZEROPAGE_Y:
+                        c.poke(c.instruct[in].op1.op+c.proc.reg_y, c.proc.reg_y);
+                        break;
+                        
+                }
                 break;
             default:
                 break;
@@ -478,7 +492,17 @@ namespace interp {
         int in = c.proc.getIp();
         switch(c.instruct[in].op1.op_t) {
             case icode::op_type::OP_MEMORY:
-                c.mem[c.instruct[in].op1.op] = c.proc.reg_x;
+                switch(c.instruct[in].mode) {
+                    case interp::ABSOULTE:
+                    case interp::ZEROPAGE:
+                        c.poke(c.instruct[in].op1.op, c.proc.reg_x);
+                        break;
+                    case interp::ABSOULTE_Y:
+                    case interp::ZEROPAGE_Y:
+                        c.poke(c.instruct[in].op1.op+c.proc.reg_y, c.proc.reg_x);
+                        break;
+                        
+                }
                 break;
             default:
                 break;
@@ -489,7 +513,16 @@ namespace interp {
         int in = c.proc.getIp();
         switch(c.instruct[in].op1.op_t) {
             case icode::op_type::OP_MEMORY:
-                c.mem[c.instruct[in].op1.op] = c.proc.reg_y;
+                switch(c.instruct[in].mode) {
+                    case interp::ABSOULTE:
+                    case interp::ZEROPAGE:
+                        c.poke(c.instruct[in].op1.op, c.proc.reg_y);
+                        break;
+                    case interp::ABSOULTE_X:
+                    case interp::ZEROPAGE_X:
+                        c.poke(c.instruct[in].op1.op+c.proc.reg_x, c.proc.reg_y);
+                        break;
+                }
                 break;
             default:
                 break;
