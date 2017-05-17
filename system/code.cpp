@@ -162,10 +162,11 @@ namespace interp {
         reset_memory();
     }
     
-    void Code::start() {
+    void Code::start(bool debug) {
         run = true;
+        proc.clrFlags();
         proc.ip = 0;
-        execute();
+        execute(debug);
     }
     
     void Code::stop() {
@@ -181,9 +182,13 @@ namespace interp {
         run = false;
     }
     
-    void Code::execute() {
+    void Code::execute(bool debug) {
         while(run == true) {
             if(proc.ip >= 0) {
+                if(debug == true) {
+                    printCurrent();
+                    print();
+                }
                 procInstruct(instruct[++proc.ip]);
                 if(proc.ip >= instruct.size()) {
                     run = false;

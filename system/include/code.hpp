@@ -38,13 +38,13 @@ namespace interp {
     public:
         Code();
         bool running() const { return run; }
-        void start();
+        void start(bool debug=false);
         void step();
         void stop();
         void end();
         void pause();
         void cont();
-        void execute();
+        void execute(bool debug=false);
         void clear();
         void print();
         void reset();
