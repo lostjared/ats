@@ -46,7 +46,7 @@ int main() {
     std::ios state(0);
     state.copyfmt(std::cout);
     
-    std::cout << "ats (atari script) interactive terminal v" << VERSION_INFO << "\npress Ctrl+C to break program\n";
+    std::cout << "ats (atari script) interactive debugger v" << VERSION_INFO << "\npress Ctrl+C to break program\n";
     
     while(1) {
         try {

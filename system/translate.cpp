@@ -64,6 +64,7 @@ namespace translate {
     bool build_line(unsigned int line) {
         std::vector<lex::Token> tokens;
         unsigned int line_value = interp::lines[line].index;
+        interp::label_line_table[line_value] = line;
         tokenize_line(interp::lines[line].text, tokens);
         icode::Instruction inst;
         inst.text = interp::lines[line].text;
@@ -76,7 +77,6 @@ namespace translate {
             inst.label_text = tokens[0].getToken();
             inst.label_index = line;
             interp::label_table[inst.label_text] = line;
-            interp::label_line_table[line_value] = line;
             match(tokens[1], lex::TOKEN_CHAR);
             icode::opc op_code;
             op_code = icode::strtoInc(tokens[1].getToken());
