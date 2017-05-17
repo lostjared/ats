@@ -71,15 +71,24 @@ namespace interp {
     }
     
     void i_bcc(Code &c) {
-        
+        unsigned int ip = c.proc.getIp();
+        if(c.proc.getFlag(icode::FLAG_CARRY) == 0) {
+            c.proc.ip = c.instruct[ip].op1.label_index-1;
+        }
     }
     
     void i_bcs(Code &c) {
-        
+        unsigned int ip = c.proc.getIp();
+        if(c.proc.getFlag(icode::FLAG_CARRY) == 1) {
+            c.proc.ip = c.instruct[ip].op1.label_index-1;
+        }
     }
     
     void i_beq(Code &c) {
-        
+        unsigned int ip = c.proc.getIp();
+        if(c.proc.getFlag(icode::FLAG_ZERO) == 1) {
+            c.proc.ip = c.instruct[ip].op1.label_index-1;
+        }
     }
     
     void i_bit(Code &c) {
@@ -87,15 +96,24 @@ namespace interp {
     }
     
     void i_bmi(Code &c) {
-        
+        unsigned int ip = c.proc.getIp();
+        if(c.proc.getFlag(icode::FLAG_NEGATIVE) == 1) {
+            c.proc.ip = c.instruct[ip].op1.label_index-1;
+        }
     }
     
     void i_bne(Code &c) {
-        
+        unsigned int ip = c.proc.getIp();
+        if(c.proc.getFlag(icode::FLAG_ZERO) == 0) {
+            c.proc.ip = c.instruct[ip].op1.label_index-1;
+        }
     }
     
     void i_bpl(Code &c) {
-        
+        unsigned int ip = c.proc.getIp();
+        if(c.proc.getFlag(icode::FLAG_NEGATIVE) == 0) {
+            c.proc.ip = c.instruct[ip].op1.label_index-1;
+        }
     }
     
     void i_brk(Code &c) {
@@ -104,11 +122,17 @@ namespace interp {
     }
     
     void i_bvc(Code &c) {
-        
+        unsigned int ip = c.proc.getIp();
+        if(c.proc.getFlag(icode::FLAG_OVERFLOW) == 0) {
+            c.proc.ip = c.instruct[ip].op1.label_index-1;
+        }
     }
     
     void i_bvs(Code &c) {
-        
+        unsigned int ip = c.proc.getIp();
+        if(c.proc.getFlag(icode::FLAG_OVERFLOW) == 1) {
+            c.proc.ip = c.instruct[ip].op1.label_index-1;
+        }
     }
     
     void i_clc(Code &c) {
