@@ -15,32 +15,26 @@
 #include<unistd.h>
 #include<signal.h>
 
-
 void control_Handler(int sig) {
     if(code.running()) {
         code.stop();
         std::cout << "Program break.\n";
-        code.print();
     }
-    else std::cout << "Caught Signal: Program not executing.\n";
+    else std::cout << "Caught Signal: Script not executing.\n";
     rl_on_new_line();
     rl_replace_line("", 0);
     rl_redisplay();
 }
 
 int main() {
-    
     struct sigaction sa;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
     sa.sa_handler = control_Handler;
-    
     if(sigaction(SIGINT, &sa, 0) == -1) {
         std::cerr << "Error on sigaction:\n";
         exit(EXIT_FAILURE);
     }
-    
-    
     code.symbols["version"].create("version", symbol::Value(VERSION_INFO, 1.0));
     code.symbols["author"].create("author", symbol::Value("lostjared", 0));
     std::ios state(0);
@@ -50,7 +44,6 @@ int main() {
     
     while(1) {
         try {
-            
             std::string input_line;
             char *input = readline("$>");
             add_history(input);

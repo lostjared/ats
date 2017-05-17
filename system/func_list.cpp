@@ -5,6 +5,7 @@ namespace token {
         for(auto i = interp::lines.begin(); i != interp::lines.end(); ++i) {
             std::cout << std::dec << i->index << " " << i->text << "\n";
         }
+        std::cout << "\nProgram contains " << std::dec << interp::lines.size() << " lines of code\n";
     }
 
 }
