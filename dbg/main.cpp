@@ -1,6 +1,6 @@
 /*
  
- ats - A Fun Practice Project
+ ats - Atari Script, A Fun Practice Project
  written by Jared Bruni
  http://lostsidedead.com
  

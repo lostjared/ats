@@ -43,6 +43,12 @@ namespace translate {
                 std::cerr << "Error: No code to build...\n";
                 return false;
             }
+            
+            if(!interp::label_table.empty())
+                interp::label_table.erase(interp::label_table.begin(), interp::label_table.end());
+            if(!interp::label_line_table.empty())
+                interp::label_line_table.erase(interp::label_line_table.begin(), interp::label_line_table.end());
+            
             for(unsigned int i = 0; i < interp::lines.size(); ++i) {
                 if(build_line(i)==false) {
                     std::cout << "Error on line: " << interp::lines[i].index << "\n";
