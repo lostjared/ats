@@ -1,0 +1,9 @@
+; count from 1-255 and store in memory
+10 LDA #0
+20 LDX #0
+30 START ADC #1
+40 INX
+50 STA $0, X
+60 BNE START
+70 END
+
