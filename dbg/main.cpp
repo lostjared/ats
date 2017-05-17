@@ -6,6 +6,7 @@
  
  */
 
+#define VERSION_INFO "1.0"
 #include"code.hpp"
 #include"function.hpp"
 #include<unordered_map>
@@ -40,13 +41,16 @@ int main() {
     }
     
     
-    code.symbols["version"].create("version", symbol::Value("1.0", 1.0));
+    code.symbols["version"].create("version", symbol::Value(VERSION_INFO, 1.0));
     code.symbols["author"].create("author", symbol::Value("lostjared", 0));
     std::ios state(0);
     state.copyfmt(std::cout);
     
+    std::cout << "ats (atari script) interactive terminal v" << VERSION_INFO << "\npress Ctrl+C to break program\n";
+    
     while(1) {
         try {
+            
             std::string input_line;
             char *input = readline("$>");
             add_history(input);
