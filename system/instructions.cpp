@@ -235,8 +235,8 @@ namespace interp {
                     case interp::ABSOULTE:
                     case interp::ZEROPAGE: {
                         uint16_t val = c.peek(c.instruct[in].op1.op);
+                        --val;
                         uint8_t value=static_cast<uint8_t>(val);
-                        --value;
                         if(value == 0)
                             c.proc.setFlag(icode::FLAG_ZERO, 1);
                         else
