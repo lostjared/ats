@@ -254,7 +254,8 @@ namespace interp {
     
     void Code::procInstruct(icode::Instruction &i) {
         unsigned int op_code = static_cast<unsigned int>(i.opcode);
-        inst[op_code].call_back(*this);
+        if(op_code < static_cast<int>(icode::opc::NOTINC))
+        	inst[op_code].call_back(*this);
     }
     
     

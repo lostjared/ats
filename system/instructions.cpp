@@ -11,11 +11,10 @@ namespace interp {
                     case interp::ZEROPAGE: {
                         uint8_t val = c.peek(c.instruct[in].op1.op);
                         uint16_t total = c.proc.reg_a + val;
-                        
                         c.proc.reg_a += val;
                         
                         if(c.proc.getFlag(icode::FLAG_CARRY))
-                            ++c.proc.reg_a;
+                            ++c.proc.reg_a, ++total;
                         
                         if(total > 255) {
                             c.proc.setFlag(icode::FLAG_CARRY, 1);
@@ -40,7 +39,7 @@ namespace interp {
                 c.proc.reg_a += val;
                 
                 if(c.proc.getFlag(icode::FLAG_CARRY)) {
-                    ++c.proc.reg_a;
+                    ++c.proc.reg_a, ++total;;
                 }
                 
                 if(total > 255) {
@@ -234,26 +233,33 @@ namespace interp {
                 switch(c.instruct[in].mode) {
                     case interp::ABSOULTE:
                     case interp::ZEROPAGE: {
-                        uint16_t val = c.peek(c.instruct[in].op1.op);
-                        --val;
-                        uint8_t value=static_cast<uint8_t>(val);
+                        uint8_t value = c.peek(c.instruct[in].op1.op)-1;
+                        if((char)value < 0) {
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        } else {
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+                        }
                         if(value == 0)
                             c.proc.setFlag(icode::FLAG_ZERO, 1);
                         else
                             c.proc.setFlag(icode::FLAG_ZERO, 0);
+                        
                         c.poke(c.instruct[in].op1.op, value);
                     }
                         break;
                     case interp::ZEROPAGE_X:
                     case interp::ABSOULTE_X: {
-                        uint16_t val = c.peek(c.instruct[in].op1.op+c.proc.reg_x);
-                        --val;
-                        
-                        uint8_t value = static_cast<uint8_t>(val);
+                        uint8_t value = c.peek(c.instruct[in].op1.op+c.proc.reg_x)-1;
+                        if((char)value < 0) {
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        } else {
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+                        }
                         if(value == 0)
                             c.proc.setFlag(icode::FLAG_ZERO, 1);
                         else
                             c.proc.setFlag(icode::FLAG_ZERO, 0);
+                        
                         c.poke(c.instruct[in].op1.op+c.proc.reg_x,value);
                     }
                         break;
@@ -265,7 +271,12 @@ namespace interp {
     }
     
     void i_dex(Code &c) {
-        //uint16_t total = c.proc.reg_x+1;
+        uint8_t value = c.proc.reg_x-1;
+        if((char)value < 0) {
+            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+        } else {
+            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+        }
         --c.proc.reg_x;
         if(c.proc.reg_x == 0) {
             c.proc.setFlag(icode::FLAG_ZERO, 1);
@@ -275,7 +286,13 @@ namespace interp {
     }
     
     void i_dey(Code &c) {
-        //uint16_t total = c.proc.reg_y+1;
+        uint8_t value = c.proc.reg_y-1;
+        if((char)value < 0) {
+            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+        } else {
+            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+        }
+        
         --c.proc.reg_y;
         if(c.proc.reg_y == 0) {
             c.proc.setFlag(icode::FLAG_ZERO, 1);
