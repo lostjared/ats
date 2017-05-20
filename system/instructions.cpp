@@ -575,9 +575,60 @@ namespace interp {
     void i_rts(Code &c) {
         
     }
-    
+    // still working on this
     void i_sbc(Code &c) {
-        
+        /*
+        int in = c.proc.getIp();
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_MEMORY: {
+                switch(c.instruct[in].mode) {
+                    case interp::ABSOULTE:
+                    case interp::ZEROPAGE: {
+                        uint8_t val = c.peek(c.instruct[in].op1.op);
+                        char total = c.proc.reg_a-val;
+                        
+                        c.proc.reg_a = static_cast<unsigned char>(total);
+                        
+                        if(total < 0) {
+                            c.proc.setFlag(icode::FLAG_CARRY, 1);
+                        } else {
+                            c.proc.setFlag(icode::FLAG_CARRY, 0);
+                        }
+                        if(c.proc.reg_a == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                    }
+                        break;
+                    default:
+                        return;
+                }
+            }
+                break;
+            case icode::op_type::OP_DECIMAL: {
+                uint8_t val = c.instruct[in].op1.op;
+                int total = c.proc.reg_a + val;
+                c.proc.reg_a -= val;
+                if(c.proc.getFlag(icode::FLAG_CARRY)) {
+                    --c.proc.reg_a;
+                }
+                
+                if(total < 0) {
+                    --c.proc.reg_a;
+                    c.proc.setFlag(icode::FLAG_CARRY, 1);
+                } else {
+                    c.proc.setFlag(icode::FLAG_CARRY, 0);
+                }
+                
+                if(c.proc.reg_a == 0)
+                    c.proc.setFlag(icode::FLAG_ZERO, 1);
+                else
+                    c.proc.setFlag(icode::FLAG_ZERO, 0);
+            }
+                break;
+            default:
+                break;
+        }*/
     }
     
     void i_sec(Code &c) {
