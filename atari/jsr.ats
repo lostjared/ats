@@ -1,0 +1,16 @@
+; jump to subroutine
+10 CLC
+20 JSR ADDVALUES
+30 END
+; Add some values
+100 ADDVALUES LDX #10
+110 LDY #25
+120 STX $1E
+130 STY $1F
+140 LDA #100
+150 ADC $1E
+160 ADC $1F
+170 STA $10
+180 RTS
+
+
