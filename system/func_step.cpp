@@ -7,6 +7,7 @@ namespace token {
             std::cerr << "Error: You must run build first.\n";
             return;
         }
+        
         code.printCurrent();
         code.step();
         std::cout << "Registers: \n";
