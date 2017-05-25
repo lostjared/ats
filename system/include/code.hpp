@@ -16,6 +16,12 @@
 
 namespace interp {
     
+    class Runtime_E {
+    public:
+        Runtime_E(const std::string &t) : text(t) { }
+        std::string text;
+    };
+    
     // address modes
     enum { IMMEDIATE=1,ZEROPAGE,ZEROPAGE_X,ZEROPAGE_Y,ABSOULTE,ABSOULTE_X,ABSOULTE_Y,IMPLIED,RELATIVE,INDIRECT_I,INDEXED_I,ACCUMULATOR,INDIRECT };
     
@@ -56,6 +62,7 @@ namespace interp {
         symbol::Symbol symbols;
         icode::Processor proc;
         std::vector<uint8_t> stack;
+        std::vector<uint32_t> in_stack;
         uint8_t mem[0xFFFF+1];
         std::vector<icode::Instruction> instruct;
     private:

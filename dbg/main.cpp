@@ -76,6 +76,10 @@ int main() {
             }
             std::cout.copyfmt(state);
         }
+        catch(interp::Runtime_E &e) {
+            std::cerr << "Runtime Error: " << e.text << "\n";
+            code.stop();
+        }
         catch(lex::Scanner_EOF) {
             
         }

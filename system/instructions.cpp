@@ -1,4 +1,5 @@
 #include "code.hpp"
+#include "translate.hpp"
 
 namespace interp {
     
@@ -403,7 +404,17 @@ namespace interp {
     }
     
     void i_jsr(Code &c) {
-        
+        int in = c.proc.getIp();
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_LABELTEXT:
+            case icode::op_type::OP_LABEL: {
+                c.in_stack.push_back(c.proc.ip);
+                c.proc.ip = c.instruct[in].op1.label_index-1;
+            }
+                break;
+            default:
+                break;
+        }
     }
     
     void i_lda(Code &c) {
@@ -573,7 +584,12 @@ namespace interp {
     }
     
     void i_rts(Code &c) {
-        
+        if(c.in_stack.size()==0) {
+            throw Runtime_E("jsr stack underflow.\n");
+        }
+        int top = c.in_stack.back();
+        c.in_stack.pop_back();
+        c.proc.ip = top;
     }
     // still working on this
     void i_sbc(Code &c) {
