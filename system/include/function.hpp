@@ -75,6 +75,7 @@ namespace token {
     void token_Insert(const std::string &text, std::vector<lex::Token> &tokens);
     void token_Continue(const std::string &cmd, std::vector<lex::Token> &tokens);
     void token_Debug(const std::string &cmd, std::vector<lex::Token> &tokens);
+    void token_Stack(const std::string &cmd, std::vector<lex::Token> &tokens);
 }
 
 #endif
