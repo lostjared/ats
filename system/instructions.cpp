@@ -556,19 +556,29 @@ namespace interp {
     }
     
     void i_pha(Code &c) {
-        
+        c.stack.push_back(c.proc.reg_a);
     }
     
     void i_php(Code &c) {
-        
+        c.stack.push_back(c.proc.valFlags());
     }
     
     void i_pla(Code &c) {
-        
+        if(c.stack.size()==0) {
+            throw interp::Runtime_E("error stack underflow");
+        }
+        uint8_t accum = c.stack.back();
+        c.stack.pop_back();
+        c.proc.reg_a = accum;
     }
     
     void i_plp(Code &c) {
-        
+        if(c.stack.size()==0) {
+            throw interp::Runtime_E("error stack underflow");
+        }
+        uint8_t flags = c.stack.back();
+        c.stack.pop_back();
+        c.proc.setFlags(flags);
     }
     
     void i_rol(Code &c) {
