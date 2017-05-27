@@ -13,21 +13,76 @@ namespace interp {
                         uint8_t val = c.peek(c.instruct[in].op1.op);
                         uint16_t total = c.proc.reg_a + val;
                         c.proc.reg_a += val;
-                        
                         if(c.proc.getFlag(icode::FLAG_CARRY))
                             ++c.proc.reg_a, ++total;
-                        
-                        if(total > 255) {
+                        if(total > 255)
                             c.proc.setFlag(icode::FLAG_CARRY, 1);
-                        } else {
+                         else
                             c.proc.setFlag(icode::FLAG_CARRY, 0);
-                        }
+                        
+                        if((char)c.proc.reg_a < 0)
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+                        
                         if(c.proc.reg_a == 0)
                             c.proc.setFlag(icode::FLAG_ZERO, 1);
                         else
                             c.proc.setFlag(icode::FLAG_ZERO, 0);
                     }
                         break;
+                        
+                    case interp::ABSOULTE_X:
+                    case interp::ZEROPAGE_X: {
+                        uint8_t val = c.peek(c.instruct[in].op1.op+c.proc.reg_x);
+                        uint16_t total = c.proc.reg_a + val;
+                        c.proc.reg_a += val;
+                        
+                        if(c.proc.getFlag(icode::FLAG_CARRY))
+                            ++c.proc.reg_a, ++total;
+                        
+                        if(total > 255)
+                            c.proc.setFlag(icode::FLAG_CARRY, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_CARRY, 0);
+                        
+                        if((char)c.proc.reg_a < 0)
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+
+                        
+                        if(c.proc.reg_a == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                    }
+                        break;
+                    case interp::ABSOULTE_Y: {
+                        uint8_t val = c.peek(c.instruct[in].op1.op+c.proc.reg_y);
+                        uint16_t total = c.proc.reg_a + val;
+                        c.proc.reg_a += val;
+                        
+                        if(c.proc.getFlag(icode::FLAG_CARRY))
+                            ++c.proc.reg_a, ++total;
+                        
+                        if(total > 255)
+                            c.proc.setFlag(icode::FLAG_CARRY, 1);
+                         else
+                            c.proc.setFlag(icode::FLAG_CARRY, 0);
+                        
+                        if((char)c.proc.reg_a < 0)
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+
+                        
+                        if(c.proc.reg_a == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                    }
+                	break;
                     default:
                         return;
                 }
@@ -43,11 +98,16 @@ namespace interp {
                     ++c.proc.reg_a, ++total;;
                 }
                 
-                if(total > 255) {
+                if(total > 255)
                     c.proc.setFlag(icode::FLAG_CARRY, 1);
-                } else {
+                 else
                     c.proc.setFlag(icode::FLAG_CARRY, 0);
-                }
+                
+                
+                if((char)c.proc.reg_a < 0)
+                    c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                else
+                    c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
                 
                 if(c.proc.reg_a == 0)
                     c.proc.setFlag(icode::FLAG_ZERO, 1);
@@ -63,7 +123,88 @@ namespace interp {
     }
     
     void i_and(Code &c) {
-        
+        int in = c.proc.getIp();
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_MEMORY: {
+                switch(c.instruct[in].mode) {
+                    case interp::ABSOULTE:
+                    case interp::ZEROPAGE: {
+                        uint8_t val = c.peek(c.instruct[in].op1.op);
+                        uint16_t total = c.proc.reg_a + val;
+                        c.proc.reg_a &= val;
+                        
+                        if((char)c.proc.reg_a < 0)
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+                        
+                        if(c.proc.reg_a == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                    }
+                        break;
+                        
+                    case interp::ABSOULTE_X:
+                    case interp::ZEROPAGE_X: {
+                        uint8_t val = c.peek(c.instruct[in].op1.op+c.proc.reg_x);
+                        uint16_t total = c.proc.reg_a + val;
+                        c.proc.reg_a &= val;
+
+                        if((char)c.proc.reg_a < 0)
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+
+                        
+                        if(c.proc.reg_a == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                    }
+                        break;
+                    case interp::ABSOULTE_Y: {
+                        uint8_t val = c.peek(c.instruct[in].op1.op+c.proc.reg_y);
+                        uint16_t total = c.proc.reg_a + val;
+                        c.proc.reg_a &= val;
+
+                        if((char)c.proc.reg_a < 0)
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+                        
+                        if(c.proc.reg_a == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                    }
+                        break;
+                    default:
+                        return;
+                }
+            }
+                break;
+            case icode::op_type::OP_DECIMAL: {
+                uint8_t val = c.instruct[in].op1.op;
+                uint16_t total = c.proc.reg_a + val;
+                
+                c.proc.reg_a &= val;
+                
+                if((char)c.proc.reg_a < 0)
+                    c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                else
+                    c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+                
+                
+                if(c.proc.reg_a == 0)
+                    c.proc.setFlag(icode::FLAG_ZERO, 1);
+                else
+                    c.proc.setFlag(icode::FLAG_ZERO, 0);
+            }
+                break;
+            default:
+                break;
+        }
     }
     
     void i_asl(Code &c) {

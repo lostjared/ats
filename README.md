@@ -54,7 +54,7 @@ Base instruction set
 Instructions:
 
 	ADC - Add Memory to Accumulator with Carry
-	AND - And Memory to Accumulator with Carry
+	AND - And Memory to Accumulator
 	ASL - Shift Left One Bit (memory or accumulator)
 	BCC - Branch if Carry Flag is clear
 	BCS - Branch if Carry Flag is set
