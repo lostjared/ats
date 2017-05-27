@@ -16,10 +16,6 @@ namespace token {
             std::cout << std::bitset<32>(value);
             return true;
         }
-        else if(text == "64") {
-            std::cout << std::bitset<64>(value);
-            return true;
-        }
         return false;
     }
     
