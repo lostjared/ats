@@ -26,14 +26,11 @@ namespace token {
             return;
         }
         unsigned int numeric = atoi(tokens[1].getToken().c_str());
-        
         if( (numeric != 8) && (numeric != 16) && (numeric != 32)) {
             std::cerr << "Error: Supported bit depths are 8, 16, and 32.\n";
             return;
         }
-        
         for(unsigned int i = 2; i < tokens.size(); ++i) {
-        
             switch(tokens[i].getTokenType()) {
                 case lex::TOKEN_DIGIT: {
                     unsigned int num = atoi(tokens[i].getToken().c_str());
