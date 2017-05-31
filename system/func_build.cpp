@@ -6,7 +6,7 @@ namespace token {
     void token_Build(const std::string &cmd, std::vector<lex::Token> &tokens) {
         code.reset();
         if(translate::build_code()==true) {
-            std::cout << "Successfully build code...\n";
+            std::cout << "Successfully built code...\n";
         }
     }
     
