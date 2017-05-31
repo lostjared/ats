@@ -77,6 +77,7 @@ namespace translate {
         inst.line_num = line_value;
         match(tokens[0], lex::TOKEN_CHAR);
         icode::opc op;
+        inst.instruction_text = interp::lines[line].text;
         op = icode::strtoInc(tokens[0].getToken());
         if(op == icode::opc::NOTINC) {
             inst.label = true;

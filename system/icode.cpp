@@ -36,13 +36,14 @@ namespace icode {
     
     Instruction::Instruction(unsigned int iline, const opc &op_code, unsigned int m, const Operand &i_op1, const Operand &i_op2) : line_num(iline), opcode(op_code), mode(m), op1(i_op1), op2(i_op2) {}
     
-    Instruction::Instruction(const Instruction &i) : op_byte(i.op_byte), line_num(i.line_num), opcode(i.opcode),
+    Instruction::Instruction(const Instruction &i) : instruction_text(i.instruction_text), op_byte(i.op_byte), line_num(i.line_num), opcode(i.opcode),
     op1(i.op1), op2(i.op2), mode(i.mode), label(i.label), label_text(i.label_text), label_index(i.label_index), text(i.text)
     
     {
     }
     
     Instruction &Instruction::operator=(const Instruction &i) {
+        instruction_text = i.instruction_text;
         opcode = i.opcode;
         op1 = i.op1;
         op2 = i.op2;
@@ -145,7 +146,7 @@ namespace icode {
             out << "address mode unknown value: " << i.mode << "..\n";
             return out;
         }
-        out << "Line: " << std::dec << i.line_num << " " << i.opcode << " Address Mode: " << interp::add_mode[i.mode] << "  Opcode: " << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<unsigned int>(i.op_byte) << " ";
+        out << "Line: " << std::dec << i.line_num << " [" << i.instruction_text << "] - Address Mode: " << interp::add_mode[i.mode] << "  Opcode: " << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<unsigned int>(i.op_byte) << " ";
         switch(i.op1.op_t) {
             case icode::op_type::OP_MEMORY:
                 if(i.mode != interp::ZEROPAGE && i.mode != interp::ZEROPAGE_X && i.mode != interp::ZEROPAGE_Y) {

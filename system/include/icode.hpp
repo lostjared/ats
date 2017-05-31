@@ -34,6 +34,7 @@ namespace icode {
     
     class Instruction {
     public:
+        std::string instruction_text;
         unsigned char op_byte;
         unsigned int line_num;
         opc opcode;
