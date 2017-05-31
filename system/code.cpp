@@ -187,11 +187,11 @@ namespace interp {
     void Code::execute(bool debug) {
         while(run == true) {
             if(proc.ip >= 0) {
-                if(debug == true) {
+                if(debug == true)
                     printCurrent();
-                    print();
-                }
                 procInstruct(instruct[proc.ip]);
+                if(run == true && debug == true)
+                    print();
                 ++proc.ip;
                 if(proc.ip > instruct.size()) {
                     run = false;
