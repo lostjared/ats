@@ -18,7 +18,7 @@
 void control_Handler(int sig) {
     if(code.running()) {
         code.stop();
-        std::cout << "Program break.\n";
+        std::cout << "\n**** - Program break.\n";
     }
     else std::cout << "Caught Signal: Script not executing.\n";
     rl_on_new_line();
