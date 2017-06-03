@@ -21,7 +21,10 @@ namespace token {
                     std::cout << "$" << std::hex << std::uppercase << value <<  " = [ " << std::dec << value << " ]\n";
                 }
                     break;
-                default:
+                default: {
+                    std::cerr << "Error requires hex or decimal integers.\n";
+                    return;
+                }
                     break;
             }
             
