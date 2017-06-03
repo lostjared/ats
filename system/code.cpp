@@ -178,6 +178,7 @@ namespace interp {
         run = false;
         proc.ip = 0;
          if(!in_stack.empty()) in_stack.erase(in_stack.begin(), in_stack.end());
+        if(!stack.empty()) stack.erase(stack.begin(), stack.end());
     }
     
     void Code::pause() {
@@ -198,6 +199,7 @@ namespace interp {
                     proc.ip = 0;
                     std::cout << "Program end reached without END, use END to terminate your program.\n";
                      if(!in_stack.empty()) in_stack.erase(in_stack.begin(), in_stack.end());
+                    if(!stack.empty()) stack.erase(stack.begin(), stack.end());
                     break;
                 }
             }
@@ -239,9 +241,12 @@ namespace interp {
             instruct.erase(instruct.begin(), instruct.end());
         
         proc.clrFlags();
-        /*if(!stack.empty())
-            stack.erase(stack.begin(), stack.end()); */
+        
+        if(!stack.empty())
+            stack.erase(stack.begin(), stack.end());
+        
         proc.reset();
+        
         if(!in_stack.empty())
         	in_stack.erase(in_stack.begin(), in_stack.end());
     }
