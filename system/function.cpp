@@ -34,7 +34,8 @@ std::unordered_map<std::string, Command> function_map = {
     { "continue", Command(token::token_Continue, 0, "Continue execution\nUse: continue") },
     { "debug", Command(token::token_Debug, 0, "Run program with debug information\nUse: debug") },
     { "stack", Command(token::token_Stack, 0, "Display contents of stack\nUse: stack") },
-    { "bin", Command(token::token_Bin, -1, "Convert to Binary\nUse: bin numbers") }
+    { "bin", Command(token::token_Bin, -1, "Convert to Binary\nUse: bin numbers") },
+    { "int", Command(token::token_Integer, -1, "Output bin/dec/hex for Integer value\nUse: int base values") }
 };
 
 namespace token {
