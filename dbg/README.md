@@ -17,9 +17,7 @@ Command: build
 
 Description: Build code
 
-Use:
-
-build
+Use: build
 
 Command: clear
 
@@ -43,9 +41,7 @@ Command: convert
 
 Description: Convert stored code to tokens 
 
-Use:
-
-convert
+Use: convert
 
 Command: debug
 
