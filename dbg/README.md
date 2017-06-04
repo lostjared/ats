@@ -1,4 +1,4 @@
-
+https://github.com/lostjared/ats/blob/master/dbg/README.md
 Command list:
 
 quit
@@ -7,13 +7,13 @@ description: quit application
 
 Use: quit
 
-bin
+Command: bin
 
 Description: Convert to Binary
 
 Use: bin numbers
 
-build
+Command: build
 
 Description: Build code
 
@@ -21,25 +21,25 @@ Use:
 
 build
 
-clear
+Command: clear
 
 Description: Clear all lines
 
 Use: clear
 
-code
+Command: code
 
 Description: Print out Hex values for Machine lanauge
 
 Use: code
 
-continue
+Command: continue
 
 Description: Continue execution
 
 Use: continue
 
-convert
+Command: convert
 
 Description: Convert stored code to tokens 
 
@@ -47,97 +47,97 @@ Use:
 
 convert
 
-debug
+Command: debug
 
 Description: Run program with debug information
 
 Use: debug
 
-display
+Command: display
 
 Description: Display indivdual line
 
 Use: display line
 
-execute
+Command: execute
 
 Description: Execute compiled code
 
 Use: execute
 
-expr
+Command: expr
 
-Description: Parse Expression ofor symbols
+Description: Parse Expression for symbols
 
 Use: expr expression
 
-help
+Command: help
 
 Description: Print help message
 
 Use: help
 
-html
+Command: html
 
 Description: Print code info to HTML
 
 Use: html "filename"
 
-insert
+Command: insert
 
 Description: Insert a stream of bytes at a starting address
 
 Use: insert startaddress val1 val2 val3 ....
 
-list
+Command: list
 
 Description: List source code
 
 Use: list
 
-memory
+Command: memory
 
 Description: Print memory range argument one is hex value starting value range argument two is hex value stop value range
 
 Use: memory start stop
 
-open
+Command: open
 
 Description: Open code from file
 
 Use: open "filename"
 
-peek
+Command: peek
 
 Description: Show memory location argument one is memory address
 
 Use: peek address
 
-peek16
+Command: peek16
 
 Description: Peek 16 bit value from memory.
 
 Use: peek16 address value
 
-poke
+Command: poke
 
 Description: Store value in memory location argument one is memory argument two is value (symbol or constant)
 
 Use: poke address value
 
-print
+Command: print
 
 Description: Print out information about built code
 
 Use: print
 
-procinfo
+Command: procinfo
 
 Description: Print registers to console
 
 Use: procinfo
 
-remove
+Command: remove
 
 Description: Remove individual line argument 1 is line number
 
@@ -149,56 +149,56 @@ Description: Save stored code
 
 Use: save "filename"
 
-setreg
+Command: setreg
 
 Description: Set register to value
 
 Use: setreg register value
 
-setsym
+Command: setsym
 
 Description: Set symbol value in Symbol Table
 
 Use: setsym variable value
 
-sh
+Command: sh
 
 Description: Execute shell command stored in argument one as a string
 
 Use: sh "command"
 
-stack
+Command: stack
 
 Description: Display contents of stack
 
 Use: stack
 
-step
+Command: step
 
 Description: Make Step in debugger
 
 Use: step
 
-symbol
+Command: symbol
 
 Description: Print indivdual symbol argument is the name
 
 Use: symbol variable
 
-symbols
+Command: symbols
 
 Description: Print stored shell variable symbols
 
 Use: symbols
 
-tokenize
+Command: tokenize
 
 Description: Tokenize string
 
 Use: tokenize string
 
-unsym
+Command: unsym
 
 Description: Remove symbol from table
 
-Use:unsym variable
+Use: unsym variable
