@@ -110,3 +110,13 @@ Instructions:
 	TXA - Transfer register X to accumulator
 	TYA - Transfer register Y to accumulator
 
+Scans
+
+![scan1](https://github.com/lostjared/ats/blob/master/scans/flags1.png?raw=true  "Scan 1")
+
+![scan2](https://github.com/lostjared/ats/blob/master/scans/flags2.png?raw=true  "Scan 2")
+
+![scan3](https://github.com/lostjared/ats/blob/master/scans/Opcodes1.png?raw=true  "Scan 3")
+
+![scan4](https://github.com/lostjared/ats/blob/master/scans/Opcodes2.png?raw=true  "Scan 4")
+
