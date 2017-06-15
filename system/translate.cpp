@@ -153,11 +153,19 @@ namespace translate {
                         break;
                     case lex::TOKEN_CHAR:
                         // check if label exisits
+                        if(tokens[1].getToken()=="A" && confirm_mode(inst.opcode, interp::ACCUMULATOR, inst.op_byte)==true) {
+                            inst.op1 = icode::Operand(0, icode::op_type::OP_REGISTER_A);
+                            inst.mode = interp::ACCUMULATOR;
+                            break;
+                        }
+                        else
                         if(confirm_mode(inst.opcode, interp::ABSOULTE, inst.op_byte) == false) {
                             
                             if(confirm_mode(inst.opcode, interp::RELATIVE, inst.op_byte) == true) {
                                 inst.mode = interp::RELATIVE;
                             } else {
+                                
+                              
                                 
                                 std::ostringstream stream;
                                 stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " does not support addressing mode.\n";

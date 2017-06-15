@@ -83,7 +83,11 @@ namespace icode {
             case icode::op_type::OP_DECIMAL:
                 stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op;
                 break;
-            case icode::op_type::OP_REGISTER:
+            case icode::op_type::OP_REGISTER_A:
+                break;
+            case icode::op_type::OP_REGISTER_X:
+                break;
+            case icode::op_type::OP_REGISTER_Y:
                 break;
             case icode::op_type::OP_LABEL:
                 stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op;
@@ -121,7 +125,11 @@ namespace icode {
             case icode::op_type::OP_DECIMAL:
                 stream << std::bitset<8>(i.op1.op);
                 break;
-            case icode::op_type::OP_REGISTER:
+            case icode::op_type::OP_REGISTER_A:
+                break;
+            case icode::op_type::OP_REGISTER_X:
+                break;
+            case icode::op_type::OP_REGISTER_Y:
                 break;
             case icode::op_type::OP_LABEL:
                 stream << std::bitset<8>(i.op1.op);
@@ -161,8 +169,14 @@ namespace icode {
                 out << "Operand 1 [Byte Constant]: " << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op << " ";
                 stream << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i.op1.op;
                 break;
-            case icode::op_type::OP_REGISTER:
-                out << "Operand 1 [Register]: "; // register here
+            case icode::op_type::OP_REGISTER_A:
+                out << "Operand 1 [Register A]: "; // register here
+                break;
+            case icode::op_type::OP_REGISTER_X:
+                out << "Operand 1 [Regsiter X]:";
+                break;
+            case icode::op_type::OP_REGISTER_Y:
+                out << "Operand 1 [Register Y]:";
                 break;
             case icode::op_type::OP_LABEL:
                 out << "Branch value: " << std::setfill('0') << std::setw(2) << i.op1.op << " ";
