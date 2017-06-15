@@ -216,6 +216,14 @@ namespace interp {
                 if(bits[7] == 1) c.proc.setFlag(icode::FLAG_CARRY, 1);
                 else c.proc.setFlag(icode::FLAG_CARRY, 0);
                 cc <<= 1;
+                if(cc == 0)
+                    c.proc.setFlag(icode::FLAG_ZERO, 1);
+                else
+                    c.proc.setFlag(icode::FLAG_ZERO, 0);
+                if((char)cc < 0)
+                    c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                else
+                    c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
             }
                 break;
             case icode::op_type::OP_MEMORY: {
@@ -228,6 +236,14 @@ namespace interp {
                         else c.proc.setFlag(icode::FLAG_CARRY, 0);
                         cc <<= 1;
                         c.poke(c.instruct[ip].op1.op, cc);
+                        if(cc == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                        if((char)cc < 0)
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
                     }
                         break;
                         
@@ -239,15 +255,14 @@ namespace interp {
                         else c.proc.setFlag(icode::FLAG_CARRY, 0);
                         cc <<= 1;
                         c.poke(c.instruct[ip].op1.op+c.proc.reg_x, cc);
-                    }
-                        break;
-                    case interp::ABSOULTE_Y: {
-                        uint8_t cc = c.peek(c.instruct[ip].op1.op+c.proc.reg_y);
-                        std::bitset<8> bits(cc);
-                        if(bits[7] == 1) c.proc.setFlag(icode::FLAG_CARRY, 1);
-                        else c.proc.setFlag(icode::FLAG_CARRY, 0);
-                        cc <<= 1;
-                        c.poke(c.instruct[ip].op1.op+c.proc.reg_y, cc);
+                        if(cc == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                        if((char)cc < 0)
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
                     }
                         break;
                     default:
@@ -815,7 +830,73 @@ namespace interp {
     }
     
     void i_lsr(Code &c) {
-        
+        unsigned int ip = c.proc.getIp();
+        switch(c.instruct[ip].op1.op_t) {
+            case icode::op_type::OP_REGISTER_A: {
+                uint8_t &cc = c.proc.reg_a;
+                std::bitset<8> bits(cc);
+                if(bits[0] == 1) c.proc.setFlag(icode::FLAG_CARRY, 1);
+                else c.proc.setFlag(icode::FLAG_CARRY, 0);
+                cc >>= 1;
+                if(cc == 0)
+                    c.proc.setFlag(icode::FLAG_ZERO, 1);
+                else
+                    c.proc.setFlag(icode::FLAG_ZERO, 0);
+                if((char)cc < 0)
+                    c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                else
+                    c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+            }
+                break;
+            case icode::op_type::OP_MEMORY: {
+                switch(c.instruct[ip].mode) {
+                    case interp::ABSOULTE:
+                    case interp::ZEROPAGE: {
+                        uint8_t cc = c.peek(c.instruct[ip].op1.op);
+                        std::bitset<8> bits(cc);
+                        if(bits[0] == 1) c.proc.setFlag(icode::FLAG_CARRY, 1);
+                        else c.proc.setFlag(icode::FLAG_CARRY, 0);
+                        cc >>= 1;
+                        c.poke(c.instruct[ip].op1.op, cc);
+                        if(cc == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                        if((char)cc < 0)
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+                    }
+                        break;
+                        
+                    case interp::ABSOULTE_X:
+                    case interp::ZEROPAGE_X: {
+                        uint8_t cc = c.peek(c.instruct[ip].op1.op+c.proc.reg_x);
+                        std::bitset<8> bits(cc);
+                        if(bits[0] == 1) c.proc.setFlag(icode::FLAG_CARRY, 1);
+                        else c.proc.setFlag(icode::FLAG_CARRY, 0);
+                        cc >>= 1;
+                        c.poke(c.instruct[ip].op1.op+c.proc.reg_x, cc);
+                        if(cc == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                        if((char)cc < 0)
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+                    }
+                        break;
+                    default:
+                        return;
+                }
+            }
+                break;
+            case icode::op_type::OP_DECIMAL:
+                break;
+            default:
+                break;
+        }
     }
     
     void i_nop(Code &c) {
