@@ -1107,7 +1107,7 @@ namespace interp {
             case icode::op_type::OP_REGISTER_A: {
                 uint8_t &cc = c.proc.reg_a;
                 std::bitset<8> bits(cc);
-                if(bits[7] == 1)
+                if(bits[0] == 1)
                     c.proc.setFlag(icode::FLAG_CARRY, 1);
                 else
                     c.proc.setFlag(icode::FLAG_CARRY, 0);
@@ -1128,7 +1128,7 @@ namespace interp {
                     case interp::ZEROPAGE: {
                         uint8_t cc = c.peek(c.instruct[ip].op1.op);
                         std::bitset<8> bits(cc);
-                        if(bits[7] == 1)
+                        if(bits[0] == 1)
                             c.proc.setFlag(icode::FLAG_CARRY, 1);
                         else
                             c.proc.setFlag(icode::FLAG_CARRY, 0);
@@ -1149,7 +1149,7 @@ namespace interp {
                     case interp::ZEROPAGE_X: {
                         uint8_t cc = c.peek(c.instruct[ip].op1.op+c.proc.reg_x);
                         std::bitset<8> bits(cc);
-                        if(bits[7] == 1)
+                        if(bits[0] == 1)
                             c.proc.setFlag(icode::FLAG_CARRY, 1);
                         else
                             c.proc.setFlag(icode::FLAG_CARRY, 0);
