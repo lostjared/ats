@@ -1014,12 +1014,167 @@ namespace interp {
         c.proc.setFlags(flags);
     }
     
+    template<typename T>
+    T ror(T x, unsigned int m)
+    {
+        return (x >> m) | (x << sizeof(T)*8 - m);
+    }
+    template<typename T>
+    T rol(T x, unsigned int m) {
+        return (x << m) | (x >> (sizeof(T)*8 -m));
+    }
+    
+    
     void i_rol(Code &c) {
-        
+        unsigned int ip = c.proc.getIp();
+        switch(c.instruct[ip].op1.op_t) {
+            case icode::op_type::OP_REGISTER_A: {
+                uint8_t &cc = c.proc.reg_a;
+                std::bitset<8> bits(cc);
+                if(bits[7] == 1)
+                    c.proc.setFlag(icode::FLAG_CARRY, 1);
+                else
+                    c.proc.setFlag(icode::FLAG_CARRY, 0);
+                cc = rol(cc, 1);
+                if(cc == 0)
+                    c.proc.setFlag(icode::FLAG_ZERO, 1);
+                else
+                    c.proc.setFlag(icode::FLAG_ZERO, 0);
+                if((char)cc < 0)
+                    c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                else
+                    c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+            }
+                break;
+            case icode::op_type::OP_MEMORY: {
+                switch(c.instruct[ip].mode) {
+                    case interp::ABSOULTE:
+                    case interp::ZEROPAGE: {
+                        uint8_t cc = c.peek(c.instruct[ip].op1.op);
+                        std::bitset<8> bits(cc);
+                        if(bits[7] == 1)
+                            c.proc.setFlag(icode::FLAG_CARRY, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_CARRY, 0);
+                        cc = rol(cc, 1);
+                        c.poke(c.instruct[ip].op1.op, cc);
+                        if(cc == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                        if((char)cc < 0)
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+                    }
+                        break;
+                        
+                    case interp::ABSOULTE_X:
+                    case interp::ZEROPAGE_X: {
+                        uint8_t cc = c.peek(c.instruct[ip].op1.op+c.proc.reg_x);
+                        std::bitset<8> bits(cc);
+                        if(bits[7] == 1)
+                            c.proc.setFlag(icode::FLAG_CARRY, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_CARRY, 0);
+                        cc = rol(cc, 1);
+                        c.poke(c.instruct[ip].op1.op+c.proc.reg_x, cc);
+                        if(cc == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                        if((char)cc < 0)
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+                    }
+                        break;
+                    default:
+                        return;
+                }
+            }
+                break;
+            case icode::op_type::OP_DECIMAL:
+                break;
+            default:
+                break;
+        }
     }
     
     void i_ror(Code &c) {
-        
+        unsigned int ip = c.proc.getIp();
+        switch(c.instruct[ip].op1.op_t) {
+            case icode::op_type::OP_REGISTER_A: {
+                uint8_t &cc = c.proc.reg_a;
+                std::bitset<8> bits(cc);
+                if(bits[7] == 1)
+                    c.proc.setFlag(icode::FLAG_CARRY, 1);
+                else
+                    c.proc.setFlag(icode::FLAG_CARRY, 0);
+                cc = ror(cc, 1);
+                if(cc == 0)
+                    c.proc.setFlag(icode::FLAG_ZERO, 1);
+                else
+                    c.proc.setFlag(icode::FLAG_ZERO, 0);
+                if((char)cc < 0)
+                    c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                else
+                    c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+            }
+                break;
+            case icode::op_type::OP_MEMORY: {
+                switch(c.instruct[ip].mode) {
+                    case interp::ABSOULTE:
+                    case interp::ZEROPAGE: {
+                        uint8_t cc = c.peek(c.instruct[ip].op1.op);
+                        std::bitset<8> bits(cc);
+                        if(bits[7] == 1)
+                            c.proc.setFlag(icode::FLAG_CARRY, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_CARRY, 0);
+                        cc = ror(cc, 1);
+                        c.poke(c.instruct[ip].op1.op, cc);
+                        if(cc == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                        if((char)cc < 0)
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+                    }
+                        break;
+                        
+                    case interp::ABSOULTE_X:
+                    case interp::ZEROPAGE_X: {
+                        uint8_t cc = c.peek(c.instruct[ip].op1.op+c.proc.reg_x);
+                        std::bitset<8> bits(cc);
+                        if(bits[7] == 1)
+                            c.proc.setFlag(icode::FLAG_CARRY, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_CARRY, 0);
+                        cc = ror(cc, 1);
+                        c.poke(c.instruct[ip].op1.op+c.proc.reg_x, cc);
+                        if(cc == 0)
+                            c.proc.setFlag(icode::FLAG_ZERO, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_ZERO, 0);
+                        if((char)cc < 0)
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 1);
+                        else
+                            c.proc.setFlag(icode::FLAG_NEGATIVE, 0);
+                    }
+                        break;
+                    default:
+                        return;
+                }
+            }
+                break;
+            case icode::op_type::OP_DECIMAL:
+                break;
+            default:
+                break;
+        }
     }
     
     void i_rti(Code &c) {
