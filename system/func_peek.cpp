@@ -13,6 +13,6 @@ namespace token {
             std::cerr << "Error: constant must be 16 bit value.\n";
             return;
         }
-        std::cout << "[ $" << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << val << " ] = $" << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<unsigned int>(code.peek(val)) << "\n";
+        std::cout << "[ $" << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << val << " ] = $" << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<unsigned int>(code.peek(val)) << " | #" << std::dec << static_cast<unsigned int>(code.peek(val)) << "\n";
     }
 }
