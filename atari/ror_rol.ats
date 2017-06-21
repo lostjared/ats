@@ -1,0 +1,8 @@
+; use
+; memory $10 $11
+; after running program to view changes
+10 LDA #$FE
+20 STA $10
+30 STA $11
+40 ROR $10
+50 ROL $11
