@@ -900,7 +900,7 @@ namespace interp {
     }
     
     void i_nop(Code &c) {
-        
+        std::cout << "nop\n";
     }
     
     void i_ora(Code &c) {
