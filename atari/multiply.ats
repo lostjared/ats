@@ -1,3 +1,4 @@
+; multiply 5 * 5 place value is $20 
 10  LDA #0
 20  LDY #0
 30  LDX #5
