@@ -426,7 +426,7 @@ namespace lex {
             cc = getChar();
             if(oc == cc && (cc != '{' && cc != '[' && cc != '(' && cc != ']' && cc != ')' && cc != '}')) {
                 tok += cc;
-            } else if(cc == '=' || cc == '>' || cc == '*') {
+            } else if(cc == '=' || cc == '>') {
                 tok += cc;
             } else {
                 putBack(cc);
