@@ -28,9 +28,9 @@ namespace lex {
                 double e = expr(false);
                 bool ohex = code.symbols["hex"].get_double()!=0;
                 if(ohex == false)
-                    std::cout << "expr: " << e << "\n";
+                    std::cout << "expr: [" << v_assign << "] = " << e << "\n";
                 else
-                    std::cout << "expr: $" << std::uppercase << std::hex << static_cast<int>(e) << "\n";
+                    std::cout << "expr: [" << v_assign << "] = $" << std::uppercase << std::hex << static_cast<int>(e) << "\n";
                 if(input.GetCurrent().getToken() == ";")
                     continue;// eat token
             }
@@ -88,16 +88,22 @@ namespace lex {
                 
                 
                 double &v = code.symbols[var_name].get_double();
+
                 if(input.GetCurrent().getToken() == "=")  {
+                    v_assign = var_name;
                     v = expr(true);
                 } else if(input.GetCurrent().getToken() == "+=") {
+                    v_assign = var_name;
                     v += expr(true);
                     
                 } else if(input.GetCurrent().getToken() == "-=") {
+                    v_assign = var_name;
                     v -= expr(true);
                 } else if(input.GetCurrent().getToken() == "*=") {
+                    v_assign = var_name;
                     v *= expr(true);
                 } else if(input.GetCurrent().getToken() == "/=") {
+                    v_assign = var_name;
                     double d = expr(true);
                     if(d == 0) err("Divide by zero");
                     v /= d;

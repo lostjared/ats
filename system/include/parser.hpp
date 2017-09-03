@@ -31,6 +31,7 @@ namespace lex {
         double prim(bool get);
         double term(bool get);
         double expr(bool get);
+        std::string v_assign;
     };
 }
 
