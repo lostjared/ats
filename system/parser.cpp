@@ -24,13 +24,20 @@ namespace lex {
                 if(t.getType() == TOKEN_EOF) {
                     return true;
                 }
-                
                 double e = expr(false);
                 bool ohex = code.symbols["hex"].get_double()!=0;
-                if(ohex == false)
-                    std::cout << "expr: [" << v_assign << "] = " << e << "\n";
+                if(ohex == false) {
+                    if(v_assign != "")
+                    	std::cout << "expr: [" << v_assign << "] = " << e << "\n";
+                    else
+                        std::cout << "expr: " << e << "\n";
+                }
                 else
-                    std::cout << "expr: [" << v_assign << "] = $" << std::uppercase << std::hex << static_cast<int>(e) << "\n";
+                    if(v_assign != "")
+                    	std::cout << "expr: [" << v_assign << "] = $" << std::uppercase << std::hex << static_cast<int>(e) << "\n";
+                	else
+                        std::cout << "expr: $" << std::uppercase << std::hex << static_cast<int>(e) << "\n";
+                
                 if(input.GetCurrent().getToken() == ";")
                     continue;// eat token
             }
