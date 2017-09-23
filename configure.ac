@@ -19,9 +19,9 @@ if test ${prefix} != "NONE"; then
 LDFLAGS="$LDFLAGS -L${prefix}/lib"
 fi
 
-AC_CHECK_LIB([readline], [readline], [], [
-AC_MSG_ERROR([unable to find the readline() function install libreadline])
-])
+#AC_CHECK_LIB([readline], [readline], [], [
+#AC_MSG_ERROR([unable to find the readline() function install libreadline])
+#])
 
 enable_dbg=no
 AC_ARG_ENABLE(debug,
