@@ -4,6 +4,9 @@ Work in progress. In early stages still, but the goal of this project is to teac
 This program just plays around with a few different concepts, but borrows a lot of the instructions and concepts from the book "the Atari Assembler".
 This is not an exact implementation I have made a few mistakes but was intended as a learning experience.
 
+Program requires: autoconf, automake, libtool, make, g++
+
+
 First you need to install the GNU readline library
 if on OS X compile readline6 then install to /usr/local/
 
