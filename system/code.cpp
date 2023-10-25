@@ -225,7 +225,7 @@ namespace interp {
                 procInstruct(instruct[proc.ip++]);
             }
         } else {
-            stream << "Program finished executing..";
+            std::cout << "Program finished executing..";
             run = false;
             proc.ip = 0;
         }
