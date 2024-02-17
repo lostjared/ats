@@ -1,6 +1,6 @@
 # ats
 
-This project is currently under development and is in its initial phases. The primary objective is self-education on interpreters. It experiments with various concepts, drawing significant inspiration from the book "the Atari Assembler". While not a precise replication, and despite some errors, it's aimed at providing a valuable learning experience.
+The primary objective is self-education on interpreters. It experiments with various concepts, drawing significant inspiration from the book "the Atari Assembler". While not a precise replication, and despite some errors, it's aimed at providing a valuable learning experience.
 
 Necessary tools for the program include: autoconf, automake, libtool, make, g++, and readline."
 
