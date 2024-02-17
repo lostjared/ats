@@ -1,11 +1,8 @@
 # ats
 
-Work in progress. In early stages still, but the goal of this project is to teach myself more about interpreters.
-This program just plays around with a few different concepts, but borrows a lot of the instructions and concepts from the book "the Atari Assembler".
-This is not an exact implementation I have made a few mistakes but was intended as a learning experience.
+This project is currently under development and is in its initial phases. The primary objective is self-education on interpreters. It experiments with various concepts, drawing significant inspiration from the book "the Atari Assembler". While not a precise replication, and despite some errors, it's aimed at providing a valuable learning experience.
 
-Program requires: autoconf, automake, libtool, make, g++, readline
-
+Necessary tools for the program include: autoconf, automake, libtool, make, g++, and readline."
 
 First you need to install the GNU readline library
 if on OS X compile readline6 then install to /usr/local/
