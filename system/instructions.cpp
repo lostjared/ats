@@ -239,23 +239,24 @@ namespace interp {
 
     void i_bit(Code &c) {
         int in = c.proc.getIp();
-        if(c.instruct[in].op1.op_t != icode::op_type::OP_MEMORY)
+        
+        if (c.instruct[in].op1.op_t != icode::op_type::OP_MEMORY) {
             return;
+        }   
         uint8_t operand = 0;
-        switch(c.instruct[in].mode) {
-            case ABSOULTE:
-            case ZEROPAGE:
+        switch (c.instruct[in].mode) {
+            case interp::ABSOLUTE:
+            case interp::ZEROPAGE:
                 operand = c.peek(c.instruct[in].op1.op);
                 break;
             default:
                 return;
-        }        
+        }
         uint8_t result = c.proc.reg_a & operand;
         c.proc.setFlag(icode::FLAG_ZERO, (result == 0));
         c.proc.setFlag(icode::FLAG_NEGATIVE, ((operand & 0x80) != 0));
         c.proc.setFlag(icode::FLAG_OVERFLOW, ((operand & 0x40) != 0));
     }
-
 
     void i_bmi(Code &c) {
         unsigned int ip = c.proc.getIp();
@@ -827,9 +828,10 @@ namespace interp {
     }
 
     void i_rti(Code &c) {
-        if(c.stack.size() < 3) {
-            throw interp::Runtime_E("RTI: Stack underflow");
+        if (c.stack.size() < 3) {
+            throw Runtime_E("RTI: Stack underflow");
         }
+    
         uint8_t status = c.stack.back();
         c.stack.pop_back();
         uint8_t pcl = c.stack.back();
@@ -837,7 +839,7 @@ namespace interp {
         uint8_t pch = c.stack.back();
         c.stack.pop_back();
         c.proc.setFlags(status);
-        c.proc.ip = (static_cast<unsigned int>(pch) << 8) | pcl;
+        c.proc.ip = (static_cast<uint16_t>(pch) << 8) | pcl;
     }
 
     void i_rts(Code &c) {
