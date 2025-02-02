@@ -1,4 +1,4 @@
-https://github.com/lostjared/ats/blob/master/dbg/README.md
+
 Command list:
 
 quit
