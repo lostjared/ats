@@ -245,7 +245,7 @@ namespace interp {
         }   
         uint8_t operand = 0;
         switch (c.instruct[in].mode) {
-            case interp::ABSOLUTE:
+            case interp::ABSOULTE:
             case interp::ZEROPAGE:
                 operand = c.peek(c.instruct[in].op1.op);
                 break;
