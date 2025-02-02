@@ -15,6 +15,15 @@
 #include<unistd.h>
 #include<signal.h>
 
+
+void my_replace_line(const char *new_line) {
+    free(rl_line_buffer);
+    rl_line_buffer = strdup(new_line);
+    rl_point = strlen(new_line);
+    rl_end = rl_point;
+    rl_redisplay();
+}
+
 void control_Handler(int sig) {
     if(code.running()) {
         code.stop();
@@ -22,10 +31,9 @@ void control_Handler(int sig) {
     }
     else std::cout << "Caught Signal: Script not executing.\n";
     rl_on_new_line();
-    rl_replace_line("", 0);
+    my_replace_line("");
     rl_redisplay();
 }
-
 int main() {
     struct sigaction sa;
     sigemptyset(&sa.sa_mask);
@@ -95,3 +103,4 @@ int main() {
     }
     return EXIT_SUCCESS;
 }
+
