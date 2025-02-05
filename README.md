@@ -140,7 +140,7 @@ Below is a categorized list of the 6502 instructions with detailed explanations.
 - **Purpose:** Tests bits in a memory operand by performing a bitwise AND with the accumulator.
 
 ---
-### Instructions
+### All Instructions
 - ADC - Add Memory to Accumulator with Carry
 - AND - And Memory to Accumulator
 - ASL - Shift Left One Bit (memory or accumulator)
