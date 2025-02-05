@@ -140,47 +140,64 @@ Below is a categorized list of the 6502 instructions with detailed explanations.
 - **Purpose:** Tests bits in a memory operand by performing a bitwise AND with the accumulator.
 
 ---
+### Instructions
+- ADC - Add Memory to Accumulator with Carry
+- AND - And Memory to Accumulator
+- ASL - Shift Left One Bit (memory or accumulator)
+- BCC - Branch if Carry Flag is clear
+- BCS - Branch if Carry Flag is set
+- BEQ - Branch on result Zero
+- BIT - Test bits in the accumulator with memory
+- BMI - Branch on result minus
+- BNE - Branch if the result is not zero
+- BPL - Branch on result plus
+- BRK - Unconditional break
+- BVC - Branch on overflow clear
+- BVS - Branch on overflow set
+- CLC - Clear Carry Flag
+- CLD - Clear Decimal Flag
+- CLI - Clear Interrupt Flag
+- CLV - Clear overflow Flag
+- CMP - Compare memory and accumulator
+- CPX - Compare Memory and Register X
+- CPY - Compare Memory and Register Y
+- DEC - Decrement Memory or accumulator
+- DEX - Decrement X Register
+- DEY - Decrement Y Register
+- EOR - Exclusive Or memory or accumulator
+- INC - Increment Memory or accumulator
+- INX - Increment register X
+- INY - Increment register Y
+- JMP - Unconditional Jump to Code label or address
+- JSR - Jump To Subroutine
+- LDA - Load accumulator with constant or memory
+- LDX - Load X register with constant or memory
+- LDY - Load Y register with constant or memory
+- LSR - Shift right one bit
+- NOP - No operation
+- ORA - Or accumulator with constant or memory
+- PHA - Push accumulator onto the stack
+- PHP - Push processor flags onto the stack
+- PLA - Pull (pop) accumulator from the stack
+- PLP - Pull (pop) processor flags from the stack
+- ROL - Rotate bits one left
+- ROR - Rotate bits one right
+- RTI - Return from interrupt
+- RTS - Return from subroutine
+- SBC - Subtract memory and borrow from the accumulator
+- SEC - Set carry flag
+- SED - Set decimal flag
+- SEI - Set interrupt flag
+- STA - Store accumulator in memory
+- STX - Store register X in memory
+- STY - Store register Y in memory
+- TAX - Transfer accumulator to X register
+- TAY - Transfer accumulator to Y register
+- TSX - Transfer stack pointer to Index X
+- TXS - Transfer register X to stack pointer
+- TXA - Transfer register X to accumulator
+- TYA - Transfer register Y to accumulator
 
-### Branch Instructions
-
-#### BCC – Branch if Carry Flag is Clear
-#### BCS – Branch if Carry Flag is Set
-#### BEQ – Branch on Result Zero
-#### BNE – Branch if Result is Not Zero
-#### BMI – Branch on Result Minus
-#### BPL – Branch on Result Plus
-#### BVC – Branch on Overflow Clear
-#### BVS – Branch on Overflow Set
-#### BRK – Unconditional Break
-
----
-
-### Stack and Subroutine Instructions
-
-#### PHA – Push Accumulator onto the Stack
-#### PHP – Push Processor Flags onto the Stack
-#### PLA – Pull (Pop) Accumulator from the Stack
-#### PLP – Pull (Pop) Processor Flags from the Stack
-#### JSR – Jump to Subroutine
-#### RTS – Return from Subroutine
-#### RTI – Return from Interrupt
-
----
-
-### Data Transfer Instructions
-
-#### LDA – Load Accumulator with Constant or Memory
-#### LDX – Load X Register with Constant or Memory
-#### LDY – Load Y Register with Constant or Memory
-#### STA – Store Accumulator in Memory
-#### STX – Store X Register in Memory
-#### STY – Store Y Register in Memory
-#### TAX – Transfer Accumulator to X Register
-#### TAY – Transfer Accumulator to Y Register
-#### TSX – Transfer Stack Pointer to Index X
-#### TXS – Transfer X Register to Stack Pointer
-#### TXA – Transfer X Register to Accumulator
-#### TYA – Transfer Y Register to Accumulator
 
 
 ![scan1](https://github.com/lostjared/ats/blob/master/scans/flags1.png?raw=true  "Scan 1")
