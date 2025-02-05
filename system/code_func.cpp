@@ -54,12 +54,15 @@ namespace interp {
     }
     
     void insertText(std::vector<lex::Token> &tokens, const TextLine &in) {
+        
         for(unsigned int i = 0; i < lines.size(); ++i) {
             if(lines[i].index == in.index) {
                 if(checkInstruction(tokens, in)) {
                 	lines[i].text = in.text;
                 	return;
-                } else return;
+                } else {
+                    return;
+                }
             }
         }
         if(checkInstruction(tokens, in)) {
@@ -80,7 +83,16 @@ namespace interp {
             codetext = input_line.substr(input_line.find(tokens[0].getToken())+tokens[0].getToken().length()+1, input_line.length());
             TextLine in(value, codetext);
             insertText(tokens, in);
-        } else {
+        } else if(tokens.size()==1 && input_line.length()>0) {
+            int index_n = atoi(tokens[0].getToken().c_str());
+            for(int i = 0; i < lines.size(); ++i) {
+                if(lines[i].index == index_n) {
+                    lines.erase(lines.begin()+i);
+                    return;
+                }
+            }
+        } 
+        else {
             std::cerr << "Error invalid input.\n";
             return;
         }
