@@ -25,7 +25,7 @@ namespace translate {
                     return false;
                 }
                 i.op1.label_index = valid->second;
-            } if(i.op1.op_t == icode::op_type::OP_LABEL) {
+            } else if(i.op1.op_t == icode::op_type::OP_LABEL) {
                 auto valid = interp::label_line_table.find(i.op1.op);
                 if(valid == interp::label_line_table.end()) {
                     std::cerr << "Error line number: " << i.op1.op << " does not exisit.\n";
@@ -82,8 +82,8 @@ namespace translate {
         if(op == icode::opc::NOTINC) {
             inst.label = true;
             inst.label_text = tokens[0].getToken();
-            inst.label_index = line;
-            interp::label_table[inst.label_text] = line;
+            inst.label_index = line;  
+            interp::label_table[inst.label_text] = code.instruct.size();  
             match(tokens[1], lex::TOKEN_CHAR);
             icode::opc op_code;
             op_code = icode::strtoInc(tokens[1].getToken());
@@ -169,6 +169,7 @@ namespace translate {
                                 
                                 std::ostringstream stream;
                                 stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " does not support addressing mode.\n";
+                                throw cExcep(stream.str());
                             }
                         } else {
                             inst.mode = interp::ABSOULTE;

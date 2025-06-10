@@ -548,15 +548,18 @@ namespace interp {
 
     void i_jsr(Code &c) {
         int in = c.proc.getIp();
+        
         switch(c.instruct[in].op1.op_t) {
             case icode::op_type::OP_LABELTEXT:
             case icode::op_type::OP_LABEL: {
-                uint16_t return_addr = c.proc.ip + 1;
+                uint16_t return_addr = c.proc.ip + 2;  
+                
                 c.poke(0x0100 + c.proc.sp, (return_addr >> 8) & 0xFF); 
                 c.proc.sp--;
                 c.poke(0x0100 + c.proc.sp, return_addr & 0xFF); 
                 c.proc.sp--;
-                c.proc.ip = c.instruct[in].op1.label_index - 1;
+                c.proc.ip = c.instruct[in].op1.label_index - 1; 
+                
             }
             break;
         }
@@ -901,7 +904,7 @@ namespace interp {
         c.proc.sp++;
         uint8_t pch = c.peek(0x0100 + c.proc.sp);
         uint16_t return_addr = ((uint16_t)pch << 8) | pcl;
-        c.proc.ip = return_addr + 1;
+        c.proc.ip = return_addr + 1;  
     }
 
     void i_pha(Code &c) {

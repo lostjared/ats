@@ -65,7 +65,7 @@ namespace interp {
         // CLV
         { 0xB8, IMPLIED, opc::CLV},
         // CMP
-        { 0xC9, IMMEDIATE, opc::CMP}, {0xC5, ZEROPAGE, opc::CMP}, { 0xD5, ZEROPAGE_X, opc::CMP }, { 0xCD, ABSOULTE, opc::CMP},{ 0xDD, ABSOULTE_X, opc::CMP}, {0xD9, ABSOULTE_Y, opc::CMP}, {0xD9, ABSOULTE_Y, opc::CMP}, { 0xC1, INDEXED_I, opc::CMP},{ 0xD1, INDIRECT_I, opc::CMP},
+        { 0xC9, IMMEDIATE, opc::CMP}, {0xC5, ZEROPAGE, opc::CMP}, { 0xD5, ZEROPAGE_X, opc::CMP }, { 0xCD, ABSOULTE, opc::CMP},{ 0xDD, ABSOULTE_X, opc::CMP}, {0xD9, ABSOULTE_Y, opc::CMP}, { 0xC1, INDEXED_I, opc::CMP},{ 0xD1, INDIRECT_I, opc::CMP},
         // CPX
         { 0xE0, IMMEDIATE, opc::CPX}, {0xE4, ZEROPAGE, opc::CPX}, {0xEC, ABSOULTE, opc::CPX},
         // CPY
@@ -76,8 +76,8 @@ namespace interp {
         { 0xCA, IMPLIED, opc::DEX},
         // DEY
         { 0x88, IMPLIED, opc::DEY},
-        // END
-        { 0x01, IMPLIED, opc::END},
+        // END - Changed from 0x01 to 0x02 to avoid conflict
+        { 0x02, IMPLIED, opc::END},
         // EOR
         { 0x49, IMMEDIATE, opc::EOR}, {0x45, ZEROPAGE, opc::EOR}, {0x55, ZEROPAGE_X, opc::EOR}, {0x4D, ABSOULTE, opc::EOR},{ 0x5D, ABSOULTE_X, opc::EOR}, {0x59, ABSOULTE_Y, opc::EOR}, {0x41, INDEXED_I, opc::EOR}, {0x51, INDIRECT_I, opc::EOR},
         // INC
@@ -93,14 +93,14 @@ namespace interp {
         // LDA
         { 0xA9, IMMEDIATE, opc::LDA}, {0xA5, ZEROPAGE, opc::LDA}, {0xB5, ZEROPAGE_X, opc::LDA}, {0xAD, ABSOULTE, opc::LDA},{ 0xBD, ABSOULTE_X, opc::LDA}, {0xB9, ABSOULTE_Y, opc::LDA}, {0xA1, INDEXED_I, opc::LDA}, {0xB1, INDIRECT_I, opc::LDA},
         // LDX
-        {0xA2, IMMEDIATE, opc::LDX}, {0xA6, ZEROPAGE, opc::LDX}, {0xB6, ZEROPAGE_Y, opc::LDX}, {0xAE, ABSOULTE, opc::LDX},{0xA1, INDEXED_I, opc::LDX},{0xB1, INDIRECT_I, opc::LDX}, {0xBE, ABSOULTE_Y, opc::LDX},
+        {0xA2, IMMEDIATE, opc::LDX}, {0xA6, ZEROPAGE, opc::LDX}, {0xB6, ZEROPAGE_Y, opc::LDX}, {0xAE, ABSOULTE, opc::LDX}, {0xBE, ABSOULTE_Y, opc::LDX},
         // LDY
         {0xA0, IMMEDIATE, opc::LDY}, {0xA4, ZEROPAGE, opc::LDY}, {0xB4, ZEROPAGE_X, opc::LDY}, {0xAC, ABSOULTE, opc::LDY},{0xBC, ABSOULTE_X, opc::LDY},
         // LSR
         {0x4A, ACCUMULATOR, opc::LSR}, {0x46, ZEROPAGE, opc::LSR}, {0x56, ZEROPAGE_X, opc::LSR}, {0x4E, ABSOULTE, opc::LSR},{0x5E, ABSOULTE_X, opc::LSR},
         // NOP
         {0xEA, IMPLIED, opc::NOP},
-        // ORA
+        // ORA - Now 0x01 is available for its correct use
         {0x09, IMMEDIATE, opc::ORA}, {0x05, ZEROPAGE, opc::ORA}, {0x15, ZEROPAGE_X, opc::ORA}, {0x0D, ABSOULTE, opc::ORA},{0x1D, ABSOULTE_X, opc::ORA}, {0x19, ABSOULTE_Y, opc::ORA}, {0x01, INDEXED_I, opc::ORA}, {0x11, INDIRECT_I, opc::ORA},
         // PHA
         {0x48, IMPLIED, opc::PHA},
@@ -193,12 +193,14 @@ namespace interp {
                 procInstruct(instruct[proc.ip]);
                 if(run == true && debug == true)
                     print();
-                ++proc.ip;
-                if(proc.ip > instruct.size()) {
+                if(run == true) {  // Only increment if instruction didn't stop execution
+                    ++proc.ip;
+                }
+                if(proc.ip >= instruct.size()) {
                     run = false;
                     proc.ip = 0;
                     std::cout << "Program end reached without END, use END to terminate your program.\n";
-                     if(!in_stack.empty()) in_stack.erase(in_stack.begin(), in_stack.end());
+                    if(!in_stack.empty()) in_stack.erase(in_stack.begin(), in_stack.end());
                     if(!stack.empty()) stack.erase(stack.begin(), stack.end());
                     break;
                 }
@@ -219,10 +221,10 @@ namespace interp {
     void Code::step() {
         if(instruct.size()==0) return;
         if(proc.ip >= 0 && proc.ip < instruct.size()) {
-        if(instruct[proc.ip].opcode == opc::END)
-               procInstruct(instruct[proc.ip]);
-        else {
-                procInstruct(instruct[proc.ip++]);
+            run = true;  
+            procInstruct(instruct[proc.ip]);
+            if(run == true) {  
+                ++proc.ip;
             }
         } else {
             std::cout << "Program finished executing..";
