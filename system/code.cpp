@@ -55,7 +55,7 @@ namespace interp {
         // BVC
         { 0x50, RELATIVE, opc::BVC},
         // BVS
-        { 0x70, RELATIVE, opc::BVC},
+        { 0x70, RELATIVE, opc::BVS}, 
         // CLC
         { 0x18, IMPLIED, opc::CLC},
         // CLD
@@ -111,7 +111,7 @@ namespace interp {
         // PLP
         {0x28, IMPLIED, opc::PLP},
         // ROL
-        {0x21, ACCUMULATOR, opc::ROL},{0x26, ZEROPAGE, opc::ROL}, {0x36, ZEROPAGE_X, opc::ROL}, {0x2E, ABSOULTE, opc::ROL},{0x3E, ABSOULTE_X, opc::ROL},
+        {0x2A, ACCUMULATOR, opc::ROL},{0x26, ZEROPAGE, opc::ROL}, {0x36, ZEROPAGE_X, opc::ROL}, {0x2E, ABSOULTE, opc::ROL},{0x3E, ABSOULTE_X, opc::ROL},
         // ROR
         {0x6A, ACCUMULATOR, opc::ROR}, {0x66, ZEROPAGE, opc::ROR}, {0x76, ZEROPAGE_X, opc::ROR}, {0x6E, ABSOULTE, opc::ROR},{0x7E, ABSOULTE_X, opc::ROR},
         // RTI
