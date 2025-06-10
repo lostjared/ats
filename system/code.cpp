@@ -193,7 +193,7 @@ namespace interp {
                 procInstruct(instruct[proc.ip]);
                 if(run == true && debug == true)
                     print();
-                if(run == true) {  // Only increment if instruction didn't stop execution
+                if(run == true) {
                     ++proc.ip;
                 }
                 if(proc.ip >= instruct.size()) {
@@ -279,4 +279,14 @@ namespace interp {
     void Code::poke(uint16_t address, uint8_t value) {
         mem[address] = value;
     }
+    
+    void Code::loadFromString(const std::string& code_text) {
+        reset(); // Clear existing code
+        
+        // Call the correct function
+        if(!interp::loadCodeFromString(code_text)) {
+            throw std::runtime_error("Failed to parse assembly code");
+        }
+    }
+
 }

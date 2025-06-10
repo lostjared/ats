@@ -52,6 +52,30 @@ namespace interp {
         file.close();
         return true;
     }
+
+    bool openLineString(const std::string &text) {
+        std::istringstream file(text);
+        if(!lines.empty()) {
+            lines.erase(lines.begin(), lines.end());
+        }
+        std::string orig;
+        while(std::getline(file, orig)) {
+            std::string in;
+            in = eatComment(orig);
+            if(in.length()==0) continue;
+            std::vector<lex::Token> tokens;
+            std::istringstream stream(in);
+            lex::Scanner scan(stream);
+            while(scan.valid()) {
+                lex::Token token;
+                scan >> token;
+                if(token.getTokenType() != lex::TOKEN_EOF)
+                	tokens.push_back(token);
+            }   
+            inputText(tokens, in);
+        }
+        return true;
+    }
     
     void insertText(std::vector<lex::Token> &tokens, const TextLine &in) {
         
@@ -176,4 +200,5 @@ namespace interp {
         std::cout << "}\n\n";
         return true;
     }
+   
 }

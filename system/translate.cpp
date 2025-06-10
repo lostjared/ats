@@ -4,6 +4,8 @@
 
 namespace translate {
     
+    std::string last_build_error;
+
     bool confirm_mode(const icode::opc code, unsigned int mode, unsigned char &op_byte) {
         for(unsigned int i = 0; interp::m_code[i].p_code != icode::opc::NOTINC; ++i) {
             if(interp::m_code[i].p_code == code && interp::m_code[i].address_mode == mode) {
@@ -40,6 +42,7 @@ namespace translate {
     bool build_code() {
         try {
             if(interp::lines.size()==0) {
+                last_build_error = "No code to build.";
                 std::cerr << "Error: No code to build...\n";
                 return false;
             }
@@ -51,18 +54,31 @@ namespace translate {
             
             for(unsigned int i = 0; i < interp::lines.size(); ++i) {
                 if(build_line(i)==false) {
-                    std::cout << "Error on line: " << interp::lines[i].index << "\n";
+                    std::ostringstream oss;
+                    oss << "Error on line: " << interp::lines[i].index;
+                    last_build_error = oss.str();
+                    std::cout << last_build_error << "\n";
                     return false;
                 }
             }
-            
-            if(check_labels() == false)
+            if(check_labels() == false) {
+                last_build_error = "Label check failed.";
                 return false;
-            
+            }
+            last_build_error.clear();
             return true;
         }
         catch(const cExcep &e) {
+            last_build_error = e.err;
             std::cerr << e.err;
+        }
+        catch(const std::exception &e) {
+            last_build_error = e.what();
+            std::cerr << e.what();
+        }
+        catch(...) {
+            last_build_error = "Unknown build error.";
+            std::cerr << "Unknown build error.\n";
         }
         return false;
     }

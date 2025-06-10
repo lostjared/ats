@@ -5,7 +5,7 @@
 #include "code.hpp"
 
 namespace translate {
-   
+    extern std::string last_build_error;
     class cExcep {
     public:
         std::string err;

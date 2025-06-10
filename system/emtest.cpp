@@ -1,0 +1,438 @@
+#include <emscripten/bind.h>
+#include <sstream>
+#include <iomanip>
+#include "function.hpp"
+#include "translate.hpp"
+
+// Function that returns HTML as a string
+std::string generateHTML() {
+    std::ostringstream html;
+    
+    // Check if we have valid instructions
+    if(code.instruct.size() == 0) {
+        html << R"(<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS - Debug Report</title>
+    <style>
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a1a, #2d1b1b);
+            color: #f0f0f0;
+            text-align: center;
+            padding: 50px;
+        }
+        .error-box {
+            background: rgba(204, 0, 0, 0.1);
+            border: 2px solid #cc0000;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-box">
+        <h1 style="color: #cc0000;">⚠️ No Instructions Found</h1>
+        <p>You need to load and build code first before generating a report.</p>
+        <p>Steps:</p>
+        <ol style="text-align: left; max-width: 400px; margin: 20px auto;">
+            <li>Enter your ATS assembly code</li>
+            <li>Click "Build Code"</li>
+            <li>Then click "Generate Report"</li>
+        </ol>
+    </div>
+</body>
+</html>)";
+        return html.str();
+    }
+    
+    html << R"(<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS - Debug Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a1a, #2d1b1b);
+            color: #f0f0f0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(45deg, #cc0000, #800000);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(204, 0, 0, 0.3);
+        }
+        
+        .header h1 {
+            color: white;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #ffcccc;
+            font-size: 1.1em;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(204, 0, 0, 0.1);
+            border: 2px solid #cc0000;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            color: #cc0000;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .value {
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .table-container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+        
+        .table-title {
+            background: linear-gradient(45deg, #cc0000, #990000);
+            color: white;
+            padding: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        
+        th {
+            background: linear-gradient(180deg, #800000, #600000);
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 2px solid #cc0000;
+        }
+        
+        td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        tr:nth-child(even) td {
+            background: rgba(204, 0, 0, 0.05);
+        }
+        
+        tr:hover td {
+            background: rgba(204, 0, 0, 0.15);
+            color: white;
+        }
+        
+        .line-num { color: #ff6666; font-weight: bold; }
+        .instruction { color: #ffcccc; font-family: 'Consolas', monospace; text-align: left; padding-left: 15px; }
+        .machine-code { color: #66ff66; font-family: 'Consolas', monospace; font-weight: bold; }
+        .address-mode { color: #ffff66; }
+        .label { color: #ff9999; font-weight: bold; }
+        .opcode { color: #99ccff; font-weight: bold; }
+        .operand { color: #ccffcc; }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 ATS Debug Report</h1>
+            <p>Atari Script Assembly Analysis & Machine Code Generation</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Instructions</h3>
+                <div class="value">)" << code.instruct.size() << R"(</div>
+            </div>
+            <div class="stat-card">
+                <h3>Code Size</h3>
+                <div class="value">)" << code.instruct.size() * 2 << R"( bytes</div>
+            </div>
+            <div class="stat-card">
+                <h3>Labels Found</h3>
+                <div class="value">)";
+    
+    // Count labels safely
+    int label_count = 0;
+    try {
+        for(unsigned int i = 0; i < code.instruct.size(); ++i) {
+            if(code.instruct[i].label) label_count++;
+        }
+    } catch(...) {
+        label_count = 0;
+    }
+    html << label_count;
+    
+    html << R"(</div>
+            </div>
+            <div class="stat-card">
+                <h3>Memory Range</h3>
+                <div class="value">$0000-$)" << std::hex << std::uppercase << (code.instruct.size() * 2) << std::dec << R"(</div>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <div class="table-title">📋 Instruction Analysis</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Index</th>
+                        <th>Line #</th>
+                        <th>Label</th>
+                        <th>Instruction</th>
+                        <th>Opcode</th>
+                        <th>Address Mode</th>
+                        <th>Operand</th>
+                        <th>Machine Code</th>
+                    </tr>
+                </thead>
+                <tbody>)";
+    
+    try {
+        for(unsigned int i = 0; i < code.instruct.size(); ++i) {
+            auto& inst = code.instruct[i];  
+            std::string hex_code;
+            try {
+                hex_code = icode::instructionToHex(inst);
+            } catch(...) {
+                hex_code = "ERROR";
+            }
+            
+            html << "                    <tr>\n";
+            html << "                        <td class=\"line-num\">" << i << "</td>\n";
+            html << "                        <td class=\"line-num\">" << inst.line_num << "</td>\n";
+            
+            // Label column
+            if(inst.label) {
+                html << "                        <td class=\"label\">" << inst.label_text << "</td>\n";
+            } else {
+                html << "                        <td>-</td>\n";
+            }
+            
+            // Instruction text
+            html << "                        <td class=\"instruction\">" << inst.text << "</td>\n";
+            
+            // Opcode (safely)
+            try {
+                html << "                        <td class=\"opcode\">" << icode::op_array[static_cast<unsigned int>(inst.opcode)] << "</td>\n";
+            } catch(...) {
+                html << "                        <td class=\"opcode\">ERROR</td>\n";
+            }
+            
+            // Address mode (safely)
+            try {
+                html << "                        <td class=\"address-mode\">" << interp::add_mode[inst.mode] << "</td>\n";
+            } catch(...) {
+                html << "                        <td class=\"address-mode\">ERROR</td>\n";
+            }
+            
+            // Operand info
+            html << "                        <td class=\"operand\">";
+            try {
+                if(inst.op1.op_t == icode::op_type::OP_LABELTEXT) {
+                    html << "Label: " << inst.op1.label_text;
+                } else if(inst.op1.op_t == icode::op_type::OP_DECIMAL) {
+                    html << "$" << std::hex << std::uppercase << (int)inst.op1.op << std::dec;
+                } else if(inst.op1.op_t == icode::op_type::OP_MEMORY) {
+                    html << "$" << std::hex << std::uppercase << inst.op1.op << std::dec;
+                } else if(inst.op1.op_t == icode::op_type::OP_LABEL) {
+                    html << "Line: " << inst.op1.op;
+                } else {
+                    html << "-";
+                }
+            } catch(...) {
+                html << "ERROR";
+            }
+            html << "</td>\n";
+            
+            // Machine code
+            html << "                        <td class=\"machine-code\">" << hex_code << "</td>\n";
+            
+            html << "                    </tr>\n";
+        }
+    } catch(...) {
+        html << "                    <tr><td colspan=\"8\" style=\"color: #ff6666; text-align: center;\">Error processing instructions</td></tr>\n";
+    }
+    
+    html << R"(                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <p>Generated by ATS (Atari Script) Debugger</p>
+        </div>
+    </div>
+</body>
+</html>)";
+    
+    return html.str();
+}
+
+// Add a global initialization function
+bool initializeSystem() {
+    static bool initialized = false;
+    if (!initialized) {
+        code.reset();
+        initialized = true;
+        return true;
+    }
+    return true;
+}
+
+// Wrapper class for Emscripten
+class ATSDebugger {
+private:
+    std::string last_error;
+    bool code_loaded;
+    bool code_built;
+    
+public:
+    ATSDebugger() : code_loaded(false), code_built(false) {
+        initializeSystem(); // Ensure system is initialized
+    }
+    
+    std::string getDebugHTML() {
+        if (!code_built) {
+            return R"(<!DOCTYPE html>
+<html><body style="font-family: monospace; background: #1a1a1a; color: #ff6666; text-align: center; padding: 50px;">
+<h1>⚠️ Code Not Built</h1>
+<p>Please load and build your code first before generating a report.</p>
+</body></html>)";
+        }
+        return generateHTML();
+    }
+    
+    bool loadCode(const std::string& ats_code) {
+        try {
+            if (!interp::openLineString(ats_code)) {
+                last_error = "Failed to load code from string";
+                code_loaded = false;
+                code_built = false;
+                return false;
+            }
+            last_error.clear();
+            code_loaded = true;
+            code_built = false; 
+            return true;
+        } catch (const std::exception& e) {
+            last_error = std::string("Load error: ") + e.what();
+            code_loaded = false;
+            code_built = false;
+            return false;
+        }
+    }
+    
+    bool buildCode() {
+        if (!code_loaded) {
+            last_error = "No code loaded - call loadCode first";
+            return false;
+        }
+        try {
+            code.reset();
+            bool result = translate::build_code();
+            if (!result) {
+                last_error = translate::last_build_error;
+                code_built = false;
+                return false;
+            }
+            last_error.clear();
+            code_built = true;
+            return true;
+        } catch (const std::exception& e) {
+            last_error = std::string("Build error: ") + e.what();
+            code_built = false;
+            return false;
+        }
+    }
+    
+    int getInstructionCount() {
+        return code_built ? code.instruct.size() : 0;
+    }
+    
+    std::string getLastError() {
+        return last_error.empty() ? "No error" : last_error;
+    }
+    
+    bool isCodeLoaded() {
+        return code_loaded;
+    }
+    
+    bool isCodeBuilt() {
+        return code_built;
+    }
+};
+
+// Emscripten bindings
+EMSCRIPTEN_BINDINGS(ats_module) {
+    emscripten::class_<ATSDebugger>("ATSDebugger")
+        .constructor<>()
+        .function("getDebugHTML", &ATSDebugger::getDebugHTML)
+        .function("loadCode", &ATSDebugger::loadCode)
+        .function("buildCode", &ATSDebugger::buildCode)
+        .function("getInstructionCount", &ATSDebugger::getInstructionCount)
+        .function("getLastError", &ATSDebugger::getLastError)
+        .function("isCodeLoaded", &ATSDebugger::isCodeLoaded)
+        .function("isCodeBuilt", &ATSDebugger::isCodeBuilt);
+    
+    // Standalone function
+    emscripten::function("generateHTML", &generateHTML);
+}

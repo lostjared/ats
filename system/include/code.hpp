@@ -58,6 +58,7 @@ namespace interp {
         void printCurrent();
         uint8_t peek(uint16_t address) const;
         void poke(uint16_t address, uint8_t value);
+        void loadFromString(const std::string& code_text);
 
         symbol::Symbol symbols;
         icode::Processor proc;
@@ -154,7 +155,10 @@ namespace interp {
     void inputText(std::vector<lex::Token> &tokens, std::string text);
     bool saveLineSource(const std::string &text);
     bool openLineSource(const std::string &text);
+    bool openLineString(const std::string &text);
+    bool parseLineSource(const std::string &code_string);
     void insertText(std::vector<lex::Token> &tokens, const TextLine &in);
+    bool loadCodeFromString(const std::string &code_string);
     bool procLine(const TextLine &text, Code &code);
     bool checkInstruction(std::vector<lex::Token> &tokens, const TextLine &text);
     
