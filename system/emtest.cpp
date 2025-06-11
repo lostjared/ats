@@ -433,17 +433,24 @@ public:
             last_error = "Code not built - cannot step";
             return false;
         }
-       
-        // Check if we're at the end
-        if (current_instruction_index >= static_cast<int>(code.instruct.size())) {
-            last_error = "End of program reached";
-            return false;
-        }
         
+        if (!execution_started) {
+            execution_started = true;
+            current_instruction_index = 0;
+            code.proc.ip = 0;
+        }
+         
         try {
-            // Execute ONE instruction
+            int ip_before = code.proc.getIp();
             code.step();
-            current_instruction_index++;
+            current_instruction_index = code.proc.getIp();
+            if (current_instruction_index < 0 || current_instruction_index >= static_cast<int>(code.instruct.size())) {
+                if (current_instruction_index >= static_cast<int>(code.instruct.size())) {
+                    last_error = "End of program reached";
+                    return false;
+                }
+            }
+            
             last_error.clear();
             return true;
         } catch (const std::exception& e) {
@@ -455,8 +462,6 @@ public:
     std::string getProcessorState() {
         std::ostringstream state;
         state << "{";
-        
-        // Use the actual member names and methods from your Processor class
         state << "\"pc\":" << code.proc.getIp() << ",";
         state << "\"ac\":" << (int)code.proc.reg_a << ",";
         state << "\"x\":" << (int)code.proc.reg_x << ",";
@@ -464,25 +469,22 @@ public:
         state << "\"sr\":" << (int)code.proc.valFlags() << ",";
         state << "\"sp\":" << (int)code.proc.sp << ",";
         
-        // Status flags - check your icode.hpp for the correct flag enum values
-        // The flags are typically numbered 0-7 for bits in the status register
-        state << "\"carry\":" << (code.proc.getFlag(static_cast<icode::proc_Flags>(0)) ? "true" : "false") << ",";
-        state << "\"zero\":" << (code.proc.getFlag(static_cast<icode::proc_Flags>(1)) ? "true" : "false") << ",";
-        state << "\"interrupt\":" << (code.proc.getFlag(static_cast<icode::proc_Flags>(2)) ? "true" : "false") << ",";
-        state << "\"decimal\":" << (code.proc.getFlag(static_cast<icode::proc_Flags>(3)) ? "true" : "false") << ",";
-        state << "\"break\":" << (code.proc.getFlag(static_cast<icode::proc_Flags>(4)) ? "true" : "false") << ",";
-        state << "\"overflow\":" << (code.proc.getFlag(static_cast<icode::proc_Flags>(6)) ? "true" : "false") << ",";
-        state << "\"negative\":" << (code.proc.getFlag(static_cast<icode::proc_Flags>(7)) ? "true" : "false") << ",";
+        state << "\"carry\":" << (code.proc.getFlag(icode::FLAG_CARRY) ? "true" : "false") << ",";
+        state << "\"zero\":" << (code.proc.getFlag(icode::FLAG_ZERO) ? "true" : "false") << ",";
+        state << "\"interrupt\":" << (code.proc.getFlag(icode::FLAG_INTERRUPT) ? "true" : "false") << ",";
+        state << "\"decimal\":" << (code.proc.getFlag(icode::FLAG_DECIMAL) ? "true" : "false") << ",";
+        state << "\"break\":" << (code.proc.getFlag(icode::FLAG_BREAK) ? "true" : "false") << ",";
+        state << "\"overflow\":" << (code.proc.getFlag(icode::FLAG_OVERFLOW) ? "true" : "false") << ",";
+        state << "\"negative\":" << (code.proc.getFlag(icode::FLAG_NEGATIVE) ? "true" : "false") << ",";
         
-        state << "\"currentInstruction\":" << current_instruction_index << ",";
+        state << "\"currentInstruction\":" << code.proc.getIp() << ",";
         state << "\"totalInstructions\":" << code.instruct.size();
         state << "}";
         return state.str();
     }
-    
+
     std::string getCurrentInstructionInfo() {
-        // Show the NEXT instruction to be executed
-        int nextIndex = current_instruction_index;
+        int nextIndex = execution_started ? code.proc.getIp() : 0;
         
         if (nextIndex < 0 || nextIndex >= static_cast<int>(code.instruct.size())) {
             return "{\"valid\":false}";
@@ -496,7 +498,29 @@ public:
         info << "\"lineNum\":" << inst.line_num << ",";
         info << "\"text\":\"" << inst.text << "\",";
         info << "\"opcode\":\"" << icode::op_array[static_cast<unsigned int>(inst.opcode)] << "\",";
-        info << "\"addressMode\":\"" << interp::add_mode[inst.mode] << "\"";
+        info << "\"addressMode\":\"" << interp::add_mode[inst.mode] << "\",";
+        
+        if (inst.opcode == icode::opc::BNE || inst.opcode == icode::opc::BEQ || 
+            inst.opcode == icode::opc::BCC || inst.opcode == icode::opc::BCS ||
+            inst.opcode == icode::opc::BPL || inst.opcode == icode::opc::BMI ||
+            inst.opcode == icode::opc::BVC || inst.opcode == icode::opc::BVS) {
+            info << "\"isBranch\":true,";
+            info << "\"branchTarget\":" << inst.op1.label_index << ",";
+            
+            bool zeroFlag = code.proc.getFlag(icode::FLAG_ZERO);
+            info << "\"zeroFlag\":" << (zeroFlag ? "true" : "false") << ",";
+            
+            bool willBranch = false;
+            switch (inst.opcode) {
+                case icode::opc::BNE: willBranch = !zeroFlag; break;
+                case icode::opc::BEQ: willBranch = zeroFlag; break;
+            }
+            info << "\"willBranch\":" << (willBranch ? "true" : "false") << ",";
+        } else {
+            info << "\"isBranch\":false,";
+        }
+        
+        info << "\"actualIP\":" << code.proc.getIp();
         info << "}";
         return info.str();
     }
