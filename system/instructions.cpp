@@ -4,6 +4,10 @@
 
 namespace interp {
 
+    void trackMemoryWrite(uint16_t address, uint8_t value) {
+        modifiedMemoryAddresses.push_back(std::make_pair(address, value));
+    }
+
     void updateZNFlags(icode::Processor &proc, uint8_t value) {
         proc.setFlag(icode::FLAG_ZERO, (value == 0));
         proc.setFlag(icode::FLAG_NEGATIVE, ((value & 0x80) != 0));
@@ -1085,6 +1089,7 @@ namespace interp {
                 switch(c.instruct[in].mode) {
                     case ABSOULTE:
                         c.poke(c.instruct[in].op1.op, c.proc.reg_a);
+                        trackMemoryWrite(c.instruct[in].op1.op, c.proc.reg_a);
                         break;
                     case ZEROPAGE:
                         c.poke(c.instruct[in].op1.op & 0xFF, c.proc.reg_a);
@@ -1092,20 +1097,24 @@ namespace interp {
                     case ABSOULTE_X: {
                         uint16_t addr = (c.instruct[in].op1.op + c.proc.reg_x) & 0xFFFF;
                         c.poke(addr, c.proc.reg_a);
+                        trackMemoryWrite(addr, c.proc.reg_a);
                     }
                     break;
                     case ZEROPAGE_X: {
                         uint8_t addr = (c.instruct[in].op1.op + c.proc.reg_x) & 0xFF;
+                        trackMemoryWrite(addr, c.proc.reg_a);
                         c.poke(addr, c.proc.reg_a);
                     }
                     break;
                     case ABSOULTE_Y: {
                         uint16_t addr = (c.instruct[in].op1.op + c.proc.reg_y) & 0xFFFF;
+                        trackMemoryWrite(addr, c.proc.reg_a);
                         c.poke(addr, c.proc.reg_a);
                     }
                     break;
                     case ZEROPAGE_Y: {
                         uint8_t addr = (c.instruct[in].op1.op + c.proc.reg_y) & 0xFF;
+                        trackMemoryWrite(addr, c.proc.reg_a);
                         c.poke(addr, c.proc.reg_a);
                     }
                     break;
@@ -1125,12 +1134,15 @@ namespace interp {
                 switch(c.instruct[in].mode) {
                     case ABSOULTE:
                         c.poke(c.instruct[in].op1.op, c.proc.reg_x);
+                        trackMemoryWrite(c.instruct[in].op1.op, c.proc.reg_x);
                         break;
                     case ZEROPAGE:
                         c.poke(c.instruct[in].op1.op & 0xFF, c.proc.reg_x);
+                        trackMemoryWrite(c.instruct[in].op1.op, c.proc.reg_x);
                         break;
                     case ZEROPAGE_Y: {
                         uint8_t addr = (c.instruct[in].op1.op + c.proc.reg_y) & 0xFF;
+                        trackMemoryWrite(addr, c.proc.reg_x);
                         c.poke(addr, c.proc.reg_x);
                     }
                     break;
@@ -1150,12 +1162,15 @@ namespace interp {
                 switch(c.instruct[in].mode) {
                     case ABSOULTE:
                         c.poke(c.instruct[in].op1.op, c.proc.reg_y);
+                        trackMemoryWrite(c.instruct[in].op1.op, c.proc.reg_y);
                         break;
                     case ZEROPAGE:
                         c.poke(c.instruct[in].op1.op & 0xFF, c.proc.reg_y);
+                        trackMemoryWrite(c.instruct[in].op1.op, c.proc.reg_y);
                         break;
                     case ZEROPAGE_X: {
                         uint8_t addr = (c.instruct[in].op1.op + c.proc.reg_x) & 0xFF;
+                        trackMemoryWrite(addr, c.proc.reg_y);
                         c.poke(addr, c.proc.reg_y);
                     }
                     break;

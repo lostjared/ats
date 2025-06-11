@@ -4,7 +4,7 @@
 #include "function.hpp"
 #include "translate.hpp"
 #include "tee_streambuf.hpp"
-
+#include"code.hpp"
 // Function that returns HTML as a string
 std::string generateHTML() {
     std::ostringstream html;
@@ -556,6 +556,42 @@ public:
     bool isCodeBuilt() {
         return code_built;
     }
+    
+    std::string getMemoryState() {
+        std::ostringstream memory;
+        memory << "{";
+        memory << "\"size\":65536,";
+        memory << "\"data\":[";
+        
+        // Output memory as array of bytes
+        for (int i = 0; i < 65536; i++) {
+            if (i > 0) memory << ",";
+            memory << (int)code.peek(i);
+        }
+        
+        memory << "],";
+        memory << "\"modified\":[";
+        
+        // Track which addresses were modified (you'd need to implement this tracking)
+        // For now, return empty array
+        memory << "]";
+        memory << "}";
+        return memory.str();
+    }
+
+
+    std::string getModifiedMemory() {
+        std::ostringstream result;
+        result << "[";
+        for (size_t i = 0; i < interp::modifiedMemoryAddresses.size(); i++) {
+            if (i > 0) result << ",";
+            result << "{\"address\":" << interp::modifiedMemoryAddresses[i].first 
+                << ",\"value\":" << (int)interp::modifiedMemoryAddresses[i].second << "}";
+        }
+        result << "]";
+        return result.str();
+    }
+
 };
 
 // Emscripten bindings
@@ -571,7 +607,9 @@ EMSCRIPTEN_BINDINGS(ats_module) {
         .function("stepInstruction", &ATSDebugger::stepInstruction)
         .function("resetExecution", &ATSDebugger::resetExecution)
         .function("getProcessorState", &ATSDebugger::getProcessorState)
-        .function("getCurrentInstructionInfo", &ATSDebugger::getCurrentInstructionInfo);
+        .function("getCurrentInstructionInfo", &ATSDebugger::getCurrentInstructionInfo)
+        .function("getMemoryState", &ATSDebugger::getMemoryState)
+        .function("getModifiedMemory", &ATSDebugger::getModifiedMemory);
     
     // Standalone function
     emscripten::function("generateHTML", &generateHTML);
