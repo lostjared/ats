@@ -3,6 +3,7 @@
 #include <iomanip>
 #include "function.hpp"
 #include "translate.hpp"
+#include "tee_streambuf.hpp"
 
 // Function that returns HTML as a string
 std::string generateHTML() {
@@ -331,6 +332,7 @@ std::string generateHTML() {
 bool initializeSystem() {
     static bool initialized = false;
     if (!initialized) {
+        interp::setup_tee_for_interp_stream();
         code.reset();
         initialized = true;
         return true;
@@ -344,9 +346,11 @@ private:
     std::string last_error;
     bool code_loaded;
     bool code_built;
+    bool execution_started;
+    int current_instruction_index;
     
 public:
-    ATSDebugger() : code_loaded(false), code_built(false) {
+    ATSDebugger() : code_loaded(false), code_built(false), execution_started(false), current_instruction_index(0) {
         initializeSystem(); // Ensure system is initialized
     }
     
@@ -371,7 +375,9 @@ public:
             }
             last_error.clear();
             code_loaded = true;
-            code_built = false; 
+            code_built = false;
+            execution_started = false;
+            current_instruction_index = 0;
             return true;
         } catch (const std::exception& e) {
             last_error = std::string("Load error: ") + e.what();
@@ -396,6 +402,8 @@ public:
             }
             last_error.clear();
             code_built = true;
+            execution_started = false;
+            current_instruction_index = 0;
             return true;
         } catch (const std::exception& e) {
             last_error = std::string("Build error: ") + e.what();
@@ -404,12 +412,117 @@ public:
         }
     }
     
+    bool startExecution() {
+        if (!code_built) {
+            last_error = "Code not built - cannot start execution";
+            return false;
+        }
+        try {
+            execution_started = true;
+            current_instruction_index = 0;
+            last_error.clear();
+            return true;
+        } catch (const std::exception& e) {
+            last_error = std::string("Start execution error: ") + e.what();
+            return false;
+        }
+    }
+    
+    bool stepInstruction() {
+        if (!code_built) {
+            last_error = "Code not built - cannot step";
+            return false;
+        }
+       
+        // Check if we're at the end
+        if (current_instruction_index >= static_cast<int>(code.instruct.size())) {
+            last_error = "End of program reached";
+            return false;
+        }
+        
+        try {
+            // Execute ONE instruction
+            code.step();
+            current_instruction_index++;
+            last_error.clear();
+            return true;
+        } catch (const std::exception& e) {
+            last_error = std::string("Step error: ") + e.what();
+            return false;
+        }
+    }
+    
+    std::string getProcessorState() {
+        std::ostringstream state;
+        state << "{";
+        
+        // Use the actual member names and methods from your Processor class
+        state << "\"pc\":" << code.proc.getIp() << ",";
+        state << "\"ac\":" << (int)code.proc.reg_a << ",";
+        state << "\"x\":" << (int)code.proc.reg_x << ",";
+        state << "\"y\":" << (int)code.proc.reg_y << ",";
+        state << "\"sr\":" << (int)code.proc.valFlags() << ",";
+        state << "\"sp\":" << (int)code.proc.sp << ",";
+        
+        // Status flags - check your icode.hpp for the correct flag enum values
+        // The flags are typically numbered 0-7 for bits in the status register
+        state << "\"carry\":" << (code.proc.getFlag(static_cast<icode::proc_Flags>(0)) ? "true" : "false") << ",";
+        state << "\"zero\":" << (code.proc.getFlag(static_cast<icode::proc_Flags>(1)) ? "true" : "false") << ",";
+        state << "\"interrupt\":" << (code.proc.getFlag(static_cast<icode::proc_Flags>(2)) ? "true" : "false") << ",";
+        state << "\"decimal\":" << (code.proc.getFlag(static_cast<icode::proc_Flags>(3)) ? "true" : "false") << ",";
+        state << "\"break\":" << (code.proc.getFlag(static_cast<icode::proc_Flags>(4)) ? "true" : "false") << ",";
+        state << "\"overflow\":" << (code.proc.getFlag(static_cast<icode::proc_Flags>(6)) ? "true" : "false") << ",";
+        state << "\"negative\":" << (code.proc.getFlag(static_cast<icode::proc_Flags>(7)) ? "true" : "false") << ",";
+        
+        state << "\"currentInstruction\":" << current_instruction_index << ",";
+        state << "\"totalInstructions\":" << code.instruct.size();
+        state << "}";
+        return state.str();
+    }
+    
+    std::string getCurrentInstructionInfo() {
+        // Show the NEXT instruction to be executed
+        int nextIndex = current_instruction_index;
+        
+        if (nextIndex < 0 || nextIndex >= static_cast<int>(code.instruct.size())) {
+            return "{\"valid\":false}";
+        }
+        
+        auto& inst = code.instruct[nextIndex];
+        std::ostringstream info;
+        info << "{";
+        info << "\"valid\":true,";
+        info << "\"index\":" << nextIndex << ",";
+        info << "\"lineNum\":" << inst.line_num << ",";
+        info << "\"text\":\"" << inst.text << "\",";
+        info << "\"opcode\":\"" << icode::op_array[static_cast<unsigned int>(inst.opcode)] << "\",";
+        info << "\"addressMode\":\"" << interp::add_mode[inst.mode] << "\"";
+        info << "}";
+        return info.str();
+    }
+    
+    void resetExecution() {
+        execution_started = false;
+        current_instruction_index = 0;
+        if (code_built) {
+            code.reset();
+        }
+    }
+    
+    bool isExecutionStarted() {
+        return execution_started;
+    }
+    
+    bool isExecutionComplete() {
+        return execution_started && current_instruction_index >= static_cast<int>(code.instruct.size());
+    }
+    
     int getInstructionCount() {
-        return code_built ? code.instruct.size() : 0;
+        return static_cast<int>(code.instruct.size());
     }
     
     std::string getLastError() {
-        return last_error.empty() ? "No error" : last_error;
+        return last_error;
     }
     
     bool isCodeLoaded() {
@@ -425,13 +538,16 @@ public:
 EMSCRIPTEN_BINDINGS(ats_module) {
     emscripten::class_<ATSDebugger>("ATSDebugger")
         .constructor<>()
-        .function("getDebugHTML", &ATSDebugger::getDebugHTML)
         .function("loadCode", &ATSDebugger::loadCode)
         .function("buildCode", &ATSDebugger::buildCode)
+        .function("getDebugHTML", &ATSDebugger::getDebugHTML)
         .function("getInstructionCount", &ATSDebugger::getInstructionCount)
         .function("getLastError", &ATSDebugger::getLastError)
-        .function("isCodeLoaded", &ATSDebugger::isCodeLoaded)
-        .function("isCodeBuilt", &ATSDebugger::isCodeBuilt);
+        .function("startExecution", &ATSDebugger::startExecution)
+        .function("stepInstruction", &ATSDebugger::stepInstruction)
+        .function("resetExecution", &ATSDebugger::resetExecution)
+        .function("getProcessorState", &ATSDebugger::getProcessorState)
+        .function("getCurrentInstructionInfo", &ATSDebugger::getCurrentInstructionInfo);
     
     // Standalone function
     emscripten::function("generateHTML", &generateHTML);

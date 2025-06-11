@@ -16,6 +16,8 @@
 
 namespace interp {
     
+    extern std::ostringstream stream;
+
     class Runtime_E {
     public:
         Runtime_E(const std::string &t) : text(t) { }

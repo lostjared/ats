@@ -5,7 +5,7 @@ namespace interp {
     std::vector<TextLine> lines;
     std::unordered_map<std::string, int> label_table;
     std::unordered_map<int, int> label_line_table;
-    
+    std::ostringstream stream;
     const char *add_mode[] = { "Non mode", "Immediate", "Zero Page", "Zero Page X", "Zero Page Y", "Absoulte", "Absoulte X", "Absoulte Y", "Implied", "Relative", "Indirect Indexed", "Indexed Indirect", "Accumulator", "Indirect", 0 };
     
 
