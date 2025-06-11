@@ -278,6 +278,7 @@ namespace interp {
     
     void Code::poke(uint16_t address, uint8_t value) {
         mem[address] = value;
+        trackMemoryWrite(address, value);
     }
     
     void Code::loadFromString(const std::string& code_text) {
