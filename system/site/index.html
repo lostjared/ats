@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS - Assembly Script Debugger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a1a, #2d1b1b);
+            color: #f0f0f0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(45deg, #cc0000, #800000);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(204, 0, 0, 0.3);
+        }
+        
+        .header h1 {
+            color: white;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #ffcccc;
+            font-size: 1.1em;
+        }
+        
+        .input-section {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .input-title {
+            background: linear-gradient(45deg, #cc0000, #990000);
+            color: white;
+            padding: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            margin: -20px -20px 20px -20px;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .code-editor {
+            width: 100%;
+            height: 300px;
+            background: #1a1a1a;
+            color: #f0f0f0;
+            border: 2px solid #cc0000;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            resize: vertical;
+        }
+        
+        .code-editor:focus {
+            outline: none;
+            border-color: #ff6666;
+            box-shadow: 0 0 10px rgba(204, 0, 0, 0.5);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #cc0000, #990000);
+            color: white;
+            box-shadow: 0 4px 15px rgba(204, 0, 0, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(204, 0, 0, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #666666, #444444);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(45deg, #888888, #666666);
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .examples {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .example-btn {
+            padding: 8px 15px;
+            background: rgba(204, 0, 0, 0.2);
+            border: 1px solid #cc0000;
+            border-radius: 5px;
+            color: #ffcccc;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .example-btn:hover {
+            background: rgba(204, 0, 0, 0.4);
+            color: white;
+        }
+        
+        .status-bar {
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .status-success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+        
+        .status-error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            color: #ff0000;
+        }
+        
+        .status-info {
+            background: rgba(0, 150, 255, 0.1);
+            border: 1px solid #0096ff;
+            color: #0096ff;
+        }
+        
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #cc0000;
+        }
+        
+        .loader::after {
+            content: "";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #cc0000;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .output-section {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .output-title {
+            background: linear-gradient(45deg, #cc0000, #990000);
+            color: white;
+            padding: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            margin: -20px -20px 20px -20px;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .output-content {
+            min-height: 200px;
+            background: #000;
+            border-radius: 8px;
+            padding: 20px;
+            overflow: auto;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            color: #999;
+        }
+
+ 
+        .memory-viewer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 1000px;
+            height: 80%;
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #cc0000;
+            border-radius: 10px;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .memory-viewer-header {
+            background: linear-gradient(45deg, #cc0000, #990000);
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .memory-viewer-content {
+            flex: 1;
+            padding: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .memory-search {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .memory-search input {
+            background: #1a1a1a;
+            border: 1px solid #cc0000;
+            color: #f0f0f0;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-family: monospace;
+            width: 120px;
+        }
+
+        .memory-search input:focus {
+            outline: none;
+            border-color: #ff6666;
+            box-shadow: 0 0 5px rgba(204, 0, 0, 0.5);
+        }
+
+        .memory-grid-container {
+            flex: 1;
+            overflow: auto;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background: #111;
+        }
+
+        .memory-grid {
+            font-family: monospace;
+            font-size: 12px;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .memory-grid th,
+        .memory-grid td {
+            padding: 4px 8px;
+            text-align: center;
+            border: 1px solid #333;
+            min-width: 30px;
+        }
+
+        .memory-grid th {
+            background: #333;
+            color: #ffcc00;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .memory-grid .address-column {
+            background: #222;
+            color: #ffcc00;
+            text-align: right;
+            font-weight: bold;
+            position: sticky;
+            left: 0;
+            z-index: 1;
+        }
+
+        .memory-grid .memory-cell {
+            background: #1a1a1a;
+            color: #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .memory-grid .memory-cell:hover {
+            background: #333;
+        }
+
+        .memory-grid .memory-cell.modified {
+            background: #004400;
+            color: #00ff00;
+        }
+
+        .memory-grid .memory-cell.highlighted {
+            background: #444400;
+            color: #ffff00;
+        }
+
+        .memory-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            display: none;
+        }
+
+        .close-btn {
+            background: #ff6666;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .close-btn:hover {
+            background: #ff3333;
+        }
+
+        .memory-info {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #222;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .memory-legend {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            font-size: 11px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 ATS Debugger</h1>
+            <p>Assembly Analysis & Machine Code Generation</p>
+        </div>
+        
+        <div class="input-section">
+            <div class="input-title">📝 Assembly Code Editor</div>
+            
+            <div class="examples">
+                <div class="example-btn" onclick="loadExample('basic')">Basic Example</div>
+                <div class="example-btn" onclick="loadExample('loop')">Loop Example</div>
+                <div class="example-btn" onclick="loadExample('subroutine')">Subroutine</div>
+                <div class="example-btn" onclick="loadExample('memory')">Memory Ops</div>
+                <div class="example-btn" onclick="loadExample('stack')">Stack Ops</div>
+            </div>
+            
+            <textarea id="codeEditor" class="code-editor" placeholder="Enter your ATS assembly code here...
+Example:
+10 CLC
+20 LDA #100
+30 ADC #50
+40 STA $10
+50 END"></textarea>
+            
+            <div class="button-group">
+                <button id="buildBtn" class="btn btn-primary">🔨 Build Code</button>
+                <button id="generateBtn" class="btn btn-primary" disabled>📊 Generate Report</button>
+                <button id="clearBtn" class="btn btn-secondary">🗑️ Clear</button>
+            </div>
+            
+            <div id="statusBar" class="status-bar"></div>
+            <div id="loader" class="loader">Compiling...</div>
+        </div>
+        
+        <div class="output-section">
+            <div class="output-title">📋 Debug Output</div>
+            <div id="outputContent" class="output-content">
+                <div style="text-align: center; padding: 40px; color: #666;">
+                    <h3>🚀 Ready to compile!</h3>
+                    <p style="margin-top: 10px;">Enter your ATS assembly code above and click "Build Code" to get started.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>ATS (Assembly Script) Debugger v1.0 | &copy; 2025 LostSideDead Software</p>
+        </div>
+    </div>
+
+<script>
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM loaded, starting ATS Debugger initialization...');
+    
+    // Example programs with proper ATS format
+    const examples = {
+        basic: `10 CLC
+20 LDA #100
+30 ADC #50
+40 STA $10
+50 END`,
+        
+        loop: `10 LDX #0
+20 LOOP TXA
+30 STA $1000,X
+40 INX
+50 CPX #10
+60 BNE LOOP
+70 END`,
+        
+        subroutine: `10 CLC
+20 JSR ADDVALUES
+30 END
+100 ADDVALUES LDX #10
+110 LDY #25
+120 STX $1E
+130 STY $1F
+140 LDA #100
+150 ADC $1E
+160 ADC $1F
+170 STA $10
+180 RTS`,
+        
+        memory: `10 LDA #$FF
+20 STA $00
+30 LDA #$AA
+40 STA $01
+50 LDX $00
+60 LDY $01
+70 STX $10
+80 STY $11
+90 END`,
+        
+        stack: `10 LDA #$42
+20 PHA
+30 LDA #$33
+40 PHA
+50 PLA
+60 STA $10
+70 PLA
+80 STA $11
+90 END`
+    };
+    
+    // DOM elements
+    const codeEditor = document.getElementById('codeEditor');
+    const buildBtn = document.getElementById('buildBtn');
+    const generateBtn = document.getElementById('generateBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const statusBar = document.getElementById('statusBar');
+    const loader = document.getElementById('loader');
+    const outputContent = document.getElementById('outputContent');
+    
+    let atsModule = null;
+    let atsDebugger = null;
+    let isBuilt = false;
+    let moduleLoadAttempted = false;
+    let debugLog = [];
+    
+    // Execution state variables
+    let executionStarted = false;
+    let executionComplete = false;
+    
+    // Memory viewer variables - MOVE THESE INSIDE
+    let memoryData = new Uint8Array(65536); // 64K memory
+    let modifiedAddresses = new Set();
+    let highlightedAddress = null;
+    
+    // Debug logging function
+    function debugMsg(message, type = 'info') {
+        const timestamp = new Date().toISOString().substring(11, 23);
+        const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+        debugLog.push(logEntry);
+        console.log(`🔧 ATS Debug: ${logEntry}`);
+        
+        // Update debug display if it exists
+        updateDebugDisplay();
+    }
+    
+    // Update debug display in the output
+    function updateDebugDisplay() {
+        const debugSection = document.getElementById('debugInfo');
+        if (debugSection) {
+            debugSection.innerHTML = `
+                <h4>🐛 Debug Log:</h4>
+                <div style="font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto; background: #111; padding: 10px; border-radius: 5px;">
+                    ${debugLog.slice(-20).map(log => `<div>${log}</div>`).join('')}
+                </div>
+            `;
+        }
+    }
+    
+    // Create debug info section
+    function createDebugSection() {
+        const debugDiv = document.createElement('div');
+        debugDiv.id = 'debugInfo';
+        debugDiv.style.cssText = 'margin-top: 20px; padding: 15px; background: rgba(255,255,0,0.1); border: 1px solid #ffff00; border-radius: 8px; color: #ffff00;';
+        outputContent.appendChild(debugDiv);
+        updateDebugDisplay();
+    }
+    
+    // Load example code
+    window.loadExample = function(exampleName) {
+        debugMsg(`Loading example: ${exampleName}`);
+        if (examples[exampleName]) {
+            codeEditor.value = examples[exampleName];
+            isBuilt = false;
+            generateBtn.disabled = true;
+            showStatus(`Loaded ${exampleName} example`, 'info');
+            debugMsg(`Example loaded successfully: ${examples[exampleName].length} characters`);
+            
+            // Reset execution state when loading new code
+            executionStarted = false;
+            executionComplete = false;
+            updateExecutionButtons();
+            updateProcessorDisplay();
+        } else {
+            debugMsg(`Example not found: ${exampleName}`, 'error');
+        }
+    };
+    
+    // Show status message
+    function showStatus(message, type = 'info') {
+        debugMsg(`Status: ${message} (${type})`);
+        statusBar.textContent = message;
+        statusBar.className = `status-bar status-${type}`;
+        statusBar.style.display = 'block';
+        
+        if (type === 'success' || type === 'info') {
+            setTimeout(() => {
+                statusBar.style.display = 'none';
+            }, 3000);
+        }
+    }
+    
+    // Check ATS module availability
+    function checkATSAvailability() {
+        debugMsg('Checking ATS module availability...');
+        debugMsg(`typeof ATS: ${typeof ATS}`);
+        debugMsg(`window.ATS: ${window.ATS ? 'defined' : 'undefined'}`);
+        debugMsg(`Current script src: ${document.currentScript ? document.currentScript.src : 'unknown'}`);
+        
+        // List all scripts
+        const scripts = Array.from(document.scripts);
+        debugMsg(`Total scripts loaded: ${scripts.length}`);
+        scripts.forEach((script, index) => {
+            debugMsg(`Script ${index}: ${script.src || 'inline'}`);
+        });
+        
+        return typeof ATS !== 'undefined';
+    }
+    
+    // Load ATS module with extensive debugging
+    async function loadATS() {
+        debugMsg('Starting ATS module loading process...');
+        moduleLoadAttempted = true;
+        
+        try {
+            if (!checkATSAvailability()) {
+                throw new Error('ATS function not available. Check if ats.js loaded correctly.');
+            }
+            
+            debugMsg('ATS function found, attempting to call ATS()...');
+            atsModule = await ATS();
+            debugMsg(`ATS module loaded. Type: ${typeof atsModule}`);
+            debugMsg(`Module keys: ${Object.keys(atsModule).join(', ')}`);
+            
+            if (!atsModule.ATSDebugger) {
+                debugMsg('Available module properties:', 'info');
+                for (const key in atsModule) {
+                    debugMsg(`  - ${key}: ${typeof atsModule[key]}`);
+                }
+                throw new Error('ATSDebugger class not found in module. Check Emscripten bindings.');
+            }
+            
+            debugMsg('Creating ATSDebugger instance...');
+            atsDebugger = new atsModule.ATSDebugger();
+            debugMsg(`ATSDebugger created. Type: ${typeof atsDebugger}`);
+            
+            // Test debugger methods
+            debugMsg('Testing ATSDebugger methods...');
+            const methods = ['loadCode', 'buildCode', 'getInstructionCount', 'getLastError', 'getDebugHTML'];
+            methods.forEach(method => {
+                debugMsg(`  - ${method}: ${typeof atsDebugger[method]}`);
+            });
+            
+            debugMsg('ATS module fully loaded and ready!');
+            showStatus('ATS module loaded successfully!', 'success');
+            
+        } catch (error) {
+            debugMsg(`ATS module load failed: ${error.message}`, 'error');
+            debugMsg(`Error stack: ${error.stack}`, 'error');
+            showStatus('Failed to load ATS module: ' + error.message, 'error');
+            console.error('ATS module load error:', error);
+            
+            // Create a mock debugger for testing
+            debugMsg('Creating mock debugger for testing...');
+            atsDebugger = createMockDebugger();
+        }
+    }
+    
+    // Create a mock debugger for testing
+    function createMockDebugger() {
+        debugMsg('Mock debugger created');
+        return {
+            loadCode: function(code) {
+                debugMsg(`Mock loadCode called with ${code.length} characters`);
+                debugMsg(`Code preview: ${code.substring(0, 50)}...`);
+                return code.trim().length > 0;
+            },
+            buildCode: function() {
+                debugMsg('Mock buildCode called');
+                return true;
+            },
+            getInstructionCount: function() {
+                debugMsg('Mock getInstructionCount called');
+                return 5;
+            },
+            getLastError: function() {
+                debugMsg('Mock getLastError called');
+                return 'Mock mode - WebAssembly not available';
+            },
+            getDebugHTML: function() {
+                debugMsg('Mock getDebugHTML called');
+                return `
+                <div style="text-align: center; padding: 40px; color: #ffaa00;">
+                    <h3>🚧 Mock Mode Active</h3>
+                    <p style="margin-top: 10px;">WebAssembly module not available - using mock debugger.</p>
+                    <div id="debugInfo"></div>
+                </div>
+                `;
+            },
+            // Mock step-through functions
+            startExecution: function() {
+                debugMsg('Mock startExecution called');
+                return true;
+            },
+            stepInstruction: function() {
+                debugMsg('Mock stepInstruction called');
+                return true;
+            },
+            getProcessorState: function() {
+                debugMsg('Mock getProcessorState called');
+                return JSON.stringify({
+                    pc: 0x1000, ac: 0x42, x: 0x10, y: 0x20, sr: 0x30, sp: 0xFF,
+                    carry: false, zero: true, interrupt: false, decimal: false,
+                    break: false, overflow: false, negative: false,
+                    currentInstruction: 0, totalInstructions: 5
+                });
+            },
+            getCurrentInstructionInfo: function() {
+                debugMsg('Mock getCurrentInstructionInfo called');
+                return JSON.stringify({
+                    valid: true, index: 0, lineNum: 10, text: "CLC",
+                    opcode: "CLC", addressMode: "IMPLIED"
+                });
+            },
+            resetExecution: function() {
+                debugMsg('Mock resetExecution called');
+            }
+        };
+    }
+    
+    // Build code with extensive debugging
+    async function buildCode() {
+        debugMsg('=== BUILD CODE STARTED ===');
+        
+        if (!atsDebugger) {
+            debugMsg('No debugger available!', 'error');
+            showStatus('ATS module not loaded yet. Please wait...', 'error');
+            return;
+        }
+        
+        const code = codeEditor.value.trim();
+        debugMsg(`Input code length: ${code.length}`);
+        
+        if (!code) {
+            debugMsg('No code entered', 'error');
+            showStatus('Please enter some ATS assembly code first.', 'error');
+            return;
+        }
+        
+        try {
+            loader.style.display = 'block';
+            outputContent.innerHTML = '<div id="buildingStatus" style="color: #ffaa00; text-align: center; padding: 20px;">Building...</div>';
+            createDebugSection();
+            
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            debugMsg('Calling atsDebugger.loadCode()...');
+            const loaded = atsDebugger.loadCode(code);
+            debugMsg(`loadCode result: ${loaded}`);
+            
+            if (!loaded) {
+                let errorMsg = atsDebugger.getLastError();
+                throw new Error('Code parsing failed: ' + errorMsg);
+            }
+            
+            debugMsg('Calling atsDebugger.buildCode()...');
+            const built = atsDebugger.buildCode();
+            debugMsg(`buildCode result: ${built}`);
+            
+            if (!built) {
+                let errorMsg = atsDebugger.getLastError();
+                throw new Error('Compilation failed: ' + errorMsg);
+            }
+            
+            isBuilt = true;
+            generateBtn.disabled = false;
+            
+            loader.style.display = 'none';
+            showStatus('Code compiled successfully! You can now step through the code.', 'success');
+            
+            let instructionCount = atsDebugger.getInstructionCount();
+            debugMsg(`getInstructionCount result: ${instructionCount}`);
+            
+            
+
+            outputContent.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #00ff00;">
+                    <h3>✅ Compilation Successful!</h3>
+                    <p style="margin-top: 10px;">Your ATS assembly code has been compiled successfully.</p>
+                    <p style="margin-top: 5px;">Use the "Step" button to execute instructions one by one.</p>
+                    <p style="margin-top: 15px; color: #cccccc;">
+                        Instructions: ${instructionCount}
+                    </p>
+                </div>
+            `;
+            createDebugSection();
+            
+            // Reset execution state and enable step button
+            executionStarted = false;
+            executionComplete = false;
+            updateExecutionButtons();
+            updateProcessorDisplay();
+            
+            debugMsg('=== BUILD CODE COMPLETED SUCCESSFULLY ===');
+            
+        } catch (error) {
+            debugMsg(`Build error: ${error.message}`, 'error');
+            loader.style.display = 'none';
+            isBuilt = false;
+            generateBtn.disabled = true;
+            showStatus('Build failed: ' + error.message, 'error');
+            
+            outputContent.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #ff6666;">
+                    <h3>❌ Compilation Failed</h3>
+                    <p style="margin-top: 10px;">${error.message}</p>
+                    <p style="margin-top: 15px; color: #cccccc;">Please check your assembly code and try again.</p>
+                </div>
+            `;
+            createDebugSection();
+            
+            debugMsg('=== BUILD CODE FAILED ===');
+        }
+    }
+    
+    // Generate report with debugging
+    async function generateReport() {
+        debugMsg('=== GENERATE REPORT STARTED ===');
+        
+        if (!isBuilt || !atsDebugger) {
+            debugMsg('Cannot generate report - not built or no debugger', 'error');
+            showStatus('Please build your code first.', 'error');
+            return;
+        }
+        
+        try {
+            loader.style.display = 'block';
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
+            debugMsg('Calling atsDebugger.getDebugHTML()...');
+            const htmlReport = atsDebugger.getDebugHTML();
+            debugMsg(`getDebugHTML result length: ${htmlReport.length}`);
+            debugMsg(`HTML preview: ${htmlReport.substring(0, 200)}...`);
+            
+            loader.style.display = 'none';
+            outputContent.innerHTML = htmlReport;
+            
+            // Re-add debug section to the new content
+            createDebugSection();
+            
+            showStatus('Debug report generated successfully!', 'success');
+            debugMsg('=== GENERATE REPORT COMPLETED ===');
+            
+        } catch (error) {
+            debugMsg(`Report generation error: ${error.message}`, 'error');
+            debugMsg(`Error stack: ${error.stack}`, 'error');
+            
+            loader.style.display = 'none';
+            showStatus('Failed to generate report: ' + error.message, 'error');
+            createDebugSection();
+            
+            debugMsg('=== GENERATE REPORT FAILED ===');
+        }
+    }
+    
+    // Clear editor
+    function clearCode() {
+        debugMsg('Clearing editor');
+        codeEditor.value = '';
+        isBuilt = false;
+        generateBtn.disabled = true;
+        outputContent.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <h3>🚀 Ready to compile!</h3>
+                <p style="margin-top: 10px;">Enter your ATS assembly code above and click "Build Code" to get started.</p>
+            </div>
+        `;
+        showStatus('Editor cleared.', 'info');
+        debugLog = []; // Clear debug log
+        
+        // Reset execution state
+        executionStarted = false;
+        executionComplete = false;
+        updateExecutionButtons();
+        updateProcessorDisplay();
+    }
+    
+    // Execution control functions
+  <!-- Update the stepInstruction function in your JavaScript -->
+
+    async function stepInstruction() {
+        if (!isBuilt || !atsDebugger) {
+            showStatus('Please build your code first.', 'error');
+            return;
+        }
+        
+        try {
+            debugMsg('Stepping instruction...');
+            
+            // Always update processor display BEFORE stepping to show the "about to execute" state
+            if (!executionStarted) {
+                updateProcessorDisplay(); // Show initial state
+            }
+            
+            const stepped = atsDebugger.stepInstruction();
+            
+            if (!stepped) {
+                const error = atsDebugger.getLastError();
+                if (error.includes('End of program')) {
+                    executionComplete = true;
+                    updateExecutionButtons();
+                    showStatus('Program execution completed!', 'success');
+                    debugMsg('Program execution completed');
+                } else {
+                    throw new Error(error);
+                }
+            } else {
+                // Automatically start execution state when first step is successful
+                if (!executionStarted) {
+                    executionStarted = true;
+                    updateExecutionButtons();
+                }
+                showStatus('Instruction executed', 'info');
+                debugMsg('Instruction stepped successfully');
+            }
+            
+            // Always update processor display AFTER stepping to show the new state
+            updateProcessorDisplay();
+            
+        } catch (error) {
+            debugMsg(`Step instruction error: ${error.message}`, 'error');
+            showStatus('Failed to step instruction: ' + error.message, 'error');
+        }
+    }
+    async function resetExecution() {
+        if (!atsDebugger) {
+            return;
+        }
+        
+        try {
+            debugMsg('Reset button pressed - rebuilding code...');
+            
+            // Reset execution state variables
+            executionStarted = false;
+            executionComplete = false;
+            
+            // Call buildCode again to rebuild and reset everything
+            await buildCode();
+            
+            debugMsg('Reset completed - code rebuilt successfully');
+            
+        } catch (error) {
+            debugMsg(`Reset execution error: ${error.message}`, 'error');
+            showStatus('Failed to reset execution: ' + error.message, 'error');
+        }
+    }
+
+    function updateExecutionButtons() {
+        const stepBtn = document.getElementById('stepBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const memoryBtn = document.getElementById('memoryBtn');
+        
+        if (stepBtn && resetBtn && memoryBtn) {
+            // Step button enabled as soon as code is built
+            stepBtn.disabled = !isBuilt || executionComplete;
+            resetBtn.disabled = !isBuilt;
+            memoryBtn.disabled = !isBuilt;  // Enable memory button when code is built
+        }
+    }
+
+    function updateProcessorDisplay() {
+        const processorContent = document.getElementById('processorContent');
+        if (!processorContent || !atsDebugger) return;
+        
+        try {
+            if (!isBuilt) {
+                processorContent.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        <h3>💤 No Code Built</h3>
+                        <p style="margin-top: 10px;">Build your code first to enable step-through debugging.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Get current processor state
+            const stateJson = atsDebugger.getProcessorState();
+            const state = JSON.parse(stateJson);
+            
+            // Get current instruction info
+            const instrJson = atsDebugger.getCurrentInstructionInfo();
+            const instrInfo = JSON.parse(instrJson);
+            
+            // Determine if execution is complete
+            const isComplete = !instrInfo.valid || (executionStarted && state.currentInstruction >= state.totalInstructions);
+            
+            processorContent.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px;">
+                    <div>
+                        <h3 style="color: #cc0000; margin-bottom: 15px;">📊 Registers</h3>
+                        <div style="font-family: monospace; font-size: 14px;">
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">PC:</span> <span style="color: #00ff00;">$${state.pc.toString(16).toUpperCase().padStart(4, '0')}</span> (${state.pc})</div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">AC:</span> <span style="color: #00ff00;">$${state.ac.toString(16).toUpperCase().padStart(2, '0')}</span> (${state.ac})</div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">X:</span>  <span style="color: #00ff00;">$${state.x.toString(16).toUpperCase().padStart(2, '0')}</span> (${state.x})</div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Y:</span>  <span style="color: #00ff00;">$${state.y.toString(16).toUpperCase().padStart(2, '0')}</span> (${state.y})</div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">SP:</span> <span style="color: #00ff00;">$${state.sp.toString(16).toUpperCase().padStart(2, '0')}</span> (${state.sp})</div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">SR:</span> <span style="color: #00ff00;">$${state.sr.toString(16).toUpperCase().padStart(2, '0')}</span> (${state.sr})</div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 style="color: #cc0000; margin-bottom: 15px;">🚩 Status Flags</h3>
+                        <div style="font-family: monospace; font-size: 14px;">
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Carry (C):</span> <span style="color: ${state.carry ? '#00ff00' : '#666666'};">${state.carry ? 'SET' : 'CLEAR'}</span></div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Zero (Z):</span> <span style="color: ${state.zero ? '#00ff00' : '#666666'};">${state.zero ? 'SET' : 'CLEAR'}</span></div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Interrupt (I):</span> <span style="color: ${state.interrupt ? '#00ff00' : '#666666'};">${state.interrupt ? 'SET' : 'CLEAR'}</span></div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Decimal (D):</span> <span style="color: ${state.decimal ? '#00ff00' : '#666666'};">${state.decimal ? 'SET' : 'CLEAR'}</span></div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Break (B):</span> <span style="color: ${state.break ? '#00ff00' : '#666666'};">${state.break ? 'SET' : 'CLEAR'}</span></div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Overflow (V):</span> <span style="color: ${state.overflow ? '#00ff00' : '#666666'};">${state.overflow ? 'SET' : 'CLEAR'}</span></div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Negative (N):</span> <span style="color: ${state.negative ? '#00ff00' : '#666666'};">${state.negative ? 'SET' : 'CLEAR'}</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding: 0 20px 20px 20px; border-top: 1px solid #333; margin-top: 20px; padding-top: 20px;">
+                    <h3 style="color: #cc0000; margin-bottom: 15px;">📍 ${isComplete ? 'Program Complete' : (executionStarted ? 'Current Instruction' : 'Next Instruction')}</h3>
+                    <div style="font-family: monospace; font-size: 14px;">
+                        ${instrInfo.valid ? `
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Step:</span> <span style="color: #00ff00;">${state.currentInstruction + 1} of ${state.totalInstructions}</span></div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Line:</span> <span style="color: #00ff00;">${instrInfo.lineNum}</span></div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">${executionStarted ? 'Current' : 'Next'}:</span> <span style="color: #00ff00;">${instrInfo.text}</span></div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Opcode:</span> <span style="color: #00ff00;">${instrInfo.opcode}</span></div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Mode:</span> <span style="color: #00ff00;">${instrInfo.addressMode}</span></div>
+                            ${instrInfo.isBranch ? `
+                                <div style="margin: 8px 0;"><span style="color: #ffcc00;">Branch:</span> <span style="color: ${instrInfo.willBranch ? '#00ff00' : '#ff6666'};">${instrInfo.willBranch ? 'WILL TAKE' : 'WILL NOT TAKE'}</span></div>
+                                <div style="margin: 8px 0;"><span style="color: #ffcc00;">Target:</span> <span style="color: #00ff00;">${instrInfo.branchTarget}</span></div>
+                            ` : ''}
+                        ` : `
+                            <div style="color: #ff6666; text-align: center;">✅ Program execution completed!</div>
+                            <div style="color: #cccccc; text-align: center; margin-top: 10px;">Final processor state shown above</div>
+                        `}
+                    </div>
+                </div>
+            `;
+            
+        } catch (error) {
+            debugMsg(`Update processor display error: ${error.message}`, 'error');
+            processorContent.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #ff6666;">
+                    <h3>❌ Error</h3>
+                    <p style="margin-top: 10px;">Failed to update processor state: ${error.message}</p>
+                </div>
+            `;
+        }
+    }
+    
+    // Memory viewer functions - MOVE ALL OF THESE INSIDE THE DOMContentLoaded
+    function showMemoryViewer() {
+        if (!isBuilt) {
+            showStatus('Please build your code first.', 'error');
+            return;
+        }
+        
+        debugMsg('Opening memory viewer...');
+        document.getElementById('memoryOverlay').style.display = 'block';
+        document.getElementById('memoryViewer').style.display = 'flex';
+        
+        refreshMemory();
+        renderMemoryGrid(0x0000); // Start at address 0x0000
+    }
+
+    function hideMemoryViewer() {
+        document.getElementById('memoryOverlay').style.display = 'none';
+        document.getElementById('memoryViewer').style.display = 'none';
+        debugMsg('Memory viewer closed');
+    }
+
+    function refreshMemory() {
+        if (!atsDebugger) return;
+        
+        try {
+            debugMsg('Refreshing memory data...');
+            
+            const modifiedJson = atsDebugger.getModifiedMemory();
+            const modifiedList = JSON.parse(modifiedJson);
+            
+            modifiedAddresses.clear();
+            modifiedList.forEach(mod => {
+                memoryData[mod.address] = mod.value;
+                modifiedAddresses.add(mod.address);
+            });
+            
+            debugMsg(`Memory refreshed. Modified addresses: ${modifiedAddresses.size}`);
+            
+        } catch (error) {
+            debugMsg(`Memory refresh error: ${error.message}`, 'error');
+        }
+    }
+
+    function renderMemoryGrid(startAddress = 0x0000) {
+        const tbody = document.getElementById('memoryTableBody');
+        tbody.innerHTML = '';
+        
+        
+        const rowCount = 32;
+        const colCount = 16;
+        
+        for (let row = 0; row < rowCount; row++) {
+            const rowAddress = startAddress + (row * colCount);
+            if (rowAddress >= 0x10000) break; // Don't exceed 64K
+            
+            const tr = document.createElement('tr');
+            
+            // Address column
+            const addressCell = document.createElement('td');
+            addressCell.className = 'address-column';
+            addressCell.textContent = `$${rowAddress.toString(16).toUpperCase().padStart(4, '0')}`;
+            tr.appendChild(addressCell);
+            
+            // Memory cells
+            for (let col = 0; col < colCount; col++) {
+                const address = rowAddress + col;
+                const cell = document.createElement('td');
+                cell.className = 'memory-cell';
+                
+                if (modifiedAddresses.has(address)) {
+                    cell.classList.add('modified');
+                }
+                
+                if (address === highlightedAddress) {
+                    cell.classList.add('highlighted');
+                }
+                
+                const value = memoryData[address];
+                cell.textContent = value.toString(16).toUpperCase().padStart(2, '0');
+                cell.dataset.address = address;
+                
+                // Click handler
+                cell.addEventListener('click', function() {
+                    selectMemoryCell(address, value);
+                });
+                
+                tr.appendChild(cell);
+            }
+            
+            tbody.appendChild(tr);
+        }
+        
+        debugMsg(`Memory grid rendered from $${startAddress.toString(16).toUpperCase()}`);
+    }
+
+    function selectMemoryCell(address, value) {
+        // Remove previous highlight
+        if (highlightedAddress !== null) {
+            const prevCell = document.querySelector(`[data-address="${highlightedAddress}"]`);
+            if (prevCell) {
+                prevCell.classList.remove('highlighted');
+            }
+        }
+        
+        // Add new highlight
+        highlightedAddress = address;
+        const cell = document.querySelector(`[data-address="${address}"]`);
+        if (cell) {
+            cell.classList.add('highlighted');
+        }
+        
+        // Update info display
+        document.getElementById('selectedAddress').textContent = `$${address.toString(16).toUpperCase().padStart(4, '0')}`;
+        document.getElementById('selectedValue').textContent = `$${value.toString(16).toUpperCase().padStart(2, '0')}`;
+        document.getElementById('selectedDecimal').textContent = value.toString();
+        
+        // ASCII representation
+        let ascii = '--';
+        if (value >= 32 && value <= 126) {
+            ascii = String.fromCharCode(value);
+        } else if (value === 0) {
+            ascii = 'NULL';
+        }
+        document.getElementById('selectedAscii').textContent = ascii;
+        
+        debugMsg(`Selected memory cell $${address.toString(16).toUpperCase()} = $${value.toString(16).toUpperCase()}`);
+    }
+
+    function jumpToAddress() {
+        const input = document.getElementById('memorySearch');
+        let addressStr = input.value.trim();
+        
+        if (!addressStr) return;
+        
+        // Handle $ prefix
+        if (addressStr.startsWith('$')) {
+            addressStr = addressStr.substring(1);
+        }
+        
+        // Parse hex address
+        const address = parseInt(addressStr, 16);
+        
+        if (isNaN(address) || address < 0 || address >= 0x10000) {
+            showStatus('Invalid address. Use format: $1000 or 1000', 'error');
+            return;
+        }
+        
+        // Calculate start address for grid (align to 16-byte boundary)
+        const startAddress = Math.floor(address / 16) * 16;
+        
+        debugMsg(`Jumping to address $${address.toString(16).toUpperCase()}`);
+        renderMemoryGrid(startAddress);
+        
+        // Highlight the specific cell
+        setTimeout(() => {
+            const value = memoryData[address];
+            selectMemoryCell(address, value);
+        }, 100);
+    }
+
+    // Add event listeners for existing buttons
+    buildBtn.addEventListener('click', buildCode);
+    generateBtn.addEventListener('click', generateReport);
+    clearBtn.addEventListener('click', clearCode);
+
+    // CREATE THE MISSING EXECUTION CONTROL BUTTONS
+    const buttonGroup = document.querySelector('.button-group');
+    if (buttonGroup) {
+        // Create step button
+        const stepBtn = document.createElement('button');
+        stepBtn.id = 'stepBtn';
+        stepBtn.textContent = '⏭️ Step';
+        stepBtn.className = 'btn btn-secondary';
+        stepBtn.disabled = true;
+        
+        // Create reset button
+        const resetBtn = document.createElement('button');
+        resetBtn.id = 'resetBtn';
+        resetBtn.textContent = '🔄 Reset';
+        resetBtn.className = 'btn btn-secondary';
+        resetBtn.disabled = true;
+        
+        // Create memory button
+        const memoryBtn = document.createElement('button');
+        memoryBtn.id = 'memoryBtn';
+        memoryBtn.textContent = '🧠 Memory';
+        memoryBtn.className = 'btn btn-secondary';
+        memoryBtn.disabled = true;
+        
+        // Create debug toggle button
+        const debugBtn = document.createElement('button');
+        debugBtn.textContent = '🐛 Debug';
+        debugBtn.className = 'btn btn-secondary';
+        debugBtn.style.fontSize = '12px';
+        debugBtn.onclick = function() {
+            const debugSection = document.getElementById('debugInfo');
+            if (debugSection) {
+                debugSection.style.display = debugSection.style.display === 'none' ? 'block' : 'none';
+            }
+        };
+        
+        // Add buttons to the button group
+        buttonGroup.appendChild(stepBtn);
+        buttonGroup.appendChild(resetBtn);
+        buttonGroup.appendChild(memoryBtn);
+        buttonGroup.appendChild(debugBtn);
+        
+        // Add event listeners for new buttons
+        stepBtn.addEventListener('click', stepInstruction);
+        resetBtn.addEventListener('click', resetExecution);
+        memoryBtn.addEventListener('click', showMemoryViewer);
+    }
+
+    // CREATE THE PROCESSOR DISPLAY SECTION
+    const outputSection = document.querySelector('.output-section');
+    if (outputSection) {
+        const processorSection = document.createElement('div');
+        processorSection.className = 'output-section';
+        processorSection.style.marginTop = '20px';
+        processorSection.innerHTML = `
+            <div class="output-title">🖥️ Processor State</div>
+            <div id="processorContent" class="output-content" style="min-height: 150px;">
+                <div style="text-align: center; padding: 40px; color: #666;">
+                    <h3>💤 No Code Built</h3>
+                    <p style="margin-top: 10px;">Build your code first to enable step-through debugging.</p>
+                </div>
+            </div>
+        `;
+        
+        // Insert the processor section after the main output section
+        outputSection.parentNode.insertBefore(processorSection, outputSection.nextSibling);
+    }
+    
+    // WAIT FOR ALL DOM ELEMENTS TO BE AVAILABLE, THEN ADD MEMORY VIEWER EVENT LISTENERS
+    setTimeout(() => {
+        const memoryCloseBtn = document.getElementById('memoryCloseBtn');
+        const memoryGoBtn = document.getElementById('memoryGoBtn');
+        const memoryRefreshBtn = document.getElementById('memoryRefreshBtn');
+        const memoryOverlay = document.getElementById('memoryOverlay');
+        const memorySearch = document.getElementById('memorySearch');
+
+        debugMsg(`Memory elements found: Close=${!!memoryCloseBtn}, Go=${!!memoryGoBtn}, Refresh=${!!memoryRefreshBtn}`);
+
+        if (memoryCloseBtn) {
+            memoryCloseBtn.addEventListener('click', hideMemoryViewer);
+            debugMsg('Close button event listener added');
+        } else {
+            debugMsg('memoryCloseBtn not found!', 'error');
+        }
+
+        if (memoryGoBtn) {
+            memoryGoBtn.addEventListener('click', jumpToAddress);
+            debugMsg('Go button event listener added');
+        }
+
+        if (memoryRefreshBtn) {
+            memoryRefreshBtn.addEventListener('click', refreshMemory);
+            debugMsg('Refresh button event listener added');
+        }
+
+        // Close memory viewer when clicking overlay
+        if (memoryOverlay) {
+            memoryOverlay.addEventListener('click', function(e) {
+                if (e.target.id === 'memoryOverlay') {
+                    hideMemoryViewer();
+                }
+            });
+            debugMsg('Overlay click listener added');
+        }
+
+        // Handle Enter key in memory search
+        if (memorySearch) {
+            memorySearch.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    jumpToAddress();
+                }
+            });
+            debugMsg('Memory search Enter key listener added');
+        }
+    }, 100); // Small delay to ensure DOM is fully ready
+    
+    debugMsg('ATS Debugger interface initialized');
+    debugMsg('Debug functions available at window.atsDebugInfo');
+    
+    // Make functions global for access
+    window.hideMemoryViewer = hideMemoryViewer;
+    window.jumpToAddress = jumpToAddress;
+    window.refreshMemory = refreshMemory;
+    window.showMemoryViewer = showMemoryViewer;
+    window.stepInstruction = stepInstruction;
+    window.resetExecution = resetExecution;
+    window.updateExecutionButtons = updateExecutionButtons;
+    window.updateProcessorDisplay = updateProcessorDisplay;
+    
+    // Load ATS module
+    loadATS();
+});
+
+// REMOVE THE DUPLICATE EVENT LISTENERS THAT WERE OUTSIDE DOMContentLoaded
+// Delete these lines:
+/*
+const memoryCloseBtn = document.getElementById('memoryCloseBtn');
+const memoryGoBtn = document.getElementById('memoryGoBtn');
+const memoryRefreshBtn = document.getElementById('memoryRefreshBtn');
+
+if (memoryCloseBtn) {
+    memoryCloseBtn.addEventListener('click', hideMemoryViewer);
+}
+
+if (memoryGoBtn) {
+    memoryGoBtn.addEventListener('click', jumpToAddress);
+}
+
+if (memoryRefreshBtn) {
+    memoryRefreshBtn.addEventListener('click', refreshMemory);
+}
+*/
+</script>
+
+<!-- Include your compiled ATS module with better error handling -->
+<script src="ats.js" 
+        onload="console.log('✅ ats.js loaded successfully')" 
+        onerror="console.error('❌ Failed to load ats.js - file may not exist or have syntax errors')">
+</script>
+
+<!-- Memory Viewer Overlay -->
+<div id="memoryOverlay" class="memory-overlay"></div>
+<div id="memoryViewer" class="memory-viewer">
+    <div class="memory-viewer-header">
+        <h3>🧠 Memory Viewer</h3>
+        <button class="close-btn" id="memoryCloseBtn">✕ Close</button>
+    </div>
+    <div class="memory-viewer-content">
+        <div class="memory-search">
+            <label style="color: #ffcc00;">Jump to address:</label>
+            <input type="text" id="memorySearch" placeholder="$1000" maxlength="6">
+            <button class="btn btn-secondary" id="memoryGoBtn" style="padding: 6px 12px; font-size: 12px;">Go</button>
+            <span style="color: #666; margin-left: 20px;">|</span>
+            <button class="btn btn-secondary" id="memoryRefreshBtn" style="padding: 6px 12px; font-size: 12px;">🔄 Refresh</button>
+        </div>
+        
+        <div class="memory-legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #1a1a1a;"></div>
+                <span style="color: #ccc;">Unmodified</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #004400;"></div>
+                <span style="color: #00ff00;">Modified</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #444400;"></div>
+                <span style="color: #ffff00;">Highlighted</span>
+            </div>
+        </div>
+        
+        <div class="memory-info">
+            <div>
+                <span style="color: #ffcc00;">Selected:</span>
+                <span id="selectedAddress" style="color: #00ff00;">None</span>
+            </div>
+            <div>
+                <span style="color: #ffcc00;">Value:</span>
+                <span id="selectedValue" style="color: #00ff00;">--</span>
+            </div>
+            <div>
+                <span style="color: #ffcc00;">Decimal:</span>
+                <span id="selectedDecimal" style="color: #00ff00;">--</span>
+            </div>
+            <div>
+                <span style="color: #ffcc00;">ASCII:</span>
+                <span id="selectedAscii" style="color: #00ff00;">--</span>
+            </div>
+        </div>
+        
+        <div class="memory-grid-container">
+            <table id="memoryTable" class="memory-grid">
+                <thead>
+                    <tr>
+                        <th class="address-column">Address</th>
+                        <th>00</th><th>01</th><th>02</th><th>03</th><th>04</th><th>05</th><th>06</th><th>07</th>
+                        <th>08</th><th>09</th><th>0A</th><th>0B</th><th>0C</th><th>0D</th><th>0E</th><th>0F</th>
+                    </tr>
+                </thead>
+                <tbody id="memoryTableBody">
+                    <!-- Memory grid will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
