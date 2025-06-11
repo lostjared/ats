@@ -17,7 +17,7 @@ namespace token {
             std::cerr << "Error: file " << fname << " could not be opened for writing.\n";
             return;
         }
-        file << "<!DOCTYPE html>\n<html>\n<head><title>ats (Atari Script) - Debug Information</title></head>\n<body>\n";
+        file << "<!DOCTYPE html>\n<html>\n<head><title>ats (Assembly Script) - Debug Information</title></head>\n<body>\n";
         file << "<table border=\"1\" cellpadding=\"3\" cellspacing=\"3\">\n";
         file << "<tr><th>Line</th><th>Address Mode</th><th>Instruction</th><th>Machine Code</th></tr>\n";
         for(unsigned int i = 0; i < code.instruct.size(); ++i) {
