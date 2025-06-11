@@ -19,7 +19,7 @@ namespace interp {
     extern std::ostringstream stream;
     extern  std::vector<std::pair<uint16_t, uint8_t>> modifiedMemoryAddresses;
     void trackMemoryWrite(uint16_t address, uint8_t value); 
-
+    extern bool mem_write;
     class Runtime_E {
     public:
         Runtime_E(const std::string &t) : text(t) { }

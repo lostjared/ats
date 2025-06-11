@@ -8,7 +8,7 @@ namespace interp {
     std::ostringstream stream;
     const char *add_mode[] = { "Non mode", "Immediate", "Zero Page", "Zero Page X", "Zero Page Y", "Absoulte", "Absoulte X", "Absoulte Y", "Implied", "Relative", "Indirect Indexed", "Indexed Indirect", "Accumulator", "Indirect", 0 };
     std::vector<std::pair<uint16_t, uint8_t>> modifiedMemoryAddresses;
-
+    bool mem_write = false;
     using namespace icode;
 
     iCodeInstruction inst[] = { {opc::ADC, i_adc }, {opc::AND, i_and}, {opc::ASL, i_asl},
@@ -278,7 +278,8 @@ namespace interp {
     
     void Code::poke(uint16_t address, uint8_t value) {
         mem[address] = value;
-        trackMemoryWrite(address, value);
+        if(mem_write == true)
+            trackMemoryWrite(address, value);
     }
     
     void Code::loadFromString(const std::string& code_text) {

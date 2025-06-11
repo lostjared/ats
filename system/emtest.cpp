@@ -331,6 +331,7 @@ std::string generateHTML() {
 // Add a global initialization function
 bool initializeSystem() {
     static bool initialized = false;
+    interp::mem_write = true; // Enable memory write tracking
     if (!initialized) {
         interp::setup_tee_for_interp_stream();
         code.reset();
