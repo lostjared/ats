@@ -92,10 +92,10 @@ namespace interp {
         {0x20, ABSOULTE, opc::JSR},
         // LDA
         { 0xA9, IMMEDIATE, opc::LDA}, {0xA5, ZEROPAGE, opc::LDA}, {0xB5, ZEROPAGE_X, opc::LDA}, {0xAD, ABSOULTE, opc::LDA},{ 0xBD, ABSOULTE_X, opc::LDA}, {0xB9, ABSOULTE_Y, opc::LDA}, {0xA1, INDEXED_I, opc::LDA}, {0xB1, INDIRECT_I, opc::LDA},
-        // LDX
+        // LDXz
         {0xA2, IMMEDIATE, opc::LDX}, {0xA6, ZEROPAGE, opc::LDX}, {0xB6, ZEROPAGE_Y, opc::LDX}, {0xAE, ABSOULTE, opc::LDX}, {0xBE, ABSOULTE_Y, opc::LDX},
         // LDY
-        {0xA0, IMMEDIATE, opc::LDY}, {0xA4, ZEROPAGE, opc::LDY}, {0xB4, ZEROPAGE_X, opc::LDY}, {0xAC, ABSOULTE, opc::LDY},{0xBC, ABSOULTE_X, opc::LDY},
+        {0xA0, IMMEDIATE, opc::LDY}, {0xA4, ZEROPAGE, opc::LDY}, {0xB4, ZEROPAGE_X, opc::LDY}, {0xAC, ABSOULTE, opc::LDY}, {0xBC, ABSOULTE_X, opc::LDY},
         // LSR
         {0x4A, ACCUMULATOR, opc::LSR}, {0x46, ZEROPAGE, opc::LSR}, {0x56, ZEROPAGE_X, opc::LSR}, {0x4E, ABSOULTE, opc::LSR},{0x5E, ABSOULTE_X, opc::LSR},
         // NOP
