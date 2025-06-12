@@ -1361,39 +1361,16 @@ document.addEventListener('DOMContentLoaded', function() {
     window.resetExecution = resetExecution;
     window.updateExecutionButtons = updateExecutionButtons;
     window.updateProcessorDisplay = updateProcessorDisplay;
-    
-    // Load ATS module
     loadATS();
 });
 
-// REMOVE THE DUPLICATE EVENT LISTENERS THAT WERE OUTSIDE DOMContentLoaded
-// Delete these lines:
-/*
-const memoryCloseBtn = document.getElementById('memoryCloseBtn');
-const memoryGoBtn = document.getElementById('memoryGoBtn');
-const memoryRefreshBtn = document.getElementById('memoryRefreshBtn');
-
-if (memoryCloseBtn) {
-    memoryCloseBtn.addEventListener('click', hideMemoryViewer);
-}
-
-if (memoryGoBtn) {
-    memoryGoBtn.addEventListener('click', jumpToAddress);
-}
-
-if (memoryRefreshBtn) {
-    memoryRefreshBtn.addEventListener('click', refreshMemory);
-}
-*/
 </script>
 
-<!-- Include your compiled ATS module with better error handling -->
-<script src="ats.js" 
+<script src="ats.js?v=1.0" 
         onload="console.log('✅ ats.js loaded successfully')" 
         onerror="console.error('❌ Failed to load ats.js - file may not exist or have syntax errors')">
 </script>
 
-<!-- Memory Viewer Overlay -->
 <div id="memoryOverlay" class="memory-overlay"></div>
 <div id="memoryViewer" class="memory-viewer">
     <div class="memory-viewer-header">
