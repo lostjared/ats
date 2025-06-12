@@ -252,6 +252,10 @@ namespace interp {
         
         if(!in_stack.empty())
         	in_stack.erase(in_stack.begin(), in_stack.end());
+
+        if(!interp::modifiedMemoryAddresses.empty()) {
+            interp::modifiedMemoryAddresses.clear();
+        }
     }
     
     void Code::reset_memory() {
