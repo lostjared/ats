@@ -1,0 +1,23 @@
+; ====================================
+; SIMPLE CALCULATOR - ADDITION EXAMPLE
+; ====================================
+; This program demonstrates basic arithmetic operations
+; It adds two numbers and stores the result in memory
+
+10 CLC              ; Clear carry flag to ensure clean addition
+20 LDA #25          ; Load first number (25) into accumulator
+30 ADC #17          ; Add second number (17) to accumulator
+                    ; Result: A = 25 + 17 = 42
+40 STA $10          ; Store the result at memory location $10
+50 LDX #100         ; Load X register with value 100
+60 STX $11          ; Store X value at memory location $11
+70 LDA $10          ; Load our calculated result back into A
+80 ADC $11          ; Add the value from memory location $11
+                    ; Result: A = 42 + 100 = 142
+90 STA $12          ; Store final result at memory location $12
+100 END             ; End program
+
+; Memory after execution:
+; $10 = 42 (25 + 17)
+; $11 = 100 (value of X)
+; $12 = 142 (42 + 100)

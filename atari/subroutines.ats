@@ -1,0 +1,51 @@
+; DETAILED SUBROUTINE TEST
+; With extra debug statements
+
+; Test 1: Simple addition
+10 LDA #5           ; Load initial value
+15 STA $45          ; DEBUG: Store initial value
+20 JSR 100          ; Call add-5 subroutine
+25 STA $46          ; DEBUG: Store result after subroutine
+30 STA $40          ; Store final result (should be 10)
+
+; Test 2: Nested call
+40 LDA #5           ; Load initial value
+45 STA $47          ; DEBUG: Store initial value 
+50 JSR 200          ; Call subroutine that calls another subroutine
+55 STA $48          ; DEBUG: Store result after subroutine
+60 STA $41          ; Store final result (should be 15)
+
+; Test 3: Loop in subroutine
+70 LDA #40          ; Load initial value
+75 STA $49          ; DEBUG: Store initial value
+80 JSR 300          ; Call subroutine with loop
+85 STA $4A          ; DEBUG: Store result after subroutine
+90 STA $42          ; Store final result (should be 42)
+95 END              ; End program
+
+; Add 5 to accumulator
+100 STA $5A         ; DEBUG: Store value on entry
+110 CLC             ; Clear carry
+120 ADC #5          ; Add 5
+130 STA $5B         ; DEBUG: Store value before return
+140 RTS             ; Return
+
+; Nested call subroutine
+200 STA $5C         ; Store original value
+210 JSR 100         ; Call subroutine 1
+215 STA $5D         ; DEBUG: Store after first subroutine call
+220 CLC             ; Clear carry
+230 ADC $5C         ; Add original value 
+240 STA $5E         ; DEBUG: Store before return
+250 RTS             ; Return
+
+; Loop subroutine
+300 STA $5F         ; Store original value
+310 LDX #2          ; Set counter to 2
+320 CLC             ; Clear carry
+330 ADC #1          ; Add 1
+335 STA $60         ; DEBUG: Store current value in loop
+340 DEX             ; Decrement counter
+350 BNE 320         ; If not zero, loop again
+360 STA $61         ; DEBUG: Store final value before return
+370 RTS             ; Return

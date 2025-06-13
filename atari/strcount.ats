@@ -1,0 +1,45 @@
+; =======================================
+; CHARACTER COUNTER
+; =======================================
+; This program counts occurrences of a specific character
+; in a string stored in memory
+; String: "HELLO" stored starting at $1500
+; Count occurrences of 'L' (ASCII 76)
+
+; First, store the string "HELLO" in memory
+10 LDA #72          ; ASCII code for 'H'
+20 STA $1500        ; Store at string[0]
+30 LDA #69          ; ASCII code for 'E'
+40 STA $1501        ; Store at string[1]
+50 LDA #76          ; ASCII code for 'L'
+60 STA $1502        ; Store at string[2]
+70 LDA #76          ; ASCII code for 'L'
+80 STA $1503        ; Store at string[3]
+90 LDA #79          ; ASCII code for 'O'
+100 STA $1504       ; Store at string[4]
+110 LDA #0          ; Null terminator
+120 STA $1505       ; Mark end of string
+
+; Initialize counter and search variables
+130 LDX #0          ; String index (start at beginning)
+140 LDY #0          ; Character counter (initialize to 0)
+150 LDA #76         ; Target character 'L' (ASCII 76)
+160 STA $2000       ; Store target character at $2000
+
+; Search loop
+170 LDA $1500,X     ; Load character from string[X]
+180 BEQ 230         ; If zero (end of string), branch to end
+190 CMP $2000       ; Compare with target character
+200 BNE 220         ; If not equal, skip increment
+210 INY             ; Found a match - increment counter
+220 INX             ; Move to next character
+230 JMP 170         ; Continue loop
+
+240 STY $2001       ; Store final count at memory $2001
+250 END             ; Program complete
+
+; Result: Memory $2001 contains 2 (found two 'L' characters)
+; Memory layout:
+; $1500-$1505: "HELLO" + null terminator
+; $2000: Target character (76 = 'L')
+; $2001: Count result (2)

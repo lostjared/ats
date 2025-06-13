@@ -1,0 +1,38 @@
+; =======================================
+; ARRAY MAXIMUM FINDER
+; =======================================
+; This program finds the maximum value in an array
+; Array is stored starting at memory location $1000
+; Maximum value will be stored at $2000
+
+10 LDX #0           ; Initialize X as array index (start at 0)
+20 LDA #50          ; Store first test value (50) in array
+30 STA $1000,X      ; Store at array[0] = $1000 + 0
+40 INX              ; Increment index to 1
+50 LDA #75          ; Second array value (75)
+60 STA $1000,X      ; Store at array[1] = $1000 + 1
+70 INX              ; Increment index to 2
+80 LDA #30          ; Third array value (30)
+90 STA $1000,X      ; Store at array[2] = $1000 + 2
+100 INX             ; Increment index to 3
+110 LDA #95         ; Fourth array value (95) - this is maximum
+120 STA $1000,X     ; Store at array[3] = $1000 + 3
+
+; Now find the maximum value
+130 LDX #0          ; Reset index to start of array
+140 LDA $1000,X     ; Load first element as initial maximum
+150 STA $2000       ; Store current maximum at $2000
+
+; Compare with remaining elements
+160 INX             ; Move to next element
+170 LDA $1000,X     ; Load next array element
+180 CMP $2000       ; Compare with current maximum
+190 BCC 220         ; Branch if less than current max (carry clear)
+200 STA $2000       ; New maximum found - store it
+210 JMP 220         ; Jump to continue
+220 INX             ; Move to next element
+230 CPX #4          ; Check if we've processed all 4 elements
+240 BNE 170         ; If not done, continue loop
+250 END             ; Program complete
+
+; Result: Memory location $2000 contains 95 (the maximum value)

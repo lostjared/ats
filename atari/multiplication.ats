@@ -1,0 +1,39 @@
+; =======================================
+; MULTIPLICATION BY REPEATED ADDITION
+; =======================================
+; This program multiplies two numbers using addition
+; Calculates 7 × 4 = 28
+; Demonstrates loops and conditional branching
+
+10 LDA #7           ; Load multiplicand (7)
+20 STA $30          ; Store multiplicand at $30
+30 LDA #4           ; Load multiplier (4)
+40 STA $31          ; Store multiplier at $31
+50 LDA #0           ; Initialize result to 0
+60 STA $32          ; Store result at $32
+70 LDX #0           ; Initialize loop counter
+
+; Multiplication loop: add multiplicand 'multiplier' times
+80 CPX $31          ; Compare counter with multiplier
+90 BEQ 140          ; If equal, we're done (branch to end)
+100 CLC             ; Clear carry for addition
+110 LDA $32         ; Load current result
+120 ADC $30         ; Add multiplicand to result
+130 STA $32         ; Store updated result
+140 INX             ; Increment loop counter
+150 JMP 80          ; Jump back to loop condition
+
+; Verify result with different approach (addition chain)
+160 LDA $30         ; Load multiplicand (7)
+170 ADC $30         ; 7 + 7 = 14
+180 ADC $30         ; 14 + 7 = 21
+190 ADC $30         ; 21 + 7 = 28
+200 STA $33         ; Store verification result
+
+210 END             ; Program complete
+
+; Memory after execution:
+; $30 = 7 (multiplicand)
+; $31 = 4 (multiplier)
+; $32 = 28 (result from loop: 7 × 4)
+; $33 = 28 (verification result)

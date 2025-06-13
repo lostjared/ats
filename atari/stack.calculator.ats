@@ -1,0 +1,20 @@
+10 LDA #5           ; Load first number (5)
+20 STA $50          ; Store at memory location $50
+30 LDA #3           ; Load second number (3)
+40 CLC              ; Clear carry flag for addition
+50 ADC $50          ; Add first number (5+3=8)
+60 STA $51          ; Store sum at memory location $51
+70 LDA #0           ; Initialize multiplication result to 0
+80 STA $52          ; Store at memory location $52
+90 LDX #2           ; Set up counter for multiplication by 2
+
+; Multiplication loop - add $51 to $52 twice
+100 LDA $52         ; Load current result
+110 CLC             ; Clear carry
+120 ADC $51         ; Add the sum (8) to result
+130 STA $52         ; Store updated result
+140 DEX             ; Decrement counter
+150 BNE 100         ; If counter not zero, repeat
+160 LDA $52         ; Load final result (16)
+170 STA $40         ; Store result to target location
+180 END             ; End program
