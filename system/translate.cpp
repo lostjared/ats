@@ -6,7 +6,7 @@ namespace translate {
     std::string last_build_error;
 
     bool confirm_mode(const icode::opc code, unsigned int mode, unsigned char &op_byte) {
-        for(unsigned int i = 0; interp::m_code[i].p_code != icode::opc::NOTINC; ++i) {
+        for(unsigned int i = 0;  interp::m_code[i].p_code != icode::opc::NOTINC; ++i) {
             if(interp::m_code[i].p_code == code && interp::m_code[i].address_mode == mode) {
                 op_byte = interp::m_code[i].op_code;
                 return true;
@@ -247,11 +247,51 @@ namespace translate {
             tokens.erase(tokens.begin());
         }
         
-        // Check for special case: indirect addressing with parentheses
+        if (tokens.size() >= 4 && 
+                tokens[0].getToken() == "JMP" &&
+                tokens[1].getToken() == "(" && 
+                tokens[3].getToken() == ")") 
+            {
+             
+                inst.opcode = icode::opc::JMP;
+                
+                
+                unsigned int address = 0;
+                
+                if (tokens[2].getTokenType() == lex::TOKEN_HEX) {
+                
+                    address = icode::toHex(tokens[2].getToken());
+                } 
+                else if (tokens[2].getTokenType() == lex::TOKEN_DIGIT) {
+                
+                    address = std::stoul(tokens[2].getToken(), nullptr, 10);
+                }
+                else {
+                    std::ostringstream stream;
+                    stream << "Error on Line: " << line_value 
+                        << " Invalid address in JMP indirect: expected hex or decimal.\n";
+                    throw cExcep(stream.str());
+                }
+                
+                
+                if (!confirm_mode(inst.opcode, interp::INDIRECT, inst.op_byte)) {
+                    std::ostringstream stream;
+                    stream << "Error on Line: " << line_value 
+                        << " JMP does not support indirect addressing.\n";
+                    throw cExcep(stream.str());
+                }
+                
+                inst.mode = interp::INDIRECT;
+                inst.op1 = icode::Operand(address, icode::op_type::OP_MEMORY);
+                code.instruct.push_back(inst);
+                return true;
+            }
+
+        
         if (tokens.size() > 1 && tokens[1].getToken() == "(") {
             return parse_indirect_addressing(tokens, inst, line_value);
-        }
         
+        }
         unsigned int tok_size = tokens.size()-1;
         
         switch(tok_size) {
@@ -337,46 +377,16 @@ namespace translate {
                         
                         inst.op1.op_t = icode::op_type::OP_LABELTEXT;
                         inst.op1.label_text = tokens[1].getToken();
-                        break;
                     case lex::TOKEN_OPERATOR: {
-                        // Handle immediate addressing
-                        if(tokens[1].getToken() == "#") {
-                            
-                            unsigned int numeric_value = 0;
-                            
-                            if(tokens[2].getTokenType() == lex::TOKEN_DIGIT) {
-                                numeric_value = atoi(tokens[2].getToken().c_str());
-                                
-                            } else if(tokens[2].getTokenType() == lex::TOKEN_HEX) {
-                                numeric_value = icode::toHex(tokens[2].getToken());
-                            } else {
-                                std::ostringstream stream;
-                                stream << "Error on Line: " << line_value << " Decimal or Hex value expected..\n";
-                                throw cExcep(stream.str());
-                            }
-                            
-                            if(confirm_mode(inst.opcode, interp::IMMEDIATE, inst.op_byte) == false) {
-                                std::ostringstream stream;
-                                stream << "Error on Line: " << line_value << " instruction " << inst.opcode << " not supported in immediate addressing mode.\n";
-                                throw cExcep(stream.str());
-                            }
-                            
-                            if(numeric_value > 255) {
-                                std::ostringstream stream;
-                                stream << "Error on Line: " << line_value << " operand is a single byte (no greater than 255).\n";
-                                throw cExcep(stream.str());
-                            }
-                            
-                            inst.op1 = icode::Operand(numeric_value, icode::op_type::OP_DECIMAL);
-                            inst.mode = interp::IMMEDIATE;
-                            
-                        } else {
-                            std::ostringstream stream;
-                            stream << "Error on Line: " << line_value << " Expected # operator..\n";
-                            throw cExcep(stream.str());
-                        }
+                        std::string op = tokens[1].getToken();
+                        
+                        // For any other operator token, throw an error
+                        std::ostringstream stream;
+                        stream << "Error on Line: " << line_value 
+                               << " Unrecognized operator: " << op << "\n";
+                        throw cExcep(stream.str());
                     }
-                        break;
+                    break;
                     default:
                         break;
                 }
