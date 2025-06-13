@@ -35,7 +35,8 @@ namespace interp {
         // AND
         { 0x29, IMMEDIATE, opc::AND }, {0x25, ZEROPAGE, opc::AND}, {0x35, ZEROPAGE_X, opc::AND}, {0x2D, ABSOULTE, opc::AND},{ 0x3D, ABSOULTE_X, opc::AND }, {0x39, ABSOULTE_Y, opc::AND }, {0x21, INDEXED_I, opc::AND}, {0x31, INDIRECT_I, opc::AND},
         // ASL
-        { 0x0A, ACCUMULATOR, opc::ASL }, {0x06, ZEROPAGE, opc::ASL}, {0x16, ZEROPAGE_X, opc::ASL}, {0x0E, ABSOULTE, opc::ASL},{ 0x1E, ABSOULTE_X, opc::ASL },
+        { 0x0A, ACCUMULATOR, opc::ASL},  // ASL A
+        {0x06, ZEROPAGE, opc::ASL}, {0x16, ZEROPAGE_X, opc::ASL}, {0x0E, ABSOULTE, opc::ASL},{ 0x1E, ABSOULTE_X, opc::ASL },
         // BCC
         { 0x90, RELATIVE, opc::BCC},
         // BCS
@@ -97,7 +98,8 @@ namespace interp {
         // LDY
         {0xA0, IMMEDIATE, opc::LDY}, {0xA4, ZEROPAGE, opc::LDY}, {0xB4, ZEROPAGE_X, opc::LDY}, {0xAC, ABSOULTE, opc::LDY}, {0xBC, ABSOULTE_X, opc::LDY},
         // LSR
-        {0x4A, ACCUMULATOR, opc::LSR}, {0x46, ZEROPAGE, opc::LSR}, {0x56, ZEROPAGE_X, opc::LSR}, {0x4E, ABSOULTE, opc::LSR},{0x5E, ABSOULTE_X, opc::LSR},
+        {0x4A, ACCUMULATOR, opc::LSR},  // LSR A  
+        {0x46, ZEROPAGE, opc::LSR}, {0x56, ZEROPAGE_X, opc::LSR}, {0x4E, ABSOULTE, opc::LSR},{0x5E, ABSOULTE_X, opc::LSR},
         // NOP
         {0xEA, IMPLIED, opc::NOP},
         // ORA - Now 0x01 is available for its correct use
@@ -111,9 +113,11 @@ namespace interp {
         // PLP
         {0x28, IMPLIED, opc::PLP},
         // ROL
-        {0x2A, ACCUMULATOR, opc::ROL},{0x26, ZEROPAGE, opc::ROL}, {0x36, ZEROPAGE_X, opc::ROL}, {0x2E, ABSOULTE, opc::ROL},{0x3E, ABSOULTE_X, opc::ROL},
+        {0x2A, ACCUMULATOR, opc::ROL},  // ROL A
+        {0x26, ZEROPAGE, opc::ROL}, {0x36, ZEROPAGE_X, opc::ROL}, {0x2E, ABSOULTE, opc::ROL},{0x3E, ABSOULTE_X, opc::ROL},
         // ROR
-        {0x6A, ACCUMULATOR, opc::ROR}, {0x66, ZEROPAGE, opc::ROR}, {0x76, ZEROPAGE_X, opc::ROR}, {0x6E, ABSOULTE, opc::ROR},{0x7E, ABSOULTE_X, opc::ROR},
+        {0x6A, ACCUMULATOR, opc::ROR},  // ROR A
+        {0x66, ZEROPAGE, opc::ROR}, {0x76, ZEROPAGE_X, opc::ROR}, {0x6E, ABSOULTE, opc::ROR},{0x7E, ABSOULTE_X, opc::ROR},
         // RTI
         {0x40, IMPLIED, opc::RTI},
         // RTS

@@ -545,6 +545,23 @@ namespace interp {
             case icode::op_type::OP_LABEL:
                 c.proc.ip = c.instruct[in].op1.label_index - 1;
                 return;
+            case icode::op_type::OP_MEMORY:
+                switch(c.instruct[in].mode) {
+                    case ABSOULTE:
+                        c.proc.ip = c.instruct[in].op1.op - 1;
+                        break;
+                    case INDIRECT: { 
+                        uint16_t addr = c.instruct[in].op1.op;
+                        uint8_t low = c.peek(addr);
+                        uint8_t high = c.peek(addr + 1);
+                        uint16_t target = (high << 8) | low;
+                        c.proc.ip = target - 1;
+                    }
+                    break;
+                    default:
+                        return;
+                }
+                break;
             default:
                 break;
         }
@@ -596,6 +613,25 @@ namespace interp {
                         c.proc.reg_a = c.peek(addr);
                     }
                     break;
+                    case INDEXED_I: {  // (address,X)
+                        uint8_t zp_addr = (c.instruct[in].op1.op + c.proc.reg_x) & 0xFF;
+                        uint8_t low = c.peek(zp_addr);
+                        uint8_t high = c.peek((zp_addr + 1) & 0xFF);
+                        uint16_t target_addr = (high << 8) | low;
+                        c.proc.reg_a = c.peek(target_addr);
+                    }
+                    break;
+                    
+                    case INDIRECT_I: { // (address),Y
+                        uint8_t zp_addr = c.instruct[in].op1.op & 0xFF;
+                        uint8_t low = c.peek(zp_addr);
+                        uint8_t high = c.peek((zp_addr + 1) & 0xFF);
+                        uint16_t base_addr = (high << 8) | low;
+                        uint16_t target_addr = (base_addr + c.proc.reg_y) & 0xFFFF;
+                        c.proc.reg_a = c.peek(target_addr);
+                    }
+                    break;
+                    
                     default:
                         return;
                 }
@@ -1117,6 +1153,25 @@ namespace interp {
                         c.poke(addr, c.proc.reg_a);
                     }
                     break;
+                    case INDEXED_I: {  // (address,X)
+                        uint8_t zp_addr = (c.instruct[in].op1.op + c.proc.reg_x) & 0xFF;
+                        uint8_t low = c.peek(zp_addr);
+                        uint8_t high = c.peek((zp_addr + 1) & 0xFF);
+                        uint16_t target_addr = (high << 8) | low;
+                        c.poke(target_addr, c.proc.reg_a);
+                    }
+                    break;
+                    
+                    case INDIRECT_I: { // (address),Y
+                        uint8_t zp_addr = c.instruct[in].op1.op & 0xFF;
+                        uint8_t low = c.peek(zp_addr);
+                        uint8_t high = c.peek((zp_addr + 1) & 0xFF);
+                        uint16_t base_addr = (high << 8) | low;
+                        uint16_t target_addr = (base_addr + c.proc.reg_y) & 0xFFFF;
+                        c.poke(target_addr, c.proc.reg_a);
+                    }
+                    break;
+                    
                     default:
                         return;
                 }

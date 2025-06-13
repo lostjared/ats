@@ -28,7 +28,14 @@ namespace interp {
     };
     
     // address modes
-    enum { IMMEDIATE=1,ZEROPAGE,ZEROPAGE_X,ZEROPAGE_Y,ABSOULTE,ABSOULTE_X,ABSOULTE_Y,IMPLIED,RELATIVE,INDIRECT_I,INDEXED_I,ACCUMULATOR,INDIRECT };
+    enum { 
+        IMMEDIATE=1, ZEROPAGE, ZEROPAGE_X, ZEROPAGE_Y, 
+        ABSOULTE, ABSOULTE_X, ABSOULTE_Y, IMPLIED, RELATIVE, 
+        INDIRECT_I,     // (address),Y 
+        INDEXED_I,      // (address,X)
+        ACCUMULATOR, 
+        INDIRECT        // (address) - JMP only
+    };
     
     extern const char *add_mode[];
     
@@ -168,6 +175,10 @@ namespace interp {
     bool checkInstruction(std::vector<lex::Token> &tokens, const TextLine &text);
     bool validateAddressingMode(std::vector<lex::Token> &tokens, icode::opc instruction, unsigned int offset);
     bool validateInstructionAddressingMode(icode::opc instruction, const std::string& mode);
+    bool validateInstructionIndirectMode(icode::opc instruction, const std::string& mode);
+    bool parseIndirectAddressing(std::vector<lex::Token> &tokens, icode::opc instruction, int startIndex);
+    bool validateInstructionAddressingMode(icode::opc instruction, const std::string& mode);
+    bool isBranchInstruction(icode::opc op);
     extern std::vector<TextLine> lines;
 }
 
