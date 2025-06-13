@@ -476,7 +476,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 DOM loaded, starting ATS Debugger initialization...');
     
     // Example programs with proper ATS format
-    const examples = {
+  const examples = {
         basic: `CLC
 LDA #100
 ADC #50
@@ -491,18 +491,82 @@ CPX #10
 BNE LOOP
 END`,
         
-        subroutine: `CLC
-JSR ADDVALUES
-END
-ADDVALUES LDX #10
-LDY #25
-STX $1E
-STY $1F
-LDA #100
-ADC $1E
-ADC $1F
-STA $10
-RTS`,
+        subroutine: `; =======================================
+; DETAILED SUBROUTINE TEST
+; =======================================
+; This program tests various subroutine capabilities:
+; - Basic JSR/RTS operations
+; - Nested subroutine calls
+; - Loops within subroutines
+; - Parameter passing through memory
+; - Multiple levels of stack usage
+;
+; Expected Results:
+; $40 = 10  (5 + 5)
+; $41 = 15  (5 + 5 + 5) 
+; $42 = 42  (40 + 1 + 1)
+; Debug locations $45-$61 contain intermediate values
+
+; Test 1: Simple addition
+10 LDA #5           ; Load initial value
+15 STA $45          ; DEBUG: Store initial value
+20 JSR 100          ; Call add-5 subroutine
+25 STA $46          ; DEBUG: Store result after subroutine
+30 STA $40          ; Store final result (should be 10)
+
+; Test 2: Nested call
+40 LDA #5           ; Load initial value
+45 STA $47          ; DEBUG: Store initial value 
+50 JSR 200          ; Call subroutine that calls another subroutine
+55 STA $48          ; DEBUG: Store result after subroutine
+60 STA $41          ; Store final result (should be 15)
+
+; Test 3: Loop in subroutine
+70 LDA #40          ; Load initial value
+75 STA $49          ; DEBUG: Store initial value
+80 JSR 300          ; Call subroutine with loop
+85 STA $4A          ; DEBUG: Store result after subroutine
+90 STA $42          ; Store final result (should be 42)
+95 END              ; End program
+
+; =======================================
+; SUBROUTINES
+; =======================================
+
+; Add 5 to accumulator
+100 STA $5A         ; DEBUG: Store value on entry
+110 CLC             ; Clear carry
+120 ADC #5          ; Add 5
+130 STA $5B         ; DEBUG: Store value before return
+140 RTS             ; Return
+
+; Nested call subroutine
+200 STA $5C         ; Store original value
+210 JSR 100         ; Call subroutine 1
+215 STA $5D         ; DEBUG: Store after first subroutine call
+220 CLC             ; Clear carry
+230 ADC $5C         ; Add original value 
+240 STA $5E         ; DEBUG: Store before return
+250 RTS             ; Return
+
+; Loop subroutine
+300 STA $5F         ; Store original value
+310 LDX #2          ; Set counter to 2
+320 CLC             ; Clear carry
+330 ADC #1          ; Add 1
+335 STA $60         ; DEBUG: Store current value in loop
+340 DEX             ; Decrement counter
+350 BNE 320         ; If not zero, loop again
+360 STA $61         ; DEBUG: Store final value before return
+370 RTS             ; Return
+
+; =======================================
+; DEBUG MEMORY MAP
+; =======================================
+; Main Results:
+; $40 = Final result of test 1 (10)
+; $41 = Final result of test 2 (15)
+; $42 = Final result of test 3 (42)`,
         
         memory: `LDA #$FF
 STA $00
@@ -514,15 +578,26 @@ STX $10
 STY $11
 END`,
         
-        stack: `LDA #$42
-PHA
-LDA #$33
-PHA
-PLA
-STA $10
-PLA
-STA $11
-END`
+        stack: `10 LDA #5           ; Load first number (5)
+20 STA $50          ; Store at memory location $50
+30 LDA #3           ; Load second number (3)
+40 CLC              ; Clear carry flag for addition
+50 ADC $50          ; Add first number (5+3=8)
+60 STA $51          ; Store sum at memory location $51
+70 LDA #0           ; Initialize multiplication result to 0
+80 STA $52          ; Store at memory location $52
+90 LDX #2           ; Set up counter for multiplication by 2
+
+; Multiplication loop - add $51 to $52 twice
+100 LDA $52         ; Load current result
+110 CLC             ; Clear carry
+120 ADC $51         ; Add the sum (8) to result
+130 STA $52         ; Store updated result
+140 DEX             ; Decrement counter
+150 BNE 100         ; If counter not zero, repeat
+160 LDA $52         ; Load final result (16)
+170 STA $40         ; Store result to target location
+180 END             ; End program`
     };
     
     // DOM elements
@@ -533,7 +608,8 @@ END`
     const statusBar = document.getElementById('statusBar');
     const loader = document.getElementById('loader');
     const outputContent = document.getElementById('outputContent');
-    
+
+
     let atsModule = null;
     let atsDebugger = null;
     let isBuilt = false;
@@ -549,6 +625,8 @@ END`
     let modifiedAddresses = new Set();
     let highlightedAddress = null;
     
+    
+
     // Debug logging function
     function debugMsg(message, type = 'info') {
         const timestamp = new Date().toISOString().substring(11, 23);
@@ -838,7 +916,7 @@ END`
             debugMsg('=== BUILD CODE FAILED ===');
         }
     }
-    
+
     // Generate report with debugging
     async function generateReport() {
         debugMsg('=== GENERATE REPORT STARTED ===');
@@ -1233,6 +1311,7 @@ END`
     generateBtn.addEventListener('click', generateReport);
     clearBtn.addEventListener('click', clearCode);
 
+
     // CREATE THE MISSING EXECUTION CONTROL BUTTONS
     const buttonGroup = document.querySelector('.button-group');
     if (buttonGroup) {
@@ -1288,7 +1367,13 @@ END`
         processorSection.className = 'output-section';
         processorSection.style.marginTop = '20px';
         processorSection.innerHTML = `
-            <div class="output-title">🖥️ Processor State</div>
+            <div class="output-title">🖥️ Processor State 
+                <button id="step-btn" class="btn btn-danger btn-sm me-2" style="background-color: #a71e2a; border-color: #a71e2a; color: white;">
+                        Step
+                    </button>
+                    <button id="reset-btn" class="btn btn-danger btn-sm" style="background-color: #a71e2a; border-color: #a71e2a; color: white;">
+                        Reset
+                    </button></div>
             <div id="processorContent" class="output-content" style="min-height: 150px;">
                 <div style="text-align: center; padding: 40px; color: #666;">
                     <h3>💤 No Code Built</h3>
@@ -1299,6 +1384,58 @@ END`
         
         // Insert the processor section after the main output section
         outputSection.parentNode.insertBefore(processorSection, outputSection.nextSibling);
+
+        const processorStepButton = processorSection.querySelector('#step-btn'); // Or document.getElementById if processorSection is already in the main doc
+        const processorResetButton = processorSection.querySelector('#reset-btn'); // Or document.getElementById
+
+        if (processorStepButton) {
+            console.log('Found button with ID "step-btn"');
+            processorStepButton.addEventListener('click', function() {
+                console.log('Processor State "Step" button was CLICKED!');
+
+                // Check if the globally exposed function exists and call it
+                if (typeof window.stepInstruction === 'function') {
+                    console.log('Calling window.stepInstruction()...');
+                    try {
+                        window.stepInstruction();
+                    } catch (e) {
+                        console.error("Error during window.stepInstruction():", e);
+                        alert("An error occurred during step. Check console.");
+                    }
+                } else {
+                    console.error('window.stepInstruction is not defined or not a function. Check where it is being set on the window object.');
+                    alert('Step function (window.stepInstruction) not found. Check console.');
+                }
+            });
+        } else {
+            console.error('Button with ID "step-btn" was NOT found.');
+        }
+
+        if (processorResetButton) {
+            console.log('Found button with ID "reset-btn"');
+            processorResetButton.addEventListener('click', function() {
+                console.log('Processor State "Reset" button was CLICKED!');
+
+                // Check if the globally exposed function exists and call it
+                if (typeof window.resetExecution === 'function') {
+                    console.log('Calling window.resetExecution()...');
+                    try {
+                        window.resetExecution();
+                        // IMPORTANT: Ensure your resetExecution function also handles updating the UI
+                        // or call your UI update function here if resetExecution doesn't do it.
+                        // For example: updateProcessorDisplay(); initializeUI();
+                    } catch (e) {
+                        console.error("Error during window.resetExecution():", e);
+                        alert("An error occurred during reset. Check console.");
+                    }
+                } else {
+                    console.error('window.resetExecution is not defined or not a function. Check where it is being set on the window object.');
+                    alert('Reset function (window.resetExecution) not found. Check console.');
+                }
+            });
+        } else {
+            console.error('Button with ID "reset-btn" was NOT found.');
+        }
     }
     
     // WAIT FOR ALL DOM ELEMENTS TO BE AVAILABLE, THEN ADD MEMORY VIEWER EVENT LISTENERS
@@ -1352,6 +1489,8 @@ END`
     debugMsg('ATS Debugger interface initialized');
     debugMsg('Debug functions available at window.atsDebugInfo');
     
+
+
     // Make functions global for access
     window.hideMemoryViewer = hideMemoryViewer;
     window.jumpToAddress = jumpToAddress;
@@ -1436,6 +1575,5 @@ END`
         </div>
     </div>
 </div>
-
 </body>
 </html>
