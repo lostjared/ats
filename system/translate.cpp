@@ -289,7 +289,11 @@ namespace translate {
 
         
         if (tokens.size() > 1 && tokens[1].getToken() == "(") {
-            return parse_indirect_addressing(tokens, inst, line_value);
+            bool rt_val = parse_indirect_addressing(tokens, inst, line_value);
+            if(rt_val) {
+                code.instruct.push_back(inst);
+                return rt_val;
+            }
         
         }
         unsigned int tok_size = tokens.size()-1;
