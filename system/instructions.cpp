@@ -506,7 +506,7 @@ namespace interp {
             }
             break;
             case ABSOULTE_X: {
-                uint16_t addrX = (addr + c.proc.reg_x) & 0xFFFF;  // Add & 0xFFFF
+                uint16_t addrX = (addr + c.proc.reg_x) & 0xFFFF;  
                 uint8_t value = c.peek(addrX) - 1;
                 c.poke(addrX, value);
                 updateZNFlags(c.proc, value);
@@ -525,7 +525,7 @@ namespace interp {
     }
 
     void i_int(Code &c) {
-        // To be implemented if needed.
+
     }
 
     void i_inx(Code &c) {
@@ -550,24 +550,20 @@ namespace interp {
         }
     }
 
+
     void i_jsr(Code &c) {
         int in = c.proc.getIp();
-        
-        switch(c.instruct[in].op1.op_t) {
-            case icode::op_type::OP_LABELTEXT:
-            case icode::op_type::OP_LABEL: {
-                uint16_t return_addr = c.proc.ip + 1;  
-                
-                c.poke(0x0100 + c.proc.sp, (return_addr >> 8) & 0xFF); 
-                c.proc.sp--;
-                c.poke(0x0100 + c.proc.sp, return_addr & 0xFF); 
-                c.proc.sp--;
-                c.proc.ip = c.instruct[in].op1.label_index - 1; 
-                
-            }
-            break;
-        }
+        uint16_t return_addr = c.proc.ip + 1;
+        uint8_t orig_sp = c.proc.sp;
+        uint8_t high = (return_addr >> 8) & 0xFF;
+        c.poke(0x0100 + c.proc.sp, high);
+        c.proc.sp = (c.proc.sp - 1) & 0xFF;
+        uint8_t low = return_addr & 0xFF;
+        c.poke(0x0100 + c.proc.sp, low);
+        c.proc.sp = (c.proc.sp - 1) & 0xFF;
+        c.proc.ip = c.instruct[in].op1.label_index - 1;
     }
+
 
     void i_lda(Code &c) {
         int in = c.proc.getIp();
@@ -901,23 +897,25 @@ namespace interp {
         c.stop();
         std::cout << "END instruction executed\n";
     }
+    
 
+    
     void i_rts(Code &c) {
-        c.proc.sp++;
-        uint8_t pcl = c.peek(0x0100 + c.proc.sp);
-        c.proc.sp++;
-        uint8_t pch = c.peek(0x0100 + c.proc.sp);
-        uint16_t return_addr = ((uint16_t)pch << 8) | pcl;
-        c.proc.ip = return_addr - 1;  
+        c.proc.sp = (c.proc.sp + 1) & 0xFF;
+        uint8_t low = c.peek(0x0100 + c.proc.sp);
+        c.proc.sp = (c.proc.sp + 1) & 0xFF;
+        uint8_t high = c.peek(0x0100 + c.proc.sp);
+        uint16_t addr = ((uint16_t)high << 8) | low;
+        c.proc.ip = addr;
     }
 
     void i_pha(Code &c) {
         c.poke(0x0100 + c.proc.sp, c.proc.reg_a);
-        c.proc.sp--;
+        c.proc.sp = (c.proc.sp - 1) & 0xFF;  
     }
 
     void i_pla(Code &c) {
-        c.proc.sp++;
+        c.proc.sp = (c.proc.sp + 1) & 0xFF;
         c.proc.reg_a = c.peek(0x0100 + c.proc.sp);
         updateZNFlags(c.proc, c.proc.reg_a);
     }
@@ -1135,15 +1133,12 @@ namespace interp {
                 switch(c.instruct[in].mode) {
                     case ABSOULTE:
                         c.poke(c.instruct[in].op1.op, c.proc.reg_x);
-                        //trackMemoryWrite(c.instruct[in].op1.op, c.proc.reg_x);
                         break;
                     case ZEROPAGE:
                         c.poke(c.instruct[in].op1.op & 0xFF, c.proc.reg_x);
-                        //trackMemoryWrite(c.instruct[in].op1.op, c.proc.reg_x);
                         break;
                     case ZEROPAGE_Y: {
                         uint8_t addr = (c.instruct[in].op1.op + c.proc.reg_y) & 0xFF;
-                        //trackMemoryWrite(addr, c.proc.reg_x);
                         c.poke(addr, c.proc.reg_x);
                     }
                     break;
@@ -1163,15 +1158,12 @@ namespace interp {
                 switch(c.instruct[in].mode) {
                     case ABSOULTE:
                         c.poke(c.instruct[in].op1.op, c.proc.reg_y);
-                        //trackMemoryWrite(c.instruct[in].op1.op, c.proc.reg_y);
                         break;
                     case ZEROPAGE:
                         c.poke(c.instruct[in].op1.op & 0xFF, c.proc.reg_y);
-                        //trackMemoryWrite(c.instruct[in].op1.op, c.proc.reg_y);
                         break;
                     case ZEROPAGE_X: {
                         uint8_t addr = (c.instruct[in].op1.op + c.proc.reg_x) & 0xFF;
-                        //trackMemoryWrite(addr, c.proc.reg_y);
                         c.poke(addr, c.proc.reg_y);
                     }
                     break;

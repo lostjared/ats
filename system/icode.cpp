@@ -256,12 +256,14 @@ namespace icode {
     }
     
     void Processor::reset() {
-        for(uint8_t i = 0; i < 8; ++i)
+        for(uint8_t i = 0; i < 8; ++i) {
             setFlag(proc_Flags(i), 0);
-        
+        }
+        setFlag(proc_Flags(5), 1);
         reg_x = reg_y = reg_a = 0;
         ip = 0;
-        sp = 0;
+        sp = 0xFF;        
+        std::cout << "DEBUG: Processor reset - SP initialized to " << (int)sp << "\n";
     }
     
     void Processor::setIp(const address_size &ip_val) {
@@ -277,4 +279,29 @@ namespace icode {
     void Processor::printRegisters() {
         std::cout << "[ IP:" << ip << " X:" << std::hex << std::uppercase << static_cast<int>(reg_x) << " Y:" << std::hex << std::uppercase <<  static_cast<int>(reg_y) << " A:" << std::hex << std::uppercase << static_cast<int>(reg_a) << " P:" << std::hex << std::uppercase << static_cast<int>(valFlags()) << " ] ";
     }
+
+    
+    uint8_t calculateStatus(icode::Processor &proc) {
+        uint8_t status = 0;
+        status |= (proc.getFlag(icode::FLAG_CARRY) ? 0x01 : 0);
+        status |= (proc.getFlag(icode::FLAG_ZERO) ? 0x02 : 0);
+        status |= (proc.getFlag(icode::FLAG_INTERRUPT) ? 0x04 : 0);
+        status |= (proc.getFlag(icode::FLAG_DECIMAL) ? 0x08 : 0);
+        status |= (proc.getFlag(icode::FLAG_BREAK) ? 0x10 : 0);
+        status |= 0x20; // Always set bit 5 (unused bit)
+        status |= (proc.getFlag(icode::FLAG_OVERFLOW) ? 0x40 : 0);
+        status |= (proc.getFlag(icode::FLAG_NEGATIVE) ? 0x80 : 0);
+        return status;
+    }
+
+    void setStatus(icode::Processor &proc, uint8_t status) {
+        proc.setFlag(icode::FLAG_CARRY, (status & 0x01) != 0);
+        proc.setFlag(icode::FLAG_ZERO, (status & 0x02) != 0);
+        proc.setFlag(icode::FLAG_INTERRUPT, (status & 0x04) != 0);
+        proc.setFlag(icode::FLAG_DECIMAL, (status & 0x08) != 0);
+        proc.setFlag(icode::FLAG_BREAK, (status & 0x10) != 0);
+        proc.setFlag(icode::FLAG_OVERFLOW, (status & 0x40) != 0);
+        proc.setFlag(icode::FLAG_NEGATIVE, (status & 0x80) != 0);
+    }
+
 }

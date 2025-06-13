@@ -52,6 +52,7 @@ namespace icode {
         
     };
     
+ 
     std::ostream &operator<<(std::ostream &out, Instruction &i);
     std::string instructionToHex(Instruction &i);
     std::string instructionToBinary(Instruction &i);
@@ -77,7 +78,7 @@ namespace icode {
         
     public:
         reg_size reg_x, reg_y, reg_a;
-        address_size sp;
+        uint8_t sp;
         address_size ip;
         
         Processor();
@@ -92,6 +93,10 @@ namespace icode {
         void printFlags();
         void printRegisters();
     };
+
+    uint8_t calculateStatus(icode::Processor &proc);
+    void setStatus(icode::Processor &proc, uint8_t status);
+
 }
 
 #endif

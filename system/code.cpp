@@ -249,6 +249,7 @@ namespace interp {
             stack.erase(stack.begin(), stack.end());
         
         proc.reset();
+        reset_memory();
         
         if(!in_stack.empty())
         	in_stack.erase(in_stack.begin(), in_stack.end());
@@ -276,14 +277,16 @@ namespace interp {
     }
     
     
-    uint8_t Code::peek(uint16_t address) const {
-        return mem[address];
+    uint8_t Code::peek(uint16_t addr) const {
+        return addr < sizeof(mem) ? mem[addr] : 0;
     }
     
     void Code::poke(uint16_t address, uint8_t value) {
-        mem[address] = value;
-        if(mem_write == true)
-            trackMemoryWrite(address, value);
+        if(address < sizeof(mem)) {
+            mem[address] = value;
+            if(mem_write == true)
+                trackMemoryWrite(address, value);
+        }
     }
     
     void Code::loadFromString(const std::string& code_text) {
