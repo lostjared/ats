@@ -28,7 +28,7 @@
 
 ; Search loop
 170 LDA $1500,X     ; Load character from string[X]
-180 BEQ 230         ; If zero (end of string), branch to end
+180 BEQ 240         ; If zero (end of string), branch to store result
 190 CMP $2000       ; Compare with target character
 200 BNE 220         ; If not equal, skip increment
 210 INY             ; Found a match - increment counter
