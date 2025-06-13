@@ -1,6 +1,8 @@
 #include "code.hpp"
 
 namespace interp {
+
+    std::ostringstream comp_err;
     
     bool saveLineSource(const std::string &text) {
         std::fstream file;
@@ -24,6 +26,7 @@ namespace interp {
     }
     
     bool openLineSource(const std::string &text) {
+        comp_err.str("");
         std::fstream file;
         file.open(text, std::ios::in);
         if(!file.is_open()) return false;
@@ -47,13 +50,15 @@ namespace interp {
             }
             
             
-            inputText(tokens, in);
+            if(!inputText(tokens, in))
+                return false;
         }
         file.close();
         return true;
     }
 
     bool openLineString(const std::string &text) {
+        comp_err.str("");
         std::istringstream file(text);
         if(!lines.empty()) {
             lines.erase(lines.begin(), lines.end());
@@ -72,7 +77,8 @@ namespace interp {
                 if(token.getTokenType() != lex::TOKEN_EOF)
                 	tokens.push_back(token);
             }   
-            inputText(tokens, in);
+            if(!inputText(tokens, in))
+                return false;
         }
         return true;
     }
@@ -94,89 +100,216 @@ namespace interp {
         	std::sort(lines.begin(), lines.end());
         }
     }
-    
-    void inputText(std::vector<lex::Token> &tokens, std::string input_line) {
-        if(tokens.size()>=2 && input_line.length()>0) {
-            lex::Token_type num = tokens[0].getTokenType();
-            if(num != lex::TOKEN_DIGIT) {
-                std::cerr << "Requires line number before code.\n";
-                return;
-            }
-            int value = atoi(tokens[0].getToken().c_str());
-            std::string codetext;
-            codetext = input_line.substr(input_line.find(tokens[0].getToken())+tokens[0].getToken().length()+1, input_line.length());
-            TextLine in(value, codetext);
-            insertText(tokens, in);
-        } else if(tokens.size()==1 && input_line.length()>0) {
-            int index_n = atoi(tokens[0].getToken().c_str());
-            for(int i = 0; i < lines.size(); ++i) {
-                if(lines[i].index == index_n) {
-                    lines.erase(lines.begin()+i);
-                    return;
-                }
-            }
-        } 
-        else {
-            std::cerr << "Error invalid input.\n";
-            return;
-        }
-    }
-    
-    // should have used recursive functions
-    // will do for translating
-    bool checkInstruction(std::vector<lex::Token> &tokens, const TextLine &text) {
-        if(tokens.size()<= 1) {
-            std::cerr << "Error: Statement requires instruction.\n";
+
+    bool inputText(std::vector<lex::Token> &tokens, std::string input_line) {
+        if(!comp_err.str().empty()) return false;
+        if (input_line.empty()) {
+            comp_err << "Error: Empty input line.\n";
             return false;
         }
+        bool hasLineNumber = (tokens.size() >= 1 && tokens[0].getTokenType() == lex::TOKEN_DIGIT);
+        if (hasLineNumber && tokens.size() >= 2) {
+            int value = atoi(tokens[0].getToken().c_str());
+            std::string codetext = input_line.substr(input_line.find(tokens[0].getToken()) + tokens[0].getToken().length() + 1);
+            TextLine in(value, codetext);
+            if (checkInstruction(tokens, in)) {
+                insertText(tokens, in);
+            }
+        } else if (!hasLineNumber && tokens.size() >= 1) {
+            int generatedLineNumber = 10;
+            if (!lines.empty()) {
+                int maxLine = 0;
+                for (const auto& line : lines) {
+                    if (line.index > maxLine) {
+                        maxLine = line.index;
+                    }
+                }
+                generatedLineNumber = maxLine + 10;
+            }
+            
+            TextLine in(generatedLineNumber, input_line);
+            
+            std::vector<lex::Token> tempTokens;
+            tempTokens.push_back(lex::Token(std::to_string(generatedLineNumber), lex::TOKEN_DIGIT));
+            tempTokens.insert(tempTokens.end(), tokens.begin(), tokens.end());
+            
+            if (checkInstruction(tempTokens, in)) {
+                insertText(tempTokens, in);
+            }
+        } else if (tokens.size() == 1 && hasLineNumber) {
+            // Delete line by number
+            int index_n = atoi(tokens[0].getToken().c_str());
+            for (int i = 0; i < lines.size(); ++i) {
+                if (lines[i].index == index_n) {
+                    lines.erase(lines.begin() + i);
+                    std::cout << "Deleted line " << index_n << std::endl;
+                    return false;
+                }
+            }
+            comp_err << "Error: Line " << index_n << " not found.\n";
+            return false;
+        } else {
+            comp_err << "Error: Invalid input.\n";
+            return false;
+        }
+        return true;
+    }
+
+
+    bool checkInstruction(std::vector<lex::Token> &tokens, const TextLine &text) {
+        if (tokens.size() <= 1) {
+            comp_err << "Error: Statement requires instruction.\n";
+            return false;
+        }
+        
         static unsigned int inc_offset = 0;
-        if(tokens.size()>=2) {
+        inc_offset = 0; 
+        
+        if (tokens.size() >= 2) {
             icode::opc op = icode::strtoInc(tokens[1].getToken());
-            if(op == icode::opc::NOTINC) {
-                if(tokens[1].getTokenType() != lex::TOKEN_CHAR) {
-                    std::cerr << "Syntax Error: After line number requires either Label or instruction.\n";
+            
+            if (op == icode::opc::NOTINC) {
+                if (tokens[1].getTokenType() != lex::TOKEN_CHAR) {
+                    comp_err << "Syntax Error: After line number requires either Label or instruction.\n";
                     return false;
                 }
+                
                 inc_offset = 1;
-                op = icode::strtoInc(tokens[1+inc_offset].getToken());
-                if(op == icode::opc::NOTINC) {
-                    std::cerr << "Syntax Error: After Label requires Instruction.\n";
+                if (tokens.size() <= 2) {
+                    comp_err << "Syntax Error: Label '" << tokens[1].getToken() << "' must be followed by an instruction.\n";
                     return false;
                 }
-            } else {
-                // check operands
-                if(tokens.size()>=3+inc_offset) {
-                    if(tokens[2+inc_offset].getToken()=="#") {
-                        if(tokens.size()>=4+inc_offset) {
-                            if(tokens[3+inc_offset].getTokenType() == lex::TOKEN_DIGIT) {}
-                            else if(tokens[3+inc_offset].getTokenType() != lex::TOKEN_DIGIT && tokens[3+inc_offset].getTokenType() != lex::TOKEN_HEX) {
-                                std::cerr << "Syntax Error: requires either digit or $.\n";
-                                return false;
-                                
-                            } else if(tokens[3+inc_offset].getTokenType() != lex::TOKEN_HEX) {
-                                std::cerr << "Syntax Error: $ is followed by a Hex value\n";
-                                return false;
-                            }
-                            
-                            if(tokens.size()>=5+inc_offset && tokens[4+inc_offset].getToken() == ",") {
-                                if(tokens.size()>=6+inc_offset && tokens[5+inc_offset].getTokenType() == lex::TOKEN_CHAR) {
-                                    // check if register
-                                }
-                            } else if(tokens.size()>=5+inc_offset && tokens[4+inc_offset].getToken() != ",") {
-                                std::cerr << "Syntax Error: Expecting comma instead I found: " << tokens[4].getToken() << "\n";
-                                return false;
-                            }
-                            
-                        } else {
-                            std::cerr << "Syntax Error: Missing value after #\n";
-                            return false;
-                        }
+                
+                op = icode::strtoInc(tokens[1 + inc_offset].getToken());
+                if (op == icode::opc::NOTINC) {
+                    comp_err << "Syntax Error: '" << tokens[1 + inc_offset].getToken() << "' is not a valid 6502 instruction.\n";
+                    return false;
+                }
+            }
+            
+            return validateAddressingMode(tokens, op, inc_offset);
+        }
+        
+        return true;
+    }
+
+    bool validateAddressingMode(std::vector<lex::Token> &tokens, icode::opc instruction, unsigned int offset) {
+        int instrIndex = 1 + offset; 
+        
+        if (instruction == icode::opc::CLC || instruction == icode::opc::CLD || 
+            instruction == icode::opc::CLI || instruction == icode::opc::CLV ||
+            instruction == icode::opc::SEC || instruction == icode::opc::SED ||
+            instruction == icode::opc::SEI || instruction == icode::opc::DEX ||
+            instruction == icode::opc::DEY || instruction == icode::opc::INX ||
+            instruction == icode::opc::INY || instruction == icode::opc::NOP ||
+            instruction == icode::opc::PHA || instruction == icode::opc::PHP ||
+            instruction == icode::opc::PLA || instruction == icode::opc::PLP ||
+            instruction == icode::opc::RTI || instruction == icode::opc::RTS ||
+            instruction == icode::opc::TAX || instruction == icode::opc::TAY ||
+            instruction == icode::opc::TSX || instruction == icode::opc::TXA ||
+            instruction == icode::opc::TXS || instruction == icode::opc::TYA ||
+            instruction == icode::opc::BRK || instruction == icode::opc::END) {
+            
+            if (tokens.size() > instrIndex + 1) {
+                comp_err << "Syntax Error: " << tokens[instrIndex].getToken() << " instruction takes no operands.\n";
+                return false;
+            }
+            return true;
+        }
+        
+        
+        if (tokens.size() <= instrIndex + 1) {
+            comp_err << "Syntax Error: " << tokens[instrIndex].getToken() << " instruction requires an operand.\n";
+            return false;
+        }
+        
+        
+        int operandIndex = instrIndex + 1;
+        
+        
+        if (tokens[operandIndex].getToken() == "#") {
+            if (tokens.size() <= operandIndex + 1) {
+                comp_err << "Syntax Error: Missing value after #\n";
+                return false;
+            }
+            
+            
+            if (tokens[operandIndex + 1].getTokenType() != lex::TOKEN_DIGIT && 
+                tokens[operandIndex + 1].getTokenType() != lex::TOKEN_HEX) {
+                comp_err << "Syntax Error: # must be followed by a number or hex value ($XX).\n";
+                return false;
+            }
+            
+         
+            if (tokens.size() > operandIndex + 2) {
+                comp_err << "Syntax Error: Immediate addressing (#) cannot be indexed with ,X or ,Y\n";
+                return false;
+            }
+            
+            return validateInstructionAddressingMode(instruction, "IMMEDIATE");
+        }
+        else if (tokens[operandIndex].getTokenType() == lex::TOKEN_HEX || 
+                tokens[operandIndex].getTokenType() == lex::TOKEN_DIGIT ||
+                tokens[operandIndex].getTokenType() == lex::TOKEN_CHAR) {
+            
+            std::string addressingMode = "ABSOLUTE";
+            
+            if (tokens[operandIndex].getTokenType() == lex::TOKEN_HEX) {
+                std::string hexValue = tokens[operandIndex].getToken();
+                if (hexValue.length() <= 3) { 
+                    addressingMode = "ZEROPAGE";
+                }
+            } else if (tokens[operandIndex].getTokenType() == lex::TOKEN_DIGIT) {
+                int value = atoi(tokens[operandIndex].getToken().c_str());
+                if (value < 256) {
+                    addressingMode = "ZEROPAGE";
+                }
+            }
+            
+            if (tokens.size() > operandIndex + 1) {
+                if (tokens[operandIndex + 1].getToken() == ",") {
+                    if (tokens.size() <= operandIndex + 2) {
+                        comp_err << "Syntax Error: Comma must be followed by X or Y register.\n";
+                        return false;
+                    }
+                    
+                    std::string reg = tokens[operandIndex + 2].getToken();
+                    if (reg == "X" || reg == "x") {
+                        addressingMode += "_X";
+                    } else if (reg == "Y" || reg == "y") {
+                        addressingMode += "_Y";
+                    } else {
+                        comp_err << "Syntax Error: Only X and Y registers are valid for indexing.\n";
+                        return false;
                     }
                 } else {
-                    return true; // check if inc requires no operand
+                    comp_err << "Syntax Error: Expected comma before register, found: " << tokens[operandIndex + 1].getToken() << "\n";
+                    return false;
                 }
-            
             }
+            
+            return validateInstructionAddressingMode(instruction, addressingMode);
+        }
+        
+        comp_err << "Syntax Error: Invalid operand format.\n";
+        return false;
+    }
+
+    bool validateInstructionAddressingMode(icode::opc instruction, const std::string& mode) {
+        if (instruction == icode::opc::LDX && mode == "ZEROPAGE_X") {
+            comp_err << "Syntax Error: LDX does not support Zero Page,X addressing mode.\n";
+            return false;
+        }
+        
+        if (instruction == icode::opc::LDY && mode == "ZEROPAGE_Y") {
+            comp_err << "Syntax Error: LDY does not support Zero Page,Y addressing mode.\n";
+            return false;
+        }
+        
+        if ((instruction == icode::opc::LDA || instruction == icode::opc::STA) && mode == "ZEROPAGE_Y") {
+            comp_err << "Syntax Error: " << (instruction == icode::opc::LDA ? "LDA" : "STA") 
+                    << " does not support Zero Page,Y addressing mode.\n";
+            return false;
         }
         return true;
     }

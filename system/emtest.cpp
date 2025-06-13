@@ -369,7 +369,7 @@ public:
     bool loadCode(const std::string& ats_code) {
         try {
             if (!interp::openLineString(ats_code)) {
-                last_error = "Failed to load code from string";
+                last_error = "Failed to load code from string: " + interp::comp_err.str();
                 code_loaded = false;
                 code_built = false;
                 return false;
@@ -397,7 +397,7 @@ public:
             code.reset();
             bool result = translate::build_code();
             if (!result) {
-                last_error = translate::last_build_error;
+                last_error = interp::comp_err.str();
                 code_built = false;
                 return false;
             }
@@ -407,7 +407,7 @@ public:
             current_instruction_index = 0;
             return true;
         } catch (const std::exception& e) {
-            last_error = std::string("Build error: ") + e.what();
+            last_error = std::string("Build error: ") +  interp::comp_err.str();
             code_built = false;
             return false;
         }

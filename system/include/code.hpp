@@ -15,8 +15,9 @@
 #include "icode.hpp"
 
 namespace interp {
-    
+
     extern std::ostringstream stream;
+    extern std::ostringstream comp_err;
     extern  std::vector<std::pair<uint16_t, uint8_t>> modifiedMemoryAddresses;
     void trackMemoryWrite(uint16_t address, uint8_t value); 
     extern bool mem_write;
@@ -156,7 +157,7 @@ namespace interp {
     extern std::unordered_map<std::string, int> label_table;
     extern std::unordered_map<int, int> label_line_table;
     
-    void inputText(std::vector<lex::Token> &tokens, std::string text);
+    bool inputText(std::vector<lex::Token> &tokens, std::string text);
     bool saveLineSource(const std::string &text);
     bool openLineSource(const std::string &text);
     bool openLineString(const std::string &text);
@@ -165,7 +166,8 @@ namespace interp {
     bool loadCodeFromString(const std::string &code_string);
     bool procLine(const TextLine &text, Code &code);
     bool checkInstruction(std::vector<lex::Token> &tokens, const TextLine &text);
-    
+    bool validateAddressingMode(std::vector<lex::Token> &tokens, icode::opc instruction, unsigned int offset);
+    bool validateInstructionAddressingMode(icode::opc instruction, const std::string& mode);
     extern std::vector<TextLine> lines;
 }
 

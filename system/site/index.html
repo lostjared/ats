@@ -439,11 +439,11 @@
             
             <textarea id="codeEditor" class="code-editor" placeholder="Enter your ATS assembly code here...
 Example:
-10 CLC
-20 LDA #100
-30 ADC #50
-40 STA $10
-50 END"></textarea>
+CLC
+LDA #100
+ADC #50
+STA $10
+END"></textarea>
             
             <div class="button-group">
                 <button id="buildBtn" class="btn btn-primary">🔨 Build Code</button>
@@ -477,52 +477,52 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Example programs with proper ATS format
     const examples = {
-        basic: `10 CLC
-20 LDA #100
-30 ADC #50
-40 STA $10
-50 END`,
+        basic: `CLC
+LDA #100
+ADC #50
+STA $10
+END`,
         
-        loop: `10 LDX #0
-20 LOOP TXA
-30 STA $1000,X
-40 INX
-50 CPX #10
-60 BNE LOOP
-70 END`,
+        loop: `LDX #0
+LOOP TXA
+STA $1000,X
+INX
+CPX #10
+BNE LOOP
+END`,
         
-        subroutine: `10 CLC
-20 JSR ADDVALUES
-30 END
-100 ADDVALUES LDX #10
-110 LDY #25
-120 STX $1E
-130 STY $1F
-140 LDA #100
-150 ADC $1E
-160 ADC $1F
-170 STA $10
-180 RTS`,
+        subroutine: `CLC
+JSR ADDVALUES
+END
+ADDVALUES LDX #10
+LDY #25
+STX $1E
+STY $1F
+LDA #100
+ADC $1E
+ADC $1F
+STA $10
+RTS`,
         
-        memory: `10 LDA #$FF
-20 STA $00
-30 LDA #$AA
-40 STA $01
-50 LDX $00
-60 LDY $01
-70 STX $10
-80 STY $11
-90 END`,
+        memory: `LDA #$FF
+STA $00
+LDA #$AA
+STA $01
+LDX $00
+LDY $01
+STX $10
+STY $11
+END`,
         
-        stack: `10 LDA #$42
-20 PHA
-30 LDA #$33
-40 PHA
-50 PLA
-60 STA $10
-70 PLA
-80 STA $11
-90 END`
+        stack: `LDA #$42
+PHA
+LDA #$33
+PHA
+PLA
+STA $10
+PLA
+STA $11
+END`
     };
     
     // DOM elements
@@ -1366,7 +1366,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </script>
 
-<script src="ats.js?v=1.0" 
+<script src="ats.js?v=1.1" 
         onload="console.log('✅ ats.js loaded successfully')" 
         onerror="console.error('❌ Failed to load ats.js - file may not exist or have syntax errors')">
 </script>

@@ -41,6 +41,11 @@ namespace translate {
     
     bool build_code() {
         try {
+
+            if(!interp::comp_err.str().empty()) {
+                return false;
+            }
+
             if(interp::lines.size()==0) {
                 last_build_error = "No code to build.";
                 std::cerr << "Error: No code to build...\n";
