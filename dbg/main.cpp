@@ -1,6 +1,6 @@
 /*
  
- ats - Atari Script, A Fun Practice Project
+ ats - 6502 Assembly Script, A Fun Practice Project
  written by Jared Bruni
  http://lostsidedead.com
  
@@ -47,7 +47,6 @@ int main() {
     code.symbols["author"].create("author", symbol::Value("lostjared", 0));
     std::ios state(0);
     state.copyfmt(std::cout);
-    
     std::cout << "ats (atari script) interactive debugger v" << VERSION_INFO << "\nPress Ctrl+C to break program.\nUse help command for more information on commands.\n";
     
     while(1) {
@@ -72,6 +71,12 @@ int main() {
             auto rt = function_map.find(first_token);
             if(rt == function_map.end()) {
                 interp::inputText(v, input_line);
+                if(interp::comp_err.str().length() > 0) {
+                    std::cout.copyfmt(state);
+                    std::cout << "Error: " << first_token << " is not a valid command.\n" << interp::comp_err.str() << "\n";
+                    interp::comp_err.str("");
+                    continue;
+                }
                 continue;
             }
             
