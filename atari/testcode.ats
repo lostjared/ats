@@ -1,0 +1,99 @@
+; =======================================
+; 6502 EMULATOR TEST SUITE
+; =======================================
+; Tests most core 6502 functionality
+; Results stored in memory locations $50-$5F
+; If all tests pass, $5F will contain $42 (66 decimal)
+
+; Test 1: Basic Load/Store Operations
+10 LDA #$55        ; Test immediate addressing
+20 STA $50         ; Store to zero page
+30 LDX #$AA        ; Load X with different value
+40 STX $51         ; Store X
+50 LDY #$33        ; Load Y with another value
+60 STY $52         ; Store Y
+
+; Test 2: Register Transfers
+70 LDA #$42        ; Load test value
+80 TAX             ; Transfer A to X
+90 TXA             ; Transfer X back to A
+100 STA $53        ; Store to verify transfers work
+110 TAY            ; Transfer A to Y
+120 TYA             ; Transfer Y back to A
+130 STA $54        ; Store to verify Y transfers
+
+; Test 3: Increment/Decrement
+140 LDA #$10       ; Load initial value
+150 CLC            ; Clear carry
+160 ADC #$01       ; Add 1
+170 ADC #$01       ; Add 1 again
+180 STA $55        ; Store result (should be $12)
+190 LDX #$05       ; Load X with 5
+200 INX            ; Increment X
+210 INX            ; Increment X again
+220 STX $56        ; Store X (should be $07)
+230 DEX            ; Decrement X
+240 STX $57        ; Store X (should be $06)
+
+; Test 4: Flags and Zero/Negative
+250 LDA #$00       ; Load 0 to set zero flag
+260 BNE 290        ; Should NOT branch (Z=1)
+270 LDA #$01       ; Load 1 (Z=0)
+280 JMP 300        ; Skip the failure case
+290 LDA #$FF       ; If we get here, BNE failed
+300 STA $58        ; Store result (should be $01)
+
+; Test 5: Logical Operations
+310 LDA #$AA       ; 10101010
+320 AND #$55       ; 01010101
+330 STA $59        ; Should be $00
+340 LDA #$AA       ; 10101010
+350 ORA #$55       ; 01010101
+360 STA $5A        ; Should be $FF
+370 LDA #$FF       ; 11111111
+380 EOR #$AA       ; 10101010
+390 STA $5B        ; Should be $55
+
+; Test 6: Addressing Modes
+400 LDA #$77       ; Test value
+410 STA $70        ; Store at $70
+420 LDX #$10       ; X offset
+430 LDA $70,X      ; Should load from $80 (which is 0)
+440 STA $5C        ; Store result (should be $00)
+450 LDA #$88       ; New test value
+460 STA $0080      ; Store at $80
+470 LDA $70,X      ; Now should load $88 from $80
+480 STA $5D        ; Store result (should be $88)
+
+; Test 7: Subroutine Test
+490 JSR 600        ; Jump to subroutine
+500 LDA $5E        ; Load result from subroutine
+510 CLC            ; Clear carry
+520 ADC #$21       ; Add $21
+530 STA $5F        ; Store final result ($42 if all is well)
+540 END            ; End of main program
+
+; Subroutine that adds two values
+600 LDA #$10       ; First value
+610 CLC            ; Clear carry
+620 ADC #$11       ; Add second value ($10+$11=$21)
+630 STA $5E        ; Store result
+640 RTS            ; Return from subroutine
+
+; Expected results:
+; $50 = $55 (Test 1: LDA/STA)
+; $51 = $AA (Test 1: LDX/STX)
+; $52 = $33 (Test 1: LDY/STY)
+; $53 = $42 (Test 2: Register transfers A/X)
+; $54 = $42 (Test 2: Register transfers A/Y)
+; $55 = $12 (Test 3: Increment via ADC)
+; $56 = $07 (Test 3: INX)
+; $57 = $06 (Test 3: DEX)
+; $58 = $01 (Test 4: Zero flag/branching)
+; $59 = $00 (Test 5: AND)
+; $5A = $FF (Test 5: ORA)
+; $5B = $55 (Test 5: EOR)
+; $5C = $00 (Test 6: Zero page,X when destination is empty)
+; $5D = $88 (Test 6: Zero page,X when destination has value)
+; $5E = $21 (Test 7: Subroutine result)
+; $5F = $42 (Final test result - 66 decimal)
