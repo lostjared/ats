@@ -15,7 +15,7 @@
 
 ; Multiplication loop: add multiplicand 'multiplier' times
 80 CPX $31          ; Compare counter with multiplier
-90 BEQ 140          ; If equal, we're done (branch to end)
+90 BEQ 159          ; If equal, we're done (branch to end)
 100 CLC             ; Clear carry for addition
 110 LDA $32         ; Load current result
 120 ADC $30         ; Add multiplicand to result
@@ -24,6 +24,7 @@
 150 JMP 80          ; Jump back to loop condition
 
 ; Verify result with different approach (addition chain)
+159 CLC             ; Clear carry for verification
 160 LDA $30         ; Load multiplicand (7)
 170 ADC $30         ; 7 + 7 = 14
 180 ADC $30         ; 14 + 7 = 21
