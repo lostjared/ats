@@ -384,6 +384,7 @@ namespace translate {
             case 2: {
                 if(tokens[1].getToken() == "#") {
                     unsigned int numeric_value = 0;
+
                     
                     if(tokens[2].getTokenType() == lex::TOKEN_DIGIT) {
                         numeric_value = atoi(tokens[2].getToken().c_str());
@@ -394,6 +395,8 @@ namespace translate {
                         stream << "Error on Line: " << line_value << " Decimal or Hex value expected after #.\n";
                         throw cExcep(stream.str());
                     }
+
+                    std::cout << "NUMERIC VALUE: " << numeric_value << "\n";
                     
                     if(confirm_mode(inst.opcode, interp::IMMEDIATE, inst.op_byte) == false) {
                         std::ostringstream stream;
@@ -409,6 +412,7 @@ namespace translate {
                     
                     inst.op1 = icode::Operand(numeric_value, icode::op_type::OP_DECIMAL);
                     inst.mode = interp::IMMEDIATE;
+                    
                 }
                 else if ((tokens[1].getToken() == "A" || tokens[1].getToken() == "a") &&
                         (inst.opcode == icode::opc::ASL || inst.opcode == icode::opc::LSR ||

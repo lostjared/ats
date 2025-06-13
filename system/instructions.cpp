@@ -17,7 +17,7 @@ namespace interp {
         int in = c.proc.getIp();
         uint8_t carry = c.proc.getFlag(icode::FLAG_CARRY);
 
-        switch (c.instruct[in].op1.op_t) {
+        switch (c.instruct.at(in).op1.op_t) {
             case icode::op_type::OP_MEMORY: {
                 uint8_t val = 0;
                 switch (c.instruct[in].mode) {
@@ -45,6 +45,26 @@ namespace interp {
                     case ZEROPAGE_Y: {
                         uint8_t addr = (c.instruct[in].op1.op + c.proc.reg_y) & 0xFF;
                         val = c.peek(addr);
+                    }
+                    break;
+                    case INDIRECT_I: { // (address),Y
+                        uint8_t zp_addr = c.instruct[in].op1.op & 0xFF;
+                        uint8_t low = c.peek(zp_addr);
+                        uint8_t high = c.peek((zp_addr + 1) & 0xFF);
+                        uint16_t base_addr = (high << 8) | low;
+                        uint16_t effective_addr = base_addr + c.proc.reg_y;
+
+                        val = c.peek(effective_addr);
+                    }
+                    break;
+                    case INDEXED_I: { // (address,X)
+                        uint8_t zp_addr = c.instruct[in].op1.op & 0xFF;
+                        uint8_t indexed_addr = (zp_addr + c.proc.reg_x) & 0xFF;
+                        uint8_t low = c.peek(indexed_addr);
+                        uint8_t high = c.peek((indexed_addr + 1) & 0xFF);
+                        uint16_t effective_addr = (high << 8) | low;
+
+                        val = c.peek(effective_addr);
                     }
                     break;
                     default:
@@ -124,10 +144,30 @@ namespace interp {
                         val = c.peek(addr);
                     }
                     break;
+                    case INDIRECT_I: { // (address),Y
+                        uint8_t zp_addr = c.instruct[in].op1.op & 0xFF;
+                        uint8_t low = c.peek(zp_addr);
+                        uint8_t high = c.peek((zp_addr + 1) & 0xFF);
+                        uint16_t base_addr = (high << 8) | low;
+                        uint16_t effective_addr = base_addr + c.proc.reg_y;
+
+                        val = c.peek(effective_addr);
+                    }
+                    break;
+                    case INDEXED_I: { // (address,X)
+                        uint8_t zp_addr = c.instruct[in].op1.op & 0xFF;
+                        uint8_t indexed_addr = (zp_addr + c.proc.reg_x) & 0xFF;
+                        uint8_t low = c.peek(indexed_addr);
+                        uint8_t high = c.peek((indexed_addr + 1) & 0xFF);
+                        uint16_t effective_addr = (high << 8) | low;
+
+                        val = c.peek(effective_addr);
+                    }
+                    break;
                     default:
                         return;
                 }
-   
+
                 uint16_t total = c.proc.reg_a - val - (1 - carry);
                 c.proc.setFlag(icode::FLAG_CARRY, (c.proc.reg_a >= (val + (1 - carry))));
 
@@ -200,6 +240,26 @@ namespace interp {
                         val = c.peek(addr);
                     }
                     break;
+                    case INDIRECT_I: { // (address),Y
+                        uint8_t zp_addr = c.instruct[in].op1.op & 0xFF;
+                        uint8_t low = c.peek(zp_addr);
+                        uint8_t high = c.peek((zp_addr + 1) & 0xFF);
+                        uint16_t base_addr = (high << 8) | low;
+                        uint16_t effective_addr = base_addr + c.proc.reg_y;
+
+                        val = c.peek(effective_addr);
+                    }
+                    break;
+                    case INDEXED_I: { // (address,X)
+                        uint8_t zp_addr = c.instruct[in].op1.op & 0xFF;
+                        uint8_t indexed_addr = (zp_addr + c.proc.reg_x) & 0xFF;
+                        uint8_t low = c.peek(indexed_addr);
+                        uint8_t high = c.peek((indexed_addr + 1) & 0xFF);
+                        uint16_t effective_addr = (high << 8) | low;
+
+                        val = c.peek(effective_addr);
+                    }
+                    break;
                     default:
                         return;
                 }
@@ -217,19 +277,25 @@ namespace interp {
     }
 
     void i_asl(Code &c) {
-        unsigned int ip = c.proc.getIp();
-        switch(c.instruct[ip].op1.op_t) {
-            case icode::op_type::OP_REGISTER_A: {
-                uint8_t &cc = c.proc.reg_a;
-                uint8_t newCarry = (cc & 0x80) ? 1 : 0;
-                cc <<= 1;
-                c.proc.setFlag(icode::FLAG_CARRY, newCarry);
-                updateZNFlags(c.proc, cc);
-            }
-            break;
+        int in = c.proc.getIp();
+        
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_REGISTER_A: { 
+                uint8_t oldVal = c.proc.reg_a;  // Declare oldVal here
+                
+                // Set carry flag to bit 7 of accumulator
+                c.proc.setFlag(icode::FLAG_CARRY, (oldVal & 0x80) != 0);
+                
+                // Shift left
+                c.proc.reg_a <<= 1;
+                
+                // Update Zero and Negative flags
+                updateZNFlags(c.proc, c.proc.reg_a);
+            } break;
+            
             case icode::op_type::OP_MEMORY: {
-                uint8_t addr = c.instruct[ip].op1.op;
-                switch(c.instruct[ip].mode) {
+                uint8_t addr = c.instruct[in].op1.op;
+                switch(c.instruct[in].mode) {
                     case ABSOULTE: {
                         uint8_t cc = c.peek(addr);
                         uint8_t newCarry = (cc & 0x80) ? 1 : 0;
@@ -417,6 +483,26 @@ namespace interp {
                     case ZEROPAGE_Y: {
                         uint8_t addr = (c.instruct[in].op1.op + c.proc.reg_y) & 0xFF;
                         operand = c.peek(addr);
+                    }
+                    break;
+                    case INDIRECT_I: { // (address),Y
+                        uint8_t zp_addr = c.instruct[in].op1.op & 0xFF;
+                        uint8_t low = c.peek(zp_addr);
+                        uint8_t high = c.peek((zp_addr + 1) & 0xFF);
+                        uint16_t base_addr = (high << 8) | low;
+                        uint16_t effective_addr = base_addr + c.proc.reg_y;
+
+                        operand = c.peek(effective_addr);
+                    }
+                    break;
+                    case INDEXED_I: { // (address,X)
+                        uint8_t zp_addr = c.instruct[in].op1.op & 0xFF;
+                        uint8_t indexed_addr = (zp_addr + c.proc.reg_x) & 0xFF;
+                        uint8_t low = c.peek(indexed_addr);
+                        uint8_t high = c.peek((indexed_addr + 1) & 0xFF);
+                        uint16_t effective_addr = (high << 8) | low;
+
+                        operand = c.peek(effective_addr);
                     }
                     break;
                     default:
@@ -723,14 +809,19 @@ namespace interp {
     void i_lsr(Code &c) {
         unsigned int ip = c.proc.getIp();
         switch(c.instruct[ip].op1.op_t) {
-            case icode::op_type::OP_REGISTER_A: {
-                uint8_t &cc = c.proc.reg_a;
-                uint8_t newCarry = (cc & 0x01) ? 1 : 0;
-                cc >>= 1;
-                c.proc.setFlag(icode::FLAG_CARRY, newCarry);
-                updateZNFlags(c.proc, cc);
-            }
-            break;
+            case icode::op_type::OP_REGISTER_A: { // ACCUMULATOR mode
+                uint8_t oldVal = c.proc.reg_a;  // Declare oldVal here
+                
+                // Set carry flag to bit 0 of accumulator
+                c.proc.setFlag(icode::FLAG_CARRY, (oldVal & 0x01) != 0);
+                
+                // Shift right
+                c.proc.reg_a >>= 1;
+                
+                // Update Zero and Negative flags
+                updateZNFlags(c.proc, c.proc.reg_a);
+            } break;
+            
             case icode::op_type::OP_MEMORY: {
                 uint8_t addr = c.instruct[ip].op1.op;
                 switch(c.instruct[ip].mode) {
@@ -819,6 +910,26 @@ namespace interp {
                         val = c.peek(addr);
                     }
                     break;
+                    case INDIRECT_I: { // (address),Y
+                        uint8_t zp_addr = c.instruct[in].op1.op & 0xFF;
+                        uint8_t low = c.peek(zp_addr);
+                        uint8_t high = c.peek((zp_addr + 1) & 0xFF);
+                        uint16_t base_addr = (high << 8) | low;
+                        uint16_t effective_addr = base_addr + c.proc.reg_y;
+
+                        val = c.peek(effective_addr);
+                    }
+                    break;
+                    case INDEXED_I: { // (address,X)
+                        uint8_t zp_addr = c.instruct[in].op1.op & 0xFF;
+                        uint8_t indexed_addr = (zp_addr + c.proc.reg_x) & 0xFF;
+                        uint8_t low = c.peek(indexed_addr);
+                        uint8_t high = c.peek((indexed_addr + 1) & 0xFF);
+                        uint16_t effective_addr = (high << 8) | low;
+
+                        val = c.peek(effective_addr);
+                    }
+                    break;
                     default:
                         return;
                 }
@@ -865,6 +976,26 @@ namespace interp {
                     case ZEROPAGE_Y: {
                         uint8_t addr = (c.instruct[in].op1.op + c.proc.reg_y) & 0xFF;
                         val = c.peek(addr);
+                    }
+                    break;
+                    case INDIRECT_I: { // (address),Y
+                        uint8_t zp_addr = c.instruct[in].op1.op & 0xFF;
+                        uint8_t low = c.peek(zp_addr);
+                        uint8_t high = c.peek((zp_addr + 1) & 0xFF);
+                        uint16_t base_addr = (high << 8) | low;
+                        uint16_t effective_addr = base_addr + c.proc.reg_y;
+
+                        val = c.peek(effective_addr);
+                    }
+                    break;
+                    case INDEXED_I: { // (address,X)
+                        uint8_t zp_addr = c.instruct[in].op1.op & 0xFF;
+                        uint8_t indexed_addr = (zp_addr + c.proc.reg_x) & 0xFF;
+                        uint8_t low = c.peek(indexed_addr);
+                        uint8_t high = c.peek((indexed_addr + 1) & 0xFF);
+                        uint16_t effective_addr = (high << 8) | low;
+
+                        val = c.peek(effective_addr);
                     }
                     break;
                     default:
@@ -981,23 +1112,29 @@ namespace interp {
     }
 
     void i_rol(Code &c) {
-        unsigned int ip = c.proc.getIp();
-        switch(c.instruct[ip].op1.op_t) {
-            case icode::op_type::OP_REGISTER_A: {
-                uint8_t &cc = c.proc.reg_a;
-                uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY);
-                uint8_t newCarry = (cc & 0x80) ? 1 : 0;
-                cc = (cc << 1) | oldCarry;
-                c.proc.setFlag(icode::FLAG_CARRY, newCarry);
-                updateZNFlags(c.proc, cc);
-            }
-            break;
+        int in = c.proc.getIp();
+    
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_REGISTER_A: { // ACCUMULATOR mode
+                uint8_t oldVal = c.proc.reg_a;  // Declare oldVal here
+                uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY) ? 1 : 0;
+                
+                // Set carry flag to bit 7 of accumulator
+                c.proc.setFlag(icode::FLAG_CARRY, (oldVal & 0x80) != 0);
+                
+                // Rotate left with old carry
+                c.proc.reg_a = (oldVal << 1) | oldCarry;
+                
+                // Update Zero and Negative flags
+                updateZNFlags(c.proc, c.proc.reg_a);
+            } break;
+            
             case icode::op_type::OP_MEMORY: {
-                uint8_t addr = c.instruct[ip].op1.op;
-                switch(c.instruct[ip].mode) {
+                uint8_t addr = c.instruct[in].op1.op;
+                switch(c.instruct[in].mode) {
                     case ABSOULTE: {
                         uint8_t cc = c.peek(addr);
-                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY);
+                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY) ? 1 : 0;
                         uint8_t newCarry = (cc & 0x80) ? 1 : 0;
                         cc = (cc << 1) | oldCarry;
                         c.poke(addr, cc);
@@ -1008,7 +1145,7 @@ namespace interp {
                     case ZEROPAGE: {
                         uint8_t realAddr = addr & 0xFF;
                         uint8_t cc = c.peek(realAddr);
-                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY);
+                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY) ? 1 : 0;
                         uint8_t newCarry = (cc & 0x80) ? 1 : 0;
                         cc = (cc << 1) | oldCarry;
                         c.poke(realAddr, cc);
@@ -1019,7 +1156,7 @@ namespace interp {
                     case ABSOULTE_X: {
                         uint16_t addrX = (addr + c.proc.reg_x) & 0xFFFF;  
                         uint8_t cc = c.peek(addrX);
-                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY);
+                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY) ? 1 : 0;
                         uint8_t newCarry = (cc & 0x80) ? 1 : 0;
                         cc = (cc << 1) | oldCarry;
                         c.poke(addrX, cc);
@@ -1030,7 +1167,7 @@ namespace interp {
                     case ZEROPAGE_X: {
                         uint8_t addrX = (addr + c.proc.reg_x) & 0xFF;
                         uint8_t cc = c.peek(addrX);
-                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY);
+                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY) ? 1 : 0;
                         uint8_t newCarry = (cc & 0x80) ? 1 : 0;
                         cc = (cc << 1) | oldCarry;
                         c.poke(addrX, cc);
@@ -1049,23 +1186,29 @@ namespace interp {
     }
 
     void i_ror(Code &c) {
-        unsigned int ip = c.proc.getIp();
-        switch(c.instruct[ip].op1.op_t) {
-            case icode::op_type::OP_REGISTER_A: {
-                uint8_t &cc = c.proc.reg_a;
-                uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY);
-                uint8_t newCarry = (cc & 0x01) ? 1 : 0;
-                cc = (cc >> 1) | (oldCarry << 7);
-                c.proc.setFlag(icode::FLAG_CARRY, newCarry);
-                updateZNFlags(c.proc, cc);
-            }
-            break;
+        int in = c.proc.getIp();
+    
+        switch(c.instruct[in].op1.op_t) {
+            case icode::op_type::OP_REGISTER_A: { // ACCUMULATOR mode
+                uint8_t oldVal = c.proc.reg_a;  // Declare oldVal here
+                uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY) ? 1 : 0;
+                
+                // Set carry flag to bit 0 of accumulator
+                c.proc.setFlag(icode::FLAG_CARRY, (oldVal & 0x01) != 0);
+                
+                // Rotate right with old carry
+                c.proc.reg_a = (oldVal >> 1) | (oldCarry << 7);
+                
+                // Update Zero and Negative flags
+                updateZNFlags(c.proc, c.proc.reg_a);
+            } break;
+            
             case icode::op_type::OP_MEMORY: {
-                uint8_t addr = c.instruct[ip].op1.op;
-                switch(c.instruct[ip].mode) {
+                uint8_t addr = c.instruct[in].op1.op;
+                switch(c.instruct[in].mode) {
                     case ABSOULTE: {
                         uint8_t cc = c.peek(addr);
-                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY);
+                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY) ? 1 : 0;
                         uint8_t newCarry = (cc & 0x01) ? 1 : 0;
                         cc = (cc >> 1) | (oldCarry << 7);
                         c.poke(addr, cc);
@@ -1076,7 +1219,7 @@ namespace interp {
                     case ZEROPAGE: {
                         uint8_t realAddr = addr & 0xFF;
                         uint8_t cc = c.peek(realAddr);
-                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY);
+                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY) ? 1 : 0;
                         uint8_t newCarry = (cc & 0x01) ? 1 : 0;
                         cc = (cc >> 1) | (oldCarry << 7);
                         c.poke(realAddr, cc);
@@ -1087,7 +1230,7 @@ namespace interp {
                     case ABSOULTE_X: {
                         uint16_t addrX = (addr + c.proc.reg_x) & 0xFFFF;
                         uint8_t cc = c.peek(addrX);
-                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY);
+                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY) ? 1 : 0;
                         uint8_t newCarry = (cc & 0x01) ? 1 : 0;
                         cc = (cc >> 1) | (oldCarry << 7);
                         c.poke(addrX, cc);
@@ -1098,7 +1241,7 @@ namespace interp {
                     case ZEROPAGE_X: {
                         uint8_t addrX = (addr + c.proc.reg_x) & 0xFF;
                         uint8_t cc = c.peek(addrX);
-                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY);
+                        uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY) ? 1 : 0;
                         uint8_t newCarry = (cc & 0x01) ? 1 : 0;
                         cc = (cc >> 1) | (oldCarry << 7);
                         c.poke(addrX, cc);
