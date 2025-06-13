@@ -296,6 +296,8 @@ namespace interp {
             mem[address] = value;
             if(mem_write == true)
                 trackMemoryWrite(address, value);
+        } else {
+            throw std::out_of_range("Memory address out of range");
         }
     }
     

@@ -11,7 +11,7 @@ namespace token {
         int in = atoi(index.c_str());
         bool found = false;
         for(unsigned int i = 0; i < interp::lines.size(); ++i) {
-            if(interp::lines[i].index == in) {
+            if(interp::lines.at(i).index == in) {
                 interp::lines.erase(interp::lines.begin()+i);
                 found = true;
                 break;

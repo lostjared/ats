@@ -18,7 +18,7 @@ namespace translate {
     
     bool check_labels() {
         for(unsigned int ix = 0; ix < code.instruct.size(); ++ix) {
-            icode::Instruction &i = code.instruct[ix];
+            icode::Instruction &i = code.instruct.at(ix);
             if(i.op1.op_t == icode::op_type::OP_LABELTEXT) {
                 auto valid = interp::label_table.find(i.op1.label_text);
                 if(valid == interp::label_table.end()) {
@@ -58,7 +58,7 @@ namespace translate {
             for(unsigned int i = 0; i < interp::lines.size(); ++i) {
                 if(build_line(i)==false) {
                     std::ostringstream oss;
-                    oss << "Error on line: " << interp::lines[i].index;
+                    oss << "Error on line: " << interp::lines.at(i).index;
                     last_build_error = oss.str();
                     std::cout << last_build_error << "\n";
                     return false;
@@ -396,7 +396,7 @@ namespace translate {
                         throw cExcep(stream.str());
                     }
 
-                    std::cout << "NUMERIC VALUE: " << numeric_value << "\n";
+                    
                     
                     if(confirm_mode(inst.opcode, interp::IMMEDIATE, inst.op_byte) == false) {
                         std::ostringstream stream;
@@ -490,7 +490,6 @@ namespace translate {
             }
                 break;
             default:
-                // This might be a case with indirect addressing that wasn't caught earlier
                 std::ostringstream stream;
                 stream << "Error on Line: " << line_value << " Unsupported addressing format (tokens: " << tok_size + 1 << ").\n";
                 throw cExcep(stream.str());

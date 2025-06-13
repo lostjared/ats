@@ -280,7 +280,7 @@ namespace interp {
                 comp_err << "Syntax Error: # must be followed by a number or hex value ($XX).\n";
                 return false;
             }
-                    
+         
             if (tokens.size() > operandIndex + 2) {
                 comp_err << "Syntax Error: Immediate addressing (#) cannot be indexed with ,X or ,Y\n";
                 return false;
