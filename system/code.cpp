@@ -6,7 +6,7 @@ namespace interp {
     std::unordered_map<std::string, int> label_table;
     std::unordered_map<int, int> label_line_table;
     std::ostringstream stream;
-    const char *add_mode[] = { "Non mode", "Immediate", "Zero Page", "Zero Page X", "Zero Page Y", "Absoulte", "Absoulte X", "Absoulte Y", "Implied", "Relative", "Indirect Indexed", "Indexed Indirect", "Accumulator", "Indirect", 0 };
+    const char *add_mode[] = { "Non mode", "Immediate", "Zero Page", "Zero Page X", "Zero Page Y", "ABSOLUTE", "ABSOLUTE X", "ABSOLUTE Y", "Implied", "Relative", "Indirect Indexed", "Indexed Indirect", "Accumulator", "Indirect", 0 };
     std::vector<std::pair<uint16_t, uint8_t>> modifiedMemoryAddresses;
     bool mem_write = false;
     using namespace icode;
@@ -31,129 +31,119 @@ namespace interp {
     
     at_code m_code[] = {
         // ADC
-        { 0x69, IMMEDIATE, opc::ADC }, { 0x65, ZEROPAGE, opc::ADC },{ 0x75, ZEROPAGE_X, opc::ADC }, { 0x6D, ABSOULTE, opc::ADC }, {0x7D, ABSOULTE_X, opc::ADC }, { 0x79, ABSOULTE_Y, opc::ADC},{ 0x61, INDEXED_I, opc::ADC }, { 0x71, INDIRECT_I, opc::ADC },
+        { 0x69, IMMEDIATE, opc::ADC }, { 0x65, ZEROPAGE, opc::ADC }, { 0x75, ZEROPAGE_X, opc::ADC }, { 0x6D, ABSOLUTE, opc::ADC }, { 0x7D, ABSOLUTE_X, opc::ADC }, { 0x79, ABSOLUTE_Y, opc::ADC }, { 0x61, INDEXED_I, opc::ADC }, { 0x71, INDIRECT_I, opc::ADC },
         // AND
-        { 0x29, IMMEDIATE, opc::AND }, {0x25, ZEROPAGE, opc::AND}, {0x35, ZEROPAGE_X, opc::AND}, {0x2D, ABSOULTE, opc::AND},{ 0x3D, ABSOULTE_X, opc::AND }, {0x39, ABSOULTE_Y, opc::AND }, {0x21, INDEXED_I, opc::AND}, {0x31, INDIRECT_I, opc::AND},
+        { 0x29, IMMEDIATE, opc::AND }, { 0x25, ZEROPAGE, opc::AND }, { 0x35, ZEROPAGE_X, opc::AND }, { 0x2D, ABSOLUTE, opc::AND }, { 0x3D, ABSOLUTE_X, opc::AND }, { 0x39, ABSOLUTE_Y, opc::AND }, { 0x21, INDEXED_I, opc::AND }, { 0x31, INDIRECT_I, opc::AND },
         // ASL
-        { 0x0A, ACCUMULATOR, opc::ASL},  // ASL A
-        {0x06, ZEROPAGE, opc::ASL}, {0x16, ZEROPAGE_X, opc::ASL}, {0x0E, ABSOULTE, opc::ASL},{ 0x1E, ABSOULTE_X, opc::ASL },
+        { 0x0A, ACCUMULATOR, opc::ASL }, { 0x06, ZEROPAGE, opc::ASL }, { 0x16, ZEROPAGE_X, opc::ASL }, { 0x0E, ABSOLUTE, opc::ASL }, { 0x1E, ABSOLUTE_X, opc::ASL },
         // BCC
-        { 0x90, RELATIVE, opc::BCC},
+        { 0x90, RELATIVE, opc::BCC },
         // BCS
-        { 0xB0, RELATIVE, opc::BCS},
+        { 0xB0, RELATIVE, opc::BCS },
         // BEQ
-        { 0xF0, RELATIVE, opc::BEQ},
+        { 0xF0, RELATIVE, opc::BEQ },
         // BIT
-        { 0x24, ZEROPAGE, opc::BIT}, {0x2C, ABSOULTE, opc::BIT},
+        { 0x24, ZEROPAGE, opc::BIT }, { 0x2C, ABSOLUTE, opc::BIT },
         // BMI
-        { 0x30, RELATIVE, opc::BMI},
+        { 0x30, RELATIVE, opc::BMI },
         // BNE
-        { 0xD0, RELATIVE, opc::BNE},
+        { 0xD0, RELATIVE, opc::BNE },
         // BPL
-        { 0x10, RELATIVE, opc::BPL},
+        { 0x10, RELATIVE, opc::BPL },
         // BRK
-        { 0x00, IMPLIED, opc::BRK},
+        { 0x00, IMPLIED, opc::BRK },
         // BVC
-        { 0x50, RELATIVE, opc::BVC},
+        { 0x50, RELATIVE, opc::BVC },
         // BVS
-        { 0x70, RELATIVE, opc::BVS}, 
+        { 0x70, RELATIVE, opc::BVS },
         // CLC
-        { 0x18, IMPLIED, opc::CLC},
+        { 0x18, IMPLIED, opc::CLC },
         // CLD
-        { 0xD8, IMPLIED, opc::CLD},
+        { 0xD8, IMPLIED, opc::CLD },
         // CLI
-        { 0x58, IMPLIED, opc::CLI},
+        { 0x58, IMPLIED, opc::CLI },
         // CLV
-        { 0xB8, IMPLIED, opc::CLV},
+        { 0xB8, IMPLIED, opc::CLV },
         // CMP
-        { 0xC9, IMMEDIATE, opc::CMP}, {0xC5, ZEROPAGE, opc::CMP}, { 0xD5, ZEROPAGE_X, opc::CMP }, { 0xCD, ABSOULTE, opc::CMP},{ 0xDD, ABSOULTE_X, opc::CMP}, {0xD9, ABSOULTE_Y, opc::CMP}, { 0xC1, INDEXED_I, opc::CMP},{ 0xD1, INDIRECT_I, opc::CMP},
+        { 0xC9, IMMEDIATE, opc::CMP }, { 0xC5, ZEROPAGE, opc::CMP }, { 0xD5, ZEROPAGE_X, opc::CMP }, { 0xCD, ABSOLUTE, opc::CMP }, { 0xDD, ABSOLUTE_X, opc::CMP }, { 0xD9, ABSOLUTE_Y, opc::CMP }, { 0xC1, INDEXED_I, opc::CMP }, { 0xD1, INDIRECT_I, opc::CMP },
         // CPX
-        { 0xE0, IMMEDIATE, opc::CPX}, {0xE4, ZEROPAGE, opc::CPX}, {0xEC, ABSOULTE, opc::CPX},
+        { 0xE0, IMMEDIATE, opc::CPX }, { 0xE4, ZEROPAGE, opc::CPX }, { 0xEC, ABSOLUTE, opc::CPX },
         // CPY
-        { 0xC0, IMMEDIATE, opc::CPY}, {0xC4, ZEROPAGE, opc::CPY}, {0xCC, ABSOULTE, opc::CPY},
+        { 0xC0, IMMEDIATE, opc::CPY }, { 0xC4, ZEROPAGE, opc::CPY }, { 0xCC, ABSOLUTE, opc::CPY },
         // DEC
-        { 0xC6, ZEROPAGE, opc::DEC}, {0xD6, ZEROPAGE_X, opc::DEC}, {0xCE, ABSOULTE, opc::DEC}, {0xDE, ABSOULTE_X, opc::DEC},
+        { 0xC6, ZEROPAGE, opc::DEC }, { 0xD6, ZEROPAGE_X, opc::DEC }, { 0xCE, ABSOLUTE, opc::DEC }, { 0xDE, ABSOLUTE_X, opc::DEC },
         // DEX
-        { 0xCA, IMPLIED, opc::DEX},
+        { 0xCA, IMPLIED, opc::DEX },
         // DEY
-        { 0x88, IMPLIED, opc::DEY},
-        // END - Changed from 0x01 to 0x02 to avoid conflict
-        { 0x02, IMPLIED, opc::END},
+        { 0x88, IMPLIED, opc::DEY },
+        // END
+        { 0x02, IMPLIED, opc::END },
         // EOR
-        { 0x49, IMMEDIATE, opc::EOR}, {0x45, ZEROPAGE, opc::EOR}, {0x55, ZEROPAGE_X, opc::EOR}, {0x4D, ABSOULTE, opc::EOR},{ 0x5D, ABSOULTE_X, opc::EOR}, {0x59, ABSOULTE_Y, opc::EOR}, {0x41, INDEXED_I, opc::EOR}, {0x51, INDIRECT_I, opc::EOR},
+        { 0x49, IMMEDIATE, opc::EOR }, { 0x45, ZEROPAGE, opc::EOR }, { 0x55, ZEROPAGE_X, opc::EOR }, { 0x4D, ABSOLUTE, opc::EOR }, { 0x5D, ABSOLUTE_X, opc::EOR }, { 0x59, ABSOLUTE_Y, opc::EOR }, { 0x41, INDEXED_I, opc::EOR }, { 0x51, INDIRECT_I, opc::EOR },
         // INC
-        {0xE6, ZEROPAGE, opc::INC}, {0xF6, ZEROPAGE_X, opc::INC}, {0xEE, ABSOULTE, opc::INC}, {0xFE, ABSOULTE_X, opc::INC},
+        { 0xE6, ZEROPAGE, opc::INC }, { 0xF6, ZEROPAGE_X, opc::INC }, { 0xEE, ABSOLUTE, opc::INC }, { 0xFE, ABSOLUTE_X, opc::INC },
         // INX
-        {0xE8, IMPLIED, opc::INX},
+        { 0xE8, IMPLIED, opc::INX },
         // INY
-        {0xC8, IMPLIED, opc::INY},
+        { 0xC8, IMPLIED, opc::INY },
         // JMP
-        {0x4C, ABSOULTE, opc::JMP}, {0x6C, INDIRECT, opc::JMP},
+        { 0x4C, ABSOLUTE, opc::JMP }, { 0x6C, INDIRECT, opc::JMP },
         // JSR
-        {0x20, ABSOULTE, opc::JSR},
+        { 0x20, ABSOLUTE, opc::JSR },
         // LDA
-        { 0xA9, IMMEDIATE, opc::LDA},    // LDA #$nn
-        { 0xA5, ZEROPAGE, opc::LDA},     // LDA $nn
-        {0xB5, ZEROPAGE_X, opc::LDA}, {0xAD, ABSOULTE, opc::LDA},{ 0xBD, ABSOULTE_X, opc::LDA}, {0xB9, ABSOULTE_Y, opc::LDA}, {0xA1, INDEXED_I, opc::LDA}, {0xB1, INDIRECT_I, opc::LDA},
-        // LDX -
-        {0xA2, IMMEDIATE, opc::LDX},    // LDX #$nn
-        { 0xA6, ZEROPAGE, opc::LDX},     // LDX $nn
-        {0xB6, ZEROPAGE_Y, opc::LDX}, {0xAE, ABSOULTE, opc::LDX}, {0xBE, ABSOULTE_Y, opc::LDX},
+        { 0xA9, IMMEDIATE, opc::LDA }, { 0xA5, ZEROPAGE, opc::LDA }, { 0xB5, ZEROPAGE_X, opc::LDA }, { 0xAD, ABSOLUTE, opc::LDA }, { 0xBD, ABSOLUTE_X, opc::LDA }, { 0xB9, ABSOLUTE_Y, opc::LDA }, { 0xA1, INDEXED_I, opc::LDA }, { 0xB1, INDIRECT_I, opc::LDA },
+        // LDX
+        { 0xA2, IMMEDIATE, opc::LDX }, { 0xA6, ZEROPAGE, opc::LDX }, { 0xB6, ZEROPAGE_Y, opc::LDX }, { 0xAE, ABSOLUTE, opc::LDX }, { 0xBE, ABSOLUTE_Y, opc::LDX },
         // LDY
-        {0xA0, IMMEDIATE, opc::LDY},    // LDY #$nn
-        { 0xA4, ZEROPAGE, opc::LDY},     // LDY $nn
-        {0xB4, ZEROPAGE_X, opc::LDY}, {0xAC, ABSOULTE, opc::LDY}, {0xBC, ABSOULTE_X, opc::LDY},
+        { 0xA0, IMMEDIATE, opc::LDY }, { 0xA4, ZEROPAGE, opc::LDY }, { 0xB4, ZEROPAGE_X, opc::LDY }, { 0xAC, ABSOLUTE, opc::LDY }, { 0xBC, ABSOLUTE_X, opc::LDY },
         // LSR
-        {0x4A, ACCUMULATOR, opc::LSR},  // LSR A  
-        {0x46, ZEROPAGE, opc::LSR}, {0x56, ZEROPAGE_X, opc::LSR}, {0x4E, ABSOULTE, opc::LSR},{0x5E, ABSOULTE_X, opc::LSR},
+        { 0x4A, ACCUMULATOR, opc::LSR }, { 0x46, ZEROPAGE, opc::LSR }, { 0x56, ZEROPAGE_X, opc::LSR }, { 0x4E, ABSOLUTE, opc::LSR }, { 0x5E, ABSOLUTE_X, opc::LSR },
         // NOP
-        {0xEA, IMPLIED, opc::NOP},
-        // ORA - Now 0x01 is available for its correct use
-        {0x09, IMMEDIATE, opc::ORA}, {0x05, ZEROPAGE, opc::ORA}, {0x15, ZEROPAGE_X, opc::ORA}, {0x0D, ABSOULTE, opc::ORA},{0x1D, ABSOULTE_X, opc::ORA}, {0x19, ABSOULTE_Y, opc::ORA}, {0x01, INDEXED_I, opc::ORA}, {0x11, INDIRECT_I, opc::ORA},
+        { 0xEA, IMPLIED, opc::NOP },
+        // ORA
+        { 0x09, IMMEDIATE, opc::ORA }, { 0x05, ZEROPAGE, opc::ORA }, { 0x15, ZEROPAGE_X, opc::ORA }, { 0x0D, ABSOLUTE, opc::ORA }, { 0x1D, ABSOLUTE_X, opc::ORA }, { 0x19, ABSOLUTE_Y, opc::ORA }, { 0x01, INDEXED_I, opc::ORA }, { 0x11, INDIRECT_I, opc::ORA },
         // PHA
-        {0x48, IMPLIED, opc::PHA},
+        { 0x48, IMPLIED, opc::PHA },
         // PHP
-        {0x08, IMPLIED, opc::PHP},
+        { 0x08, IMPLIED, opc::PHP },
         // PLA
-        {0x68, IMPLIED, opc::PLA},
+        { 0x68, IMPLIED, opc::PLA },
         // PLP
-        {0x28, IMPLIED, opc::PLP},
+        { 0x28, IMPLIED, opc::PLP },
         // ROL
-        {0x2A, ACCUMULATOR, opc::ROL},  // ROL A
-        {0x26, ZEROPAGE, opc::ROL}, {0x36, ZEROPAGE_X, opc::ROL}, {0x2E, ABSOULTE, opc::ROL},{0x3E, ABSOULTE_X, opc::ROL},
+        { 0x2A, ACCUMULATOR, opc::ROL }, { 0x26, ZEROPAGE, opc::ROL }, { 0x36, ZEROPAGE_X, opc::ROL }, { 0x2E, ABSOLUTE, opc::ROL }, { 0x3E, ABSOLUTE_X, opc::ROL },
         // ROR
-        {0x6A, ACCUMULATOR, opc::ROR},  // ROR A
-        {0x66, ZEROPAGE, opc::ROR}, {0x76, ZEROPAGE_X, opc::ROR}, {0x6E, ABSOULTE, opc::ROR},{0x7E, ABSOULTE_X, opc::ROR},
+        { 0x6A, ACCUMULATOR, opc::ROR }, { 0x66, ZEROPAGE, opc::ROR }, { 0x76, ZEROPAGE_X, opc::ROR }, { 0x6E, ABSOLUTE, opc::ROR }, { 0x7E, ABSOLUTE_X, opc::ROR },
         // RTI
-        {0x40, IMPLIED, opc::RTI},
+        { 0x40, IMPLIED, opc::RTI },
         // RTS
-        {0x60, IMPLIED, opc::RTS},
+        { 0x60, IMPLIED, opc::RTS },
         // SBC
-        { 0xE9, IMMEDIATE, opc::SBC}, {0xE5, ZEROPAGE, opc::SBC}, {0xF5, ZEROPAGE_X, opc::SBC}, {0xED, ABSOULTE, opc::SBC},{ 0xFD, ABSOULTE_X, opc::SBC}, {0xF9, ABSOULTE_Y, opc::SBC}, {0xE1, INDEXED_I, opc::SBC}, {0xF1, INDIRECT_I, opc::SBC},
+        { 0xE9, IMMEDIATE, opc::SBC }, { 0xE5, ZEROPAGE, opc::SBC }, { 0xF5, ZEROPAGE_X, opc::SBC }, { 0xED, ABSOLUTE, opc::SBC }, { 0xFD, ABSOLUTE_X, opc::SBC }, { 0xF9, ABSOLUTE_Y, opc::SBC }, { 0xE1, INDEXED_I, opc::SBC }, { 0xF1, INDIRECT_I, opc::SBC },
         // SEC
-        {0x38, IMPLIED, opc::SEC},
+        { 0x38, IMPLIED, opc::SEC },
         // SED
-        {0xF8, IMPLIED, opc::SED},
+        { 0xF8, IMPLIED, opc::SED },
         // SEI
-        {0x78, IMPLIED, opc::SEI},
+        { 0x78, IMPLIED, opc::SEI },
         // STA
-        { 0x85, ZEROPAGE, opc::STA}, {0x95, ZEROPAGE_X, opc::STA}, {0x8D, ABSOULTE, opc::STA}, {0x9D, ABSOULTE_X, opc::STA},{ 0x99, ABSOULTE_Y, opc::STA}, {0x81, INDEXED_I, opc::STA}, {0x91, INDIRECT_I, opc::STA},
+        { 0x85, ZEROPAGE, opc::STA }, { 0x95, ZEROPAGE_X, opc::STA }, { 0x8D, ABSOLUTE, opc::STA }, { 0x9D, ABSOLUTE_X, opc::STA }, { 0x99, ABSOLUTE_Y, opc::STA }, { 0x81, INDEXED_I, opc::STA }, { 0x91, INDIRECT_I, opc::STA },
         // STX
-        { 0x86, ZEROPAGE, opc::STX}, {0x96,  ZEROPAGE_Y, opc::STX}, {0x8E, ABSOULTE, opc::STX},
+        { 0x86, ZEROPAGE, opc::STX }, { 0x96, ZEROPAGE_Y, opc::STX }, { 0x8E, ABSOLUTE, opc::STX },
         // STY
-        { 0x84, ZEROPAGE, opc::STY}, {0x94, ZEROPAGE_X, opc::STY}, {0x8C, ABSOULTE, opc::STY},
+        { 0x84, ZEROPAGE, opc::STY }, { 0x94, ZEROPAGE_X, opc::STY }, { 0x8C, ABSOLUTE, opc::STY },
         // TAX
-        { 0xAA, IMPLIED, opc::TAX},
+        { 0xAA, IMPLIED, opc::TAX },
         // TAY
-        { 0xA8, IMPLIED, opc::TAY},
+        { 0xA8, IMPLIED, opc::TAY },
         // TSX
-        { 0xBA, IMPLIED, opc::TSX},
+        { 0xBA, IMPLIED, opc::TSX },
         // TXA
-        { 0x8A, IMPLIED, opc::TXA},
+        { 0x8A, IMPLIED, opc::TXA },
         // TXS
-        { 0x9A, IMPLIED, opc::TXS},
+        { 0x9A, IMPLIED, opc::TXS },
         // TYA
-        { 0x98, IMPLIED, opc::TYA},
+        { 0x98, IMPLIED, opc::TYA },
         { 0x0, 0x0, opc::NOTINC }
     };
     

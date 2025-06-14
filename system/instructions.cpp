@@ -21,13 +21,13 @@ namespace interp {
             case icode::op_type::OP_MEMORY: {
                 uint8_t val = 0;
                 switch (c.instruct.at(in).mode) {
-                    case ABSOULTE:
+                    case ABSOLUTE:
                         val = c.peek(c.instruct.at(in).op1.op);
                         break;
                     case ZEROPAGE:
                         val = c.peek(c.instruct.at(in).op1.op & 0xFF);
                         break;
-                    case ABSOULTE_X: {
+                    case ABSOLUTE_X: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_x) & 0xFFFF;
                         val = c.peek(addr);
                     }
@@ -37,7 +37,7 @@ namespace interp {
                         val = c.peek(addr);
                     }
                     break;
-                    case ABSOULTE_Y: {
+                    case ABSOLUTE_Y: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_y) & 0xFFFF;
                         val = c.peek(addr);
                     }
@@ -118,13 +118,13 @@ namespace interp {
             case icode::op_type::OP_MEMORY: {
                 uint8_t val = 0;
                 switch (c.instruct.at(in).mode) {
-                    case ABSOULTE:
+                    case ABSOLUTE:
                         val = c.peek(c.instruct.at(in).op1.op);
                         break;
                     case ZEROPAGE:
                         val = c.peek(c.instruct.at(in).op1.op & 0xFF);
                         break;
-                    case ABSOULTE_X: {
+                    case ABSOLUTE_X: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_x) & 0xFFFF;
                         val = c.peek(addr);
                     }
@@ -134,7 +134,7 @@ namespace interp {
                         val = c.peek(addr);
                     }
                     break;
-                    case ABSOULTE_Y: {
+                    case ABSOLUTE_Y: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_y) & 0xFFFF;
                         val = c.peek(addr);
                     }
@@ -214,13 +214,13 @@ namespace interp {
         switch(c.instruct.at(in).op1.op_t) {
             case icode::op_type::OP_MEMORY: {
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE:
+                    case ABSOLUTE:
                         val = c.peek(c.instruct.at(in).op1.op);
                         break;
                     case ZEROPAGE:
                         val = c.peek(c.instruct.at(in).op1.op & 0xFF);
                         break;
-                    case ABSOULTE_X: {
+                    case ABSOLUTE_X: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_x) & 0xFFFF;
                         val = c.peek(addr);
                     }
@@ -230,7 +230,7 @@ namespace interp {
                         val = c.peek(addr);
                     }
                     break;
-                    case ABSOULTE_Y: {
+                    case ABSOLUTE_Y: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_y) & 0xFFFF;
                         val = c.peek(addr);
                     }
@@ -296,7 +296,7 @@ namespace interp {
             case icode::op_type::OP_MEMORY: {
                 uint8_t addr = c.instruct.at(in).op1.op;
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE: {
+                    case ABSOLUTE: {
                         uint8_t cc = c.peek(addr);
                         uint8_t newCarry = (cc & 0x80) ? 1 : 0;
                         cc <<= 1;
@@ -315,7 +315,7 @@ namespace interp {
                         updateZNFlags(c.proc, cc);
                     }
                     break;
-                    case ABSOULTE_X: {
+                    case ABSOLUTE_X: {
                         uint16_t addrX = (addr + c.proc.reg_x) & 0xFFFF;
                         uint8_t cc = c.peek(addrX);
                         uint8_t newCarry = (cc & 0x80) ? 1 : 0;
@@ -374,7 +374,7 @@ namespace interp {
         }   
         uint8_t operand = 0;
         switch (c.instruct.at(in).mode) {
-            case interp::ABSOULTE:
+            case interp::ABSOLUTE:
             case interp::ZEROPAGE:
                 operand = c.peek(c.instruct.at(in).op1.op);
                 break;
@@ -459,13 +459,13 @@ namespace interp {
         switch(c.instruct.at(in).op1.op_t) {
             case icode::op_type::OP_MEMORY:
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE:
+                    case ABSOLUTE:
                         operand = c.peek(c.instruct.at(in).op1.op);
                         break;
                     case ZEROPAGE:
                         operand = c.peek(c.instruct.at(in).op1.op & 0xFF);
                         break;
-                    case ABSOULTE_X: {
+                    case ABSOLUTE_X: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_x) & 0xFFFF;
                         operand = c.peek(addr);
                     }
@@ -475,7 +475,7 @@ namespace interp {
                         operand = c.peek(addr);
                     }
                     break;
-                    case ABSOULTE_Y: {
+                    case ABSOLUTE_Y: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_y) & 0xFFFF;
                         operand = c.peek(addr);
                     }
@@ -526,7 +526,7 @@ namespace interp {
         switch(c.instruct.at(in).op1.op_t) {
             case icode::op_type::OP_MEMORY:
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE:
+                    case ABSOLUTE:
                         operand = c.peek(c.instruct.at(in).op1.op);
                         break;
                     case ZEROPAGE:
@@ -553,7 +553,7 @@ namespace interp {
         switch(c.instruct.at(in).op1.op_t) {
             case icode::op_type::OP_MEMORY:
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE:
+                    case ABSOLUTE:
                         operand = c.peek(c.instruct.at(in).op1.op);
                         break;
                     case ZEROPAGE:
@@ -578,7 +578,7 @@ namespace interp {
         int in = c.proc.getIp();
         uint8_t addr = c.instruct.at(in).op1.op;
         switch(c.instruct.at(in).mode) {
-            case ABSOULTE: {
+            case ABSOLUTE: {
                 uint8_t value = c.peek(addr) - 1;
                 c.poke(addr, value);
                 updateZNFlags(c.proc, value);
@@ -591,7 +591,7 @@ namespace interp {
                 updateZNFlags(c.proc, value);
             }
             break;
-            case ABSOULTE_X: {
+            case ABSOLUTE_X: {
                 uint16_t addrX = (addr + c.proc.reg_x) & 0xFFFF;  
                 uint8_t value = c.peek(addrX) - 1;
                 c.poke(addrX, value);
@@ -633,7 +633,7 @@ namespace interp {
                 return;
             case icode::op_type::OP_MEMORY:
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE:
+                    case ABSOLUTE:
                         c.proc.ip = c.instruct.at(in).op1.op - 1;
                         break;
                     case INDIRECT: { 
@@ -673,13 +673,13 @@ namespace interp {
         switch(c.instruct.at(in).op1.op_t) {
             case icode::op_type::OP_MEMORY:
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE:
+                    case ABSOLUTE:
                         c.proc.reg_a = c.peek(c.instruct.at(in).op1.op);
                         break;
                     case ZEROPAGE:
                         c.proc.reg_a = c.peek(c.instruct.at(in).op1.op & 0xFF);
                         break;
-                    case ABSOULTE_X: {
+                    case ABSOLUTE_X: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_x) & 0xFFFF;
                         c.proc.reg_a = c.peek(addr);
                     }
@@ -689,7 +689,7 @@ namespace interp {
                         c.proc.reg_a = c.peek(addr);
                     }
                     break;
-                    case ABSOULTE_Y: {
+                    case ABSOLUTE_Y: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_y) & 0xFFFF;
                         c.proc.reg_a = c.peek(addr);
                     }
@@ -741,13 +741,13 @@ namespace interp {
         switch(c.instruct.at(in).op1.op_t) {
             case icode::op_type::OP_MEMORY:
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE:
+                    case ABSOLUTE:
                         c.proc.reg_x = c.peek(c.instruct.at(in).op1.op);
                         break;
                     case ZEROPAGE:
                         c.proc.reg_x = c.peek(c.instruct.at(in).op1.op & 0xFF);
                         break;
-                    case ABSOULTE_Y: {
+                    case ABSOLUTE_Y: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_y) & 0xFFFF;
                         c.proc.reg_x = c.peek(addr);
                     }
@@ -776,13 +776,13 @@ namespace interp {
         switch(c.instruct.at(in).op1.op_t) {
             case icode::op_type::OP_MEMORY:
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE:
+                    case ABSOLUTE:
                         c.proc.reg_y = c.peek(c.instruct.at(in).op1.op);
                         break;
                     case ZEROPAGE:
                         c.proc.reg_y = c.peek(c.instruct.at(in).op1.op & 0xFF);
                         break;
-                    case ABSOULTE_X: {
+                    case ABSOLUTE_X: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_x) & 0xFFFF;
                         c.proc.reg_y = c.peek(addr);
                     }
@@ -825,7 +825,7 @@ namespace interp {
             case icode::op_type::OP_MEMORY: {
                 uint8_t addr = c.instruct[ip].op1.op;
                 switch(c.instruct[ip].mode) {
-                    case ABSOULTE: {
+                    case ABSOLUTE: {
                         uint8_t cc = c.peek(addr);
                         uint8_t newCarry = (cc & 0x01) ? 1 : 0;
                         cc >>= 1;
@@ -844,7 +844,7 @@ namespace interp {
                         updateZNFlags(c.proc, cc);
                     }
                     break;
-                    case ABSOULTE_X: {
+                    case ABSOLUTE_X: {
                         uint16_t addrX = (addr + c.proc.reg_x) & 0xFFFF;
                         uint8_t cc = c.peek(addrX);
                         uint8_t newCarry = (cc & 0x01) ? 1 : 0;
@@ -884,13 +884,13 @@ namespace interp {
         switch(c.instruct.at(in).op1.op_t) {
             case icode::op_type::OP_MEMORY: {
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE:
+                    case ABSOLUTE:
                         val = c.peek(c.instruct.at(in).op1.op);
                         break;
                     case ZEROPAGE:
                         val = c.peek(c.instruct.at(in).op1.op & 0xFF);
                         break;
-                    case ABSOULTE_X: {
+                    case ABSOLUTE_X: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_x) & 0xFFFF;
                         val = c.peek(addr);
                     }
@@ -900,7 +900,7 @@ namespace interp {
                         val = c.peek(addr);
                     }
                     break;
-                    case ABSOULTE_Y: {
+                    case ABSOLUTE_Y: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_y) & 0xFFFF;
                         val = c.peek(addr);
                     }
@@ -952,13 +952,13 @@ namespace interp {
         switch(c.instruct.at(in).op1.op_t) {
             case icode::op_type::OP_MEMORY: {
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE:
+                    case ABSOLUTE:
                         val = c.peek(c.instruct.at(in).op1.op);
                         break;
                     case ZEROPAGE:
                         val = c.peek(c.instruct.at(in).op1.op & 0xFF);
                         break;
-                    case ABSOULTE_X: {
+                    case ABSOLUTE_X: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_x) & 0xFFFF;
                         val = c.peek(addr);
                     }
@@ -968,7 +968,7 @@ namespace interp {
                         val = c.peek(addr);
                     }
                     break;
-                    case ABSOULTE_Y: {
+                    case ABSOLUTE_Y: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_y) & 0xFFFF;
                         val = c.peek(addr);
                     }
@@ -1018,7 +1018,7 @@ namespace interp {
         int in = c.proc.getIp();
         uint8_t addr = c.instruct.at(in).op1.op;
         switch(c.instruct.at(in).mode) {
-            case ABSOULTE: {
+            case ABSOLUTE: {
                 uint8_t value = c.peek(addr) + 1;
                 c.poke(addr, value);
                 updateZNFlags(c.proc, value);
@@ -1031,7 +1031,7 @@ namespace interp {
                 updateZNFlags(c.proc, value);
             }
             break;
-            case ABSOULTE_X: {
+            case ABSOLUTE_X: {
                 uint16_t addrX = (addr + c.proc.reg_x) & 0xFFFF;  // Add & 0xFFFF
                 uint8_t value = c.peek(addrX) + 1;
                 c.poke(addrX, value);
@@ -1132,7 +1132,7 @@ namespace interp {
             case icode::op_type::OP_MEMORY: {
                 uint8_t addr = c.instruct.at(in).op1.op;
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE: {
+                    case ABSOLUTE: {
                         uint8_t cc = c.peek(addr);
                         uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY) ? 1 : 0;
                         uint8_t newCarry = (cc & 0x80) ? 1 : 0;
@@ -1153,7 +1153,7 @@ namespace interp {
                         updateZNFlags(c.proc, cc);
                     }
                     break;
-                    case ABSOULTE_X: {
+                    case ABSOLUTE_X: {
                         uint16_t addrX = (addr + c.proc.reg_x) & 0xFFFF;  
                         uint8_t cc = c.peek(addrX);
                         uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY) ? 1 : 0;
@@ -1200,7 +1200,7 @@ namespace interp {
             case icode::op_type::OP_MEMORY: {
                 uint8_t addr = c.instruct.at(in).op1.op;
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE: {
+                    case ABSOLUTE: {
                         uint8_t cc = c.peek(addr);
                         uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY) ? 1 : 0;
                         uint8_t newCarry = (cc & 0x01) ? 1 : 0;
@@ -1221,7 +1221,7 @@ namespace interp {
                         updateZNFlags(c.proc, cc);
                     }
                     break;
-                    case ABSOULTE_X: {
+                    case ABSOLUTE_X: {
                         uint16_t addrX = (addr + c.proc.reg_x) & 0xFFFF;
                         uint8_t cc = c.peek(addrX);
                         uint8_t oldCarry = c.proc.getFlag(icode::FLAG_CARRY) ? 1 : 0;
@@ -1258,7 +1258,7 @@ namespace interp {
         switch(c.instruct.at(in).op1.op_t) {
             case icode::op_type::OP_MEMORY:
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE:
+                    case ABSOLUTE:
                         c.poke(c.instruct.at(in).op1.op, c.proc.reg_a);
                         ///trackMemoryWrite(c.instruct.at(in).op1.op, c.proc.reg_a);
                         break;
@@ -1266,7 +1266,7 @@ namespace interp {
                         c.poke(c.instruct.at(in).op1.op & 0xFF, c.proc.reg_a);
                         //trackMemoryWrite(c.instruct.at(in).op1.op & 0xFF, c.proc.reg_a);
                         break;
-                    case ABSOULTE_X: {
+                    case ABSOLUTE_X: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_x) & 0xFFFF;
                         c.poke(addr, c.proc.reg_a);
                         //trackMemoryWrite(addr, c.proc.reg_a);
@@ -1278,7 +1278,7 @@ namespace interp {
                         c.poke(addr, c.proc.reg_a);
                     }
                     break;
-                    case ABSOULTE_Y: {
+                    case ABSOLUTE_Y: {
                         uint16_t addr = (c.instruct.at(in).op1.op + c.proc.reg_y) & 0xFFFF;
                         //trackMemoryWrite(addr, c.proc.reg_a);
                         c.poke(addr, c.proc.reg_a);
@@ -1323,7 +1323,7 @@ namespace interp {
         switch(c.instruct.at(in).op1.op_t) {
             case icode::op_type::OP_MEMORY:
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE:
+                    case ABSOLUTE:
                         c.poke(c.instruct.at(in).op1.op, c.proc.reg_x);
                         break;
                     case ZEROPAGE:
@@ -1348,7 +1348,7 @@ namespace interp {
         switch(c.instruct.at(in).op1.op_t) {
             case icode::op_type::OP_MEMORY:
                 switch(c.instruct.at(in).mode) {
-                    case ABSOULTE:
+                    case ABSOLUTE:
                         c.poke(c.instruct.at(in).op1.op, c.proc.reg_y);
                         break;
                     case ZEROPAGE:

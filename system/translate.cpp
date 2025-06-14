@@ -287,6 +287,44 @@ namespace translate {
                 return true;
             }
 
+            if (tokens.size() == 4 &&
+                (tokens[1].getTokenType() == lex::TOKEN_HEX || tokens[1].getTokenType() == lex::TOKEN_DIGIT) &&
+                tokens[2].getToken() == "," &&
+                (tokens[3].getToken() == "X" || tokens[3].getToken() == "x")) {
+                uint32_t v = (tokens[1].getTokenType() == lex::TOKEN_HEX)
+                    ? icode::toHex(tokens[1].getToken())
+                    : std::stoul(tokens[1].getToken(), nullptr, 10);
+
+                if (v <= 0xFF) {
+                    inst.mode = interp::ZEROPAGE_X;
+                } else {
+                    inst.mode = interp::ABSOLUTE_X;
+                }
+
+                inst.op1 = icode::Operand(v, icode::op_type::OP_MEMORY);
+                code.instruct.push_back(inst);
+                return true;
+            }
+
+            if (tokens.size() == 4 &&
+                (tokens[1].getTokenType() == lex::TOKEN_HEX || tokens[1].getTokenType() == lex::TOKEN_DIGIT) &&
+                tokens[2].getToken() == "," &&
+                (tokens[3].getToken() == "Y" || tokens[3].getToken() == "y")) {
+                uint32_t v = (tokens[1].getTokenType() == lex::TOKEN_HEX)
+                    ? icode::toHex(tokens[1].getToken())
+                    : std::stoul(tokens[1].getToken(), nullptr, 10);
+
+                if (v <= 0xFF) {
+                    inst.mode = interp::ZEROPAGE_Y;
+                } else {
+                    inst.mode = interp::ABSOLUTE_Y;
+                }
+
+                inst.op1 = icode::Operand(v, icode::op_type::OP_MEMORY);
+                code.instruct.push_back(inst);
+                return true;
+            }
+
             if (tokens.size() == 6) {
                 if (tokens[1].getToken() == "(" &&
                     (tokens[2].getTokenType() == lex::TOKEN_HEX || tokens[2].getTokenType() == lex::TOKEN_DIGIT) &&
@@ -361,8 +399,8 @@ namespace translate {
                     case lex::TOKEN_DIGIT: {
                         
                         if(confirm_mode(inst.opcode, interp::RELATIVE, inst.op_byte) == false) {
-                            if(confirm_mode(inst.opcode, interp::ABSOULTE, inst.op_byte) == true) {
-                                inst.mode = interp::ABSOULTE;
+                            if(confirm_mode(inst.opcode, interp::ABSOLUTE, inst.op_byte) == true) {
+                                inst.mode = interp::ABSOLUTE;
                             } else {
                                 std::ostringstream stream;
                                 stream << "Error on Line: " << line_value << " instruction " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " not supported in relative addressing mode.\n";
@@ -376,9 +414,9 @@ namespace translate {
                         break;
                     case lex::TOKEN_HEX: {
                         
-                        if(confirm_mode(inst.opcode, interp::ABSOULTE, inst.op_byte) == false) {
+                        if(confirm_mode(inst.opcode, interp::ABSOLUTE, inst.op_byte) == false) {
                             std::ostringstream stream;
-                            stream << "Error on Line: " << line_value << " " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " not supported in absoulte addressing mode.\n";
+                            stream << "Error on Line: " << line_value << " " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " not supported in ABSOLUTE addressing mode.\n";
                             throw cExcep(stream.str());
                         }
                         unsigned int hex_address = icode::toHex(tokens[1].getToken());
@@ -388,7 +426,7 @@ namespace translate {
                             
                         } else {
                             inst.op1 = icode::Operand(hex_address, icode::op_type::OP_MEMORY);
-                            inst.mode = interp::ABSOULTE;
+                            inst.mode = interp::ABSOLUTE;
                         }
                     }
                         break;
@@ -400,7 +438,7 @@ namespace translate {
                             break;
                         }
                         else
-                        if(confirm_mode(inst.opcode, interp::ABSOULTE, inst.op_byte) == false) {
+                        if(confirm_mode(inst.opcode, interp::ABSOLUTE, inst.op_byte) == false) {
                             
                             if(confirm_mode(inst.opcode, interp::RELATIVE, inst.op_byte) == true) {
                                 inst.mode = interp::RELATIVE;
@@ -410,7 +448,7 @@ namespace translate {
                                 throw cExcep(stream.str());
                             }
                         } else {
-                            inst.mode = interp::ABSOULTE;
+                            inst.mode = interp::ABSOLUTE;
                         }
                         
                         inst.op1.op_t = icode::op_type::OP_LABELTEXT;
@@ -493,28 +531,28 @@ namespace translate {
                         
                         if(tokens[2].getToken() == "," && reg == "x") {
                             
-                            if(confirm_mode(inst.opcode, interp::ABSOULTE_X, inst.op_byte)==false) {
+                            if(confirm_mode(inst.opcode, interp::ABSOLUTE_X, inst.op_byte)==false) {
                                 if(confirm_mode(inst.opcode, interp::ZEROPAGE_X, inst.op_byte)) {
                                     inst.mode = interp::ZEROPAGE_X;
                                 } else {
                                     std::ostringstream stream;
-                                    stream << "Error on Line: " << line_value << " instruction " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " has X register but not supported in absoulte X address mode.\n";
+                                    stream << "Error on Line: " << line_value << " instruction " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " has X register but not supported in ABSOLUTE X address mode.\n";
                                     throw cExcep(stream.str());
                                 }
                             }
                             
                             if(hex_value > 0xFF)
-                                inst.mode = interp::ABSOULTE_X;
+                                inst.mode = interp::ABSOLUTE_X;
                             else
                                 inst.mode = interp::ZEROPAGE_X;
                         }
                         if(tokens[2].getToken() == "," && reg == "y") {
-                            if(confirm_mode(inst.opcode, interp::ABSOULTE_Y,inst.op_byte)==false) {
+                            if(confirm_mode(inst.opcode, interp::ABSOLUTE_Y,inst.op_byte)==false) {
                                 if(confirm_mode(inst.opcode, interp::ZEROPAGE_Y, inst.op_byte)) {
                                     inst.mode = interp::ZEROPAGE_Y;
                                 } else {
                                     std::ostringstream stream;
-                                    stream << "Error on Line: " << line_value << " instruction " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " has Y register but not supported in absoulte y address mode.\n";
+                                    stream << "Error on Line: " << line_value << " instruction " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " has Y register but not supported in ABSOLUTE y address mode.\n";
                                     throw cExcep(stream.str());
                                 }
                             }
@@ -522,7 +560,7 @@ namespace translate {
                             if(hex_value <= 255)
                                 inst.mode = interp::ZEROPAGE_Y;
                             else
-                                inst.mode = interp::ABSOULTE_Y;
+                                inst.mode = interp::ABSOLUTE_Y;
                         }
                         inst.op1 = icode::Operand(hex_value, icode::op_type::OP_MEMORY);
                     }

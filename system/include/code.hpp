@@ -30,7 +30,7 @@ namespace interp {
     // address modes
     enum { 
         IMMEDIATE=1, ZEROPAGE, ZEROPAGE_X, ZEROPAGE_Y, 
-        ABSOULTE, ABSOULTE_X, ABSOULTE_Y, IMPLIED, RELATIVE, 
+        ABSOLUTE, ABSOLUTE_X, ABSOLUTE_Y, IMPLIED, RELATIVE, 
         INDIRECT_I,     // (address),Y 
         INDEXED_I,      // (address,X)
         ACCUMULATOR, 
