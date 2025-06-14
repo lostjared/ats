@@ -204,10 +204,29 @@ namespace interp {
 
     bool validateAddressingMode(std::vector<lex::Token> &tokens, icode::opc instruction, unsigned int offset) {
         int instrIndex = 1 + offset; 
-    
+
         std::cout << "=== validateAddressingMode DEBUG ===\n";
         std::cout << "Instruction: " << icode::op_array[static_cast<unsigned int>(instruction)] << "\n";
         std::cout << "Token count: " << tokens.size() << ", instrIndex: " << instrIndex << "\n";
+        
+        if (instruction == icode::opc::JSR) {
+            std::cout << "Handling JSR instruction...\n";
+            if (tokens.size() <= instrIndex + 1) {
+                comp_err << "Syntax Error: JSR instruction requires a target address or label.\n";
+                return false;
+            }
+            
+            const lex::Token& targetToken = tokens[instrIndex + 1];
+            if (targetToken.getTokenType() == lex::TOKEN_CHAR) {
+                return validateInstructionAddressingMode(instruction, "ABSOLUTE");
+            } else if (targetToken.getTokenType() == lex::TOKEN_HEX || 
+                       targetToken.getTokenType() == lex::TOKEN_DIGIT) {
+                return validateInstructionAddressingMode(instruction, "ABSOLUTE");
+            } else {
+                comp_err << "Syntax Error: JSR requires a valid address or label.\n";
+                return false;
+            }
+        }
         
         // Handle implied instructions
         if (tokens.size() <= instrIndex + 1) {

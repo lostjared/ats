@@ -246,6 +246,25 @@ namespace translate {
         if(inst.label == true) {
             tokens.erase(tokens.begin());
         }
+        /*
+        if(tokens.size() == 2 && tokens[0].getToken() == "JSR") {
+            if (tokens[1].getTokenType() != lex::TOKEN_HEX && tokens[1].getTokenType() != lex::TOKEN_DIGIT) {
+                uint16_t addr = tokens[1].getTokenType() == lex::TOKEN_HEX
+                    ? icode::toHex(tokens[1].getToken())
+                    : std::stoul(tokens[1].getToken(), nullptr, 10);
+
+                    inst.opcode = icode::opc::JSR;
+                    inst.op_byte = 0x20;
+                    if(addr <= 0xFF) {
+                        inst.mode = interp::ZEROPAGE;
+                    } else {
+                        inst.mode = interp::ABSOLUTE;
+                    }
+                    inst.op1 = icode::Operand(addr, icode::op_type::OP_MEMORY);
+                    code.instruct.push_back(inst);
+                    return true;
+            }   
+        }*/
         
         if (tokens.size() >= 4 && 
                 tokens[0].getToken() == "JMP" &&
@@ -410,6 +429,8 @@ namespace translate {
                         inst.mode = interp::RELATIVE;
                         unsigned int label_value = atoi(tokens[1].getToken().c_str());
                         inst.op1 = icode::Operand(label_value, icode::op_type::OP_LABEL);
+                        code.instruct.push_back(inst);
+                        return true;
                     }
                         break;
                     case lex::TOKEN_HEX: {
@@ -428,6 +449,8 @@ namespace translate {
                             inst.op1 = icode::Operand(hex_address, icode::op_type::OP_MEMORY);
                             inst.mode = interp::ABSOLUTE;
                         }
+                        code.instruct.push_back(inst);
+                        return true;
                     }
                         break;
                     case lex::TOKEN_CHAR:
@@ -453,6 +476,8 @@ namespace translate {
                         
                         inst.op1.op_t = icode::op_type::OP_LABELTEXT;
                         inst.op1.label_text = tokens[1].getToken();
+                        code.instruct.push_back(inst);
+                        return true;
                     case lex::TOKEN_OPERATOR: {
                         std::string op = tokens[1].getToken();
                         
@@ -498,6 +523,8 @@ namespace translate {
                     
                     inst.op1 = icode::Operand(numeric_value, icode::op_type::OP_DECIMAL);
                     inst.mode = interp::IMMEDIATE;
+                    code.instruct.push_back(inst);
+                    return true;
                     
                 }
                 else if ((tokens[1].getToken() == "A" || tokens[1].getToken() == "a") &&
@@ -505,12 +532,16 @@ namespace translate {
                         inst.opcode == icode::opc::ROL || inst.opcode == icode::opc::ROR)) {
                     inst.mode = interp::ACCUMULATOR;
                     inst.op1 = icode::Operand(0, icode::op_type::OP_REGISTER_A);
+                    code.instruct.push_back(inst);
+                    return true;
                 }
                 else if (interp::isBranchInstruction(inst.opcode)) {
                     if(tokens[1].getTokenType() == lex::TOKEN_DIGIT) {
                         unsigned int label_value = atoi(tokens[1].getToken().c_str());
                         inst.op1 = icode::Operand(label_value, icode::op_type::OP_LABEL);
                         inst.mode = interp::RELATIVE;
+                        code.instruct.push_back(inst);
+                        return true;
                     }
                 }
                 else {
@@ -563,6 +594,7 @@ namespace translate {
                                 inst.mode = interp::ABSOLUTE_Y;
                         }
                         inst.op1 = icode::Operand(hex_value, icode::op_type::OP_MEMORY);
+
                     }
                         break;
                     default: {

@@ -433,7 +433,6 @@
                 <div class="example-btn" onclick="loadExample('basic')">Basic Example</div>
                 <div class="example-btn" onclick="loadExample('loop')">Loop Example</div>
                 <div class="example-btn" onclick="loadExample('subroutine')">Subroutine</div>
-                <div class="example-btn" onclick="loadExample('memory')">Memory Ops</div>
                 <div class="example-btn" onclick="loadExample('stack')">Stack Ops</div>
                 <div class="example-btn" onclick="loadExample('test_')">Test</div>
                 <div class="example-btn" onclick="loadExample('test_complete')">Test All</div>
@@ -493,40 +492,27 @@ CPX #10
 BNE LOOP
 END`,
         
-        subroutine: `; =======================================
-; DETAILED SUBROUTINE TEST
-; =======================================
-; This program tests various subroutine capabilities:
-; - Basic JSR/RTS operations
-; - Nested subroutine calls
-; - Loops within subroutines
-; - Parameter passing through memory
-; - Multiple levels of stack usage
-;
-; Expected Results:
-; $40 = 10  (5 + 5)
-; $41 = 15  (5 + 5 + 5) 
-; $42 = 42  (40 + 1 + 1)
-; Debug locations $45-$61 contain intermediate values
+        subroutine: `; DETAILED SUBROUTINE TEST
+; With proper label syntax
 
 ; Test 1: Simple addition
 10 LDA #5           ; Load initial value
 15 STA $45          ; DEBUG: Store initial value
-20 JSR 100          ; Call add-5 subroutine
+20 JSR ADD5         ; Call add-5 subroutine
 25 STA $46          ; DEBUG: Store result after subroutine
 30 STA $40          ; Store final result (should be 10)
 
 ; Test 2: Nested call
 40 LDA #5           ; Load initial value
 45 STA $47          ; DEBUG: Store initial value 
-50 JSR 200          ; Call subroutine that calls another subroutine
+50 JSR NESTED       ; Call subroutine that calls another subroutine
 55 STA $48          ; DEBUG: Store result after subroutine
 60 STA $41          ; Store final result (should be 15)
 
 ; Test 3: Loop in subroutine
 70 LDA #40          ; Load initial value
 75 STA $49          ; DEBUG: Store initial value
-80 JSR 300          ; Call subroutine with loop
+80 JSR LOOP         ; Call subroutine with loop
 85 STA $4A          ; DEBUG: Store result after subroutine
 90 STA $42          ; Store final result (should be 42)
 95 END              ; End program
@@ -536,15 +522,15 @@ END`,
 ; =======================================
 
 ; Add 5 to accumulator
-100 STA $5A         ; DEBUG: Store value on entry
+100 ADD5 STA $5A    ; DEBUG: Store value on entry
 110 CLC             ; Clear carry
 120 ADC #5          ; Add 5
 130 STA $5B         ; DEBUG: Store value before return
 140 RTS             ; Return
 
-; Nested call subroutine
-200 STA $5C         ; Store original value
-210 JSR 100         ; Call subroutine 1
+; Nested call subroutine  
+200 NESTED STA $5C  ; Store original value
+210 JSR ADD5        ; Call ADD5 subroutine
 215 STA $5D         ; DEBUG: Store after first subroutine call
 220 CLC             ; Clear carry
 230 ADC $5C         ; Add original value 
@@ -552,33 +538,15 @@ END`,
 250 RTS             ; Return
 
 ; Loop subroutine
-300 STA $5F         ; Store original value
+300 LOOP STA $5F    ; Store original value
 310 LDX #2          ; Set counter to 2
-320 CLC             ; Clear carry
+320 LOOP_START CLC  ; Clear carry
 330 ADC #1          ; Add 1
 335 STA $60         ; DEBUG: Store current value in loop
 340 DEX             ; Decrement counter
-350 BNE 320         ; If not zero, loop again
+350 BNE LOOP_START  ; If not zero, loop again
 360 STA $61         ; DEBUG: Store final value before return
-370 RTS             ; Return
-
-; =======================================
-; DEBUG MEMORY MAP
-; =======================================
-; Main Results:
-; $40 = Final result of test 1 (10)
-; $41 = Final result of test 2 (15)
-; $42 = Final result of test 3 (42)`,
-        
-        memory: `LDA #$FF
-STA $00
-LDA #$AA
-STA $01
-LDX $00
-LDY $01
-STX $10
-STY $11
-END`,
+370 RTS             ; Return`,
         
         stack: `10 LDA #5           ; Load first number (5)
 20 STA $50          ; Store at memory location $50
@@ -1355,11 +1323,12 @@ END`,
     // Execution state variables
     let executionStarted = false;
     let executionComplete = false;
-    
+    let execInterval =  null;
     // Memory viewer variables - MOVE THESE INSIDE
     let memoryData = new Uint8Array(65536); // 64K memory
     let modifiedAddresses = new Set();
     let highlightedAddress = null;
+    
     
     
 
@@ -1607,7 +1576,8 @@ END`,
             
             loader.style.display = 'none';
             showStatus('Code compiled successfully! You can now step through the code.', 'success');
-            
+            execBtn.disabled = false;
+            stopBtn.disabled = true;
             let instructionCount = atsDebugger.getInstructionCount();
             debugMsg(`getInstructionCount result: ${instructionCount}`);
             
@@ -1699,6 +1669,8 @@ END`,
         codeEditor.value = '';
         isBuilt = false;
         generateBtn.disabled = true;
+        execBtn.disabled = false;
+        stopBtn.disabled = true;
         outputContent.innerHTML = `
             <div style="text-align: center; padding: 40px; color: #666;">
                 <h3>🚀 Ready to compile!</h3>
@@ -1715,73 +1687,156 @@ END`,
         updateProcessorDisplay();
     }
     
+    
+
+    function startExecution() {
+        if (!atsDebugger || !isBuilt) {
+            showStatus('Please build the code first', 'error');
+            return;
+        }
+
+        if (execInterval) {
+            debugMsg('Execution already running');
+            return;
+        }
+
+        executionStarted = true;
+        executionComplete = false;
+        
+        // Update button states
+        document.getElementById('execBtn').disabled = true;
+        document.getElementById('stopBtn').disabled = false;
+        document.getElementById('stepBtn').disabled = true;
+        
+        showStatus('Auto-execution started...', 'info');
+        debugMsg('Starting auto-execution...');
+
+        execInterval = setInterval(() => {
+            const continueExecution = stepInstruction();
+            
+            if (!continueExecution || executionComplete) {
+                stopExecution();
+            }
+        }, 500); // 500ms between steps, adjust as needed
+    }
+
+    function stopExecution() {
+        if (execInterval) {
+            clearInterval(execInterval);
+            execInterval = null;
+            debugMsg('Auto-execution stopped');
+        }
+
+        // Update button states
+        document.getElementById('execBtn').disabled = !isBuilt || executionComplete;
+        document.getElementById('stopBtn').disabled = true;
+        document.getElementById('stepBtn').disabled = !isBuilt || executionComplete;
+        
+        if (executionComplete) {
+            showStatus('Program execution completed', 'success');
+        } else {
+            showStatus('Execution stopped', 'info');
+        }
+    }
+
     // Execution control functions
   <!-- Update the stepInstruction function in your JavaScript -->
 
+    let isComplete = false;
+
     async function stepInstruction() {
-        if (!isBuilt || !atsDebugger) {
-            showStatus('Please build your code first.', 'error');
-            return;
+        if (!atsDebugger || !isBuilt) {
+            debugMsg('Cannot step: debugger not ready or code not built', 'error');
+            return false;
         }
-        
+
         try {
-            debugMsg('Stepping instruction...');
-            
-            // Always update processor display BEFORE stepping to show the "about to execute" state
-            if (!executionStarted) {
-                updateProcessorDisplay(); // Show initial state
-            }
-            
             const stepped = atsDebugger.stepInstruction();
             
-            if (!stepped) {
-                const error = atsDebugger.getLastError();
-                if (error.includes('End of program')) {
+            if(stepped == false) {
+                debugMsg('No more instructions to step through', 'info');
+                executionComplete = true;
+                
+            
+                if (execInterval) {
+                    stopExecution();
+                    showStatus('No more instructions to execute', 'info');
+                }
+                
+                return false; 
+            }
+
+            if (stepped) {
+                const currentInfo = atsDebugger.getCurrentInstructionInfo();
+                
+        
+                debugMsg(`Step executed: ${currentInfo}`);
+                
+                updateProcessorDisplay();
+                
+
+                
+                // Check if program has ended
+                const processorState = atsDebugger.getProcessorState();
+                if (isComplete || processorState.includes('END instruction') || 
+                    processorState.includes('Program finished') ||
+                    processorState.includes('execution complete')) {
+                    
+                    debugMsg('Program execution completed', 'success');
                     executionComplete = true;
-                    updateExecutionButtons();
-                    showStatus('Program execution completed!', 'success');
-                    debugMsg('Program execution completed');
-                } else {
-                    throw new Error(error);
+                    
+                    // Stop auto-execution if running
+                    if (execInterval) {
+                        stopExecution();
+                        showStatus('Program execution completed', 'success');
+                    }
+                    
+                    return false; // Indicate execution should stop
                 }
+                
+                return true; // Continue execution
             } else {
-                // Automatically start execution state when first step is successful
-                if (!executionStarted) {
-                    executionStarted = true;
-                    updateExecutionButtons();
+                const error = atsDebugger.getLastError();
+                debugMsg(`Step failed: ${error}`, 'error');
+                executionComplete = true;
+                
+                // Stop auto-execution on error
+                if (execInterval) {
+                    stopExecution();
+                    showStatus(`Execution stopped: ${error}`, 'error');
                 }
-                showStatus('Instruction executed', 'info');
-                debugMsg('Instruction stepped successfully');
+                
+                return false;
+            }
+        } catch (error) {
+            debugMsg(`Step error: ${error.message}`, 'error');
+            executionComplete = true;
+            
+            // Stop auto-execution on exception
+            if (execInterval) {
+                stopExecution();
+                showStatus(`Execution error: ${error.message}`, 'error');
             }
             
-            // Always update processor display AFTER stepping to show the new state
-            updateProcessorDisplay();
-            
-        } catch (error) {
-            debugMsg(`Step instruction error: ${error.message}`, 'error');
-            showStatus('Failed to step instruction: ' + error.message, 'error');
+            return false;
         }
     }
     async function resetExecution() {
-        if (!atsDebugger) {
-            return;
-        }
+        stopExecution();
         
-        try {
-            debugMsg('Reset button pressed - rebuilding code...');
-            
-            // Reset execution state variables
+        if (atsDebugger) {
+            atsDebugger.resetExecution();
             executionStarted = false;
             executionComplete = false;
             
-            // Call buildCode again to rebuild and reset everything
-            await buildCode();
+            updateProcessorDisplay();
+                    
+            // Re-enable buttons
+            document.getElementById('executeBtn').disabled = !isBuilt;
+            document.getElementById('stepBtn').disabled = !isBuilt;
             
-            debugMsg('Reset completed - code rebuilt successfully');
-            
-        } catch (error) {
-            debugMsg(`Reset execution error: ${error.message}`, 'error');
-            showStatus('Failed to reset execution: ' + error.message, 'error');
+            showStatus('Execution reset', 'info');
+            debugMsg('Execution reset to beginning');
         }
     }
 
@@ -1821,8 +1876,18 @@ END`,
             const instrJson = atsDebugger.getCurrentInstructionInfo();
             const instrInfo = JSON.parse(instrJson);
             
+            if(instrInfo.opcode == "end") {
+                clearInterval(execInterval);
+                executionComplete = true;
+                debugMsg('Execution reached END instruction', 'info');     
+            }
+
             // Determine if execution is complete
-            const isComplete = !instrInfo.valid || (executionStarted && state.currentInstruction >= state.totalInstructions);
+            isComplete = !instrInfo.valid || (executionStarted && state.currentInstruction >= state.totalInstructions) || instrInfo.text == "END" || instrInfo.text == "END ";
+            if(isComplete) {
+                clearInterval(execInterval);
+                executionComplete = true;
+            }
             
             processorContent.innerHTML = `
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px;">
@@ -2047,7 +2112,7 @@ END`,
     generateBtn.addEventListener('click', generateReport);
     clearBtn.addEventListener('click', clearCode);
 
-
+    
     // CREATE THE MISSING EXECUTION CONTROL BUTTONS
     const buttonGroup = document.querySelector('.button-group');
     if (buttonGroup) {
@@ -2087,9 +2152,27 @@ END`,
         // Add buttons to the button group
         buttonGroup.appendChild(stepBtn);
         buttonGroup.appendChild(resetBtn);
+        const execBtn = document.createElement('button');
+        
+        execBtn.id = 'execBtn';
+        execBtn.textContent = '▶️ Run';
+        execBtn.className = 'btn btn-primary';
+        buttonGroup.appendChild(execBtn);
+
+        // ⏹️ Stop button
+        const stopBtn = document.createElement('button');
+        stopBtn.id = 'stopBtn';
+        stopBtn.textContent = '⏹️ Stop';
+        stopBtn.className = 'btn btn-secondary';
+        stopBtn.disabled = true;
+        buttonGroup.appendChild(stopBtn);
         buttonGroup.appendChild(memoryBtn);
         buttonGroup.appendChild(debugBtn);
-        
+
+        // Execute button
+        document.getElementById('execBtn').addEventListener('click', startExecution);
+        // Stop button  
+        document.getElementById('stopBtn').addEventListener('click', stopExecution);     
         // Add event listeners for new buttons
         stepBtn.addEventListener('click', stepInstruction);
         resetBtn.addEventListener('click', resetExecution);
@@ -2241,7 +2324,7 @@ END`,
 
 </script>
 
-<script src="ats.js?v=1.4" 
+<script src="ats.js?v=1.7" 
         onload="console.log('✅ ats.js loaded successfully')" 
         onerror="console.error('❌ Failed to load ats.js - file may not exist or have syntax errors')">
 </script>
