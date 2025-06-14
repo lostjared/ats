@@ -346,6 +346,7 @@ namespace interp {
     }
 
     bool validateInstructionIndirectMode(icode::opc instruction, const std::string& mode) {
+        std::cout << "validate mode: " << mode << "\n";
         if (mode == "RELATIVE") {
                return isBranchInstruction(instruction);
         }
@@ -381,48 +382,61 @@ namespace interp {
             comp_err << "Syntax Error: Incomplete indirect addressing mode.\n";
             return false;
         }
-    
-        if (tokens[startIndex + 1].getTokenType() != lex::TOKEN_HEX && 
+
+        if (tokens[startIndex + 1].getTokenType() != lex::TOKEN_HEX &&
             tokens[startIndex + 1].getTokenType() != lex::TOKEN_DIGIT) {
             comp_err << "Syntax Error: Expected address inside parentheses.\n";
             return false;
         }
-    
-        std::string addressingMode;
-    
-        if (tokens.size() > startIndex + 2) {
-            if (tokens[startIndex + 2].getToken() == ")") {
-                if (tokens.size() > startIndex + 3 && tokens[startIndex + 3].getToken() == ",") {
-                    if (tokens.size() > startIndex + 4 && 
-                        (tokens[startIndex + 4].getToken() == "Y" || tokens[startIndex + 4].getToken() == "y")) {
-                        addressingMode = "INDIRECT_INDEXED"; 
-                    } else {
-                        comp_err << "Syntax Error: Only Y register supported for ),Y addressing.\n";
-                        return false;
-                    }
-                } else {
-                    addressingMode = "INDIRECT"; 
-                }
-            } else if (tokens[startIndex + 2].getToken() == ",") {
-                
-                if (tokens.size() > startIndex + 3 && 
-                    (tokens[startIndex + 3].getToken() == "X" || tokens[startIndex + 3].getToken() == "x")) {
-                    if (tokens.size() > startIndex + 4 && tokens[startIndex + 4].getToken() == ")") {
-                        addressingMode = "INDEXED_INDIRECT"; // (address,X)
-                    } else {
-                        comp_err << "Syntax Error: Missing closing parenthesis.\n";
-                        return false;
-                    }
-                } else {
-                    comp_err << "Syntax Error: Only X register supported for (,X) addressing.\n";
-                    return false;
-                }
-            }
-        }
-    
-        return validateInstructionIndirectMode(instruction, addressingMode);
-    }
 
+        std::string addressingMode;
+
+        // Handle JMP ($nnnn)
+        if (tokens[startIndex + 2].getToken() == ")" && instruction == icode::opc::JMP) {
+            addressingMode = "INDIRECT";
+            return validateInstructionIndirectMode(instruction, addressingMode);
+        }
+
+        // Handle ($zp,X) and ($zp),X as INDEXED_INDIRECT
+        if (
+            // Standard: (addr , X )
+            (tokens.size() > startIndex + 4 &&
+            tokens[startIndex + 2].getToken() == "," &&
+            (tokens[startIndex + 3].getToken() == "X" || tokens[startIndex + 3].getToken() == "x") &&
+            tokens[startIndex + 4].getToken() == ")")
+            ||
+            // Non-standard: (addr ) , X
+            (tokens.size() > startIndex + 4 &&
+            tokens[startIndex + 2].getToken() == ")" &&
+            tokens[startIndex + 3].getToken() == "," &&
+            (tokens[startIndex + 4].getToken() == "X" || tokens[startIndex + 4].getToken() == "x"))
+        ) {
+            addressingMode = "INDEXED_INDIRECT";
+            return validateInstructionIndirectMode(instruction, addressingMode);
+        }
+
+        // Handle ($zp),Y as INDIRECT_INDEXED
+        if (tokens.size() > startIndex + 4 &&
+            tokens[startIndex + 2].getToken() == ")" &&
+            tokens[startIndex + 3].getToken() == "," &&
+            (tokens[startIndex + 4].getToken() == "Y" || tokens[startIndex + 4].getToken() == "y")) {
+            addressingMode = "INDIRECT_INDEXED";
+            return validateInstructionIndirectMode(instruction, addressingMode);
+        }
+
+        // Handle just (addr) for non-JMP (should error)
+        if (tokens[startIndex + 2].getToken() == ")") {
+            if (instruction != icode::opc::JMP) {
+                comp_err << "Syntax Error: Only JMP supports (addr) indirect mode.\n";
+                return false;
+            }
+            addressingMode = "INDIRECT";
+            return validateInstructionIndirectMode(instruction, addressingMode);
+        }
+
+        comp_err << "Syntax Error: Invalid indirect addressing syntax.\n";
+        return false;
+    }
     bool validateInstructionAddressingMode(icode::opc instruction, const std::string& mode) {        
         std::cout << "validateInstructionAddressingMode: " << icode::op_array[static_cast<unsigned int>(instruction)] 
                   << " with mode: " << mode << "\n";

@@ -287,7 +287,41 @@ namespace translate {
                 return true;
             }
 
+            if (tokens.size() == 6) {
+                if (tokens[1].getToken() == "(" &&
+                    (tokens[2].getTokenType() == lex::TOKEN_HEX || tokens[2].getTokenType() == lex::TOKEN_DIGIT) &&
+                    tokens[3].getToken() == "," &&
+                    (tokens[4].getToken() == "X" || tokens[4].getToken() == "x") &&
+                    tokens[5].getToken() == ")") {
+                    inst.mode = interp::INDEXED_I;
+                    inst.op1 = icode::Operand(icode::toHex(tokens[2].getToken()), icode::op_type::OP_MEMORY);
+                    code.instruct.push_back(inst);
+                    return true;
+                }
         
+                if (tokens[1].getToken() == "(" &&
+                    (tokens[2].getTokenType() == lex::TOKEN_HEX || tokens[2].getTokenType() == lex::TOKEN_DIGIT) &&
+                    tokens[3].getToken() == ")" &&
+                    tokens[4].getToken() == "," &&
+                    (tokens[5].getToken() == "X" || tokens[5].getToken() == "x")) {
+                    inst.mode = interp::INDEXED_I;
+                    inst.op1 = icode::Operand(icode::toHex(tokens[2].getToken()), icode::op_type::OP_MEMORY);
+                    code.instruct.push_back(inst);
+                    return true;
+                }
+
+                if (tokens[1].getToken() == "(" &&
+                    (tokens[2].getTokenType() == lex::TOKEN_HEX || tokens[2].getTokenType() == lex::TOKEN_DIGIT) &&
+                    tokens[3].getToken() == ")" &&
+                    tokens[4].getToken() == "," &&
+                    (tokens[5].getToken() == "Y" || tokens[5].getToken() == "y")) {
+                    inst.mode = interp::INDIRECT_I;
+                    inst.op1 = icode::Operand(icode::toHex(tokens[2].getToken()), icode::op_type::OP_MEMORY);
+                    code.instruct.push_back(inst);
+                    return true;
+                }
+        }
+
         if (tokens.size() > 1 && tokens[1].getToken() == "(") {
             bool rt_val = parse_indirect_addressing(tokens, inst, line_value);
             if(rt_val) {
@@ -505,7 +539,7 @@ namespace translate {
                 break;
             default:
                 std::ostringstream stream;
-                stream << "Error on Line: " << line_value << " Unsupported addressing format (tokens: " << tok_size + 1 << ").\n";
+                stream << "!Error on Line: " << line_value << " Unsupported addressing format (tokens: " << tok_size + 1 << ").\n";
                 throw cExcep(stream.str());
                 return false;
         }
