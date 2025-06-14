@@ -1,0 +1,52 @@
+; =======================================
+; FIXED FACTORIAL CALCULATOR
+; =======================================
+
+10 LDA #4           ; Calculate 4! 
+20 STA $30          ; Store input number
+30 JSR INIT         ; Initialize result to 1
+40 JSR FACTORIAL    ; Calculate factorial  
+50 END              ; End program
+
+; =======================================
+; INITIALIZE RESULT TO 1
+; =======================================
+
+100 INIT LDA #1     ; Set result = 1
+110 STA $40         ; Store in result location
+120 RTS             ; Return
+
+; =======================================
+; FACTORIAL CALCULATION
+; =======================================
+
+200 FACTORIAL LDA $30    ; Get input number
+210 CMP #2               ; Compare with 2
+220 BCC FACT_DONE        ; If less than 2, done
+230 FACT_LOOP LDA $30    ; Get current multiplier
+240 JSR MULTIPLY         ; Multiply result by current number
+250 DEC $30              ; Decrease the number
+260 LDA $30              ; Check if we're done
+270 CMP #1               ; Compare with 1
+280 BNE FACT_LOOP        ; If not 1, continue
+290 FACT_DONE RTS        ; Return
+
+; =======================================
+; MULTIPLY SUBROUTINE
+; =======================================
+
+300 MULTIPLY STA $36     ; Store multiplier
+310 LDA $40              ; Get current result
+320 STA $35              ; Store as multiplicand  
+330 LDA #0               ; Clear new result
+340 STA $37              ; Temporary result storage
+350 LDX $36              ; Load multiplier into X counter
+360 MULT_LOOP LDA $37    ; Get current sum
+370 CLC                  ; Clear carry
+380 ADC $35              ; Add the multiplicand
+390 STA $37              ; Store new sum
+400 DEX                  ; Decrement counter
+410 BNE MULT_LOOP        ; Continue if not zero
+420 LDA $37              ; Get final result
+430 STA $40              ; Store back in result location
+440 RTS                  ; Return

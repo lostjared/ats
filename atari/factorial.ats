@@ -1,0 +1,103 @@
+; =======================================
+; FACTORIAL CALCULATOR (FIXED)
+; =======================================
+; This program calculates the factorial of a number
+; Input: Number stored at $30 
+; Output: Factorial result stored at $40-$41 (16-bit)
+
+; =======================================
+; MAIN PROGRAM
+; =======================================
+
+10 LDA #5           ; Calculate 5! (change this number to test)
+20 STA $30          ; Store input number
+30 JSR FACTORIAL    ; Call factorial subroutine
+40 LDA $42          ; Check error flag
+50 BEQ SUCCESS      ; If no error, jump to success
+60 JSR ERROR_MSG    ; Handle overflow error
+70 JMP FINISH       ; Jump to end
+
+80 SUCCESS LDA $40  ; Load low byte of result
+90 STA $50          ; Store for display
+100 LDA $41         ; Load high byte of result  
+110 STA $51         ; Store for display
+120 JSR SHOW_RESULT ; Display the result
+
+130 FINISH END      ; End program
+
+; =======================================
+; FACTORIAL SUBROUTINE (FIXED)
+; =======================================
+
+200 FACTORIAL LDA $30    ; Get input number
+210 STA $35              ; Store current multiplier
+220 LDA #1               ; Initialize result to 1
+230 STA $40              ; Store low byte
+240 LDA #0               ; 
+250 STA $41              ; Store high byte (result = 1)
+260 STA $42              ; Clear error flag
+
+270 LDA $35              ; Check if input is 0 or 1
+280 CMP #2               ;
+290 BCC FACT_DONE        ; If < 2, factorial is 1
+
+300 FACT_LOOP LDA $35    ; Get current multiplier
+310 CMP #1               ; Check if we're done first
+320 BEQ FACT_DONE        ; If multiplier is 1, we're done
+330 JSR MULTIPLY_SIMPLE  ; Use simpler multiplication
+340 LDA $42              ; Check for overflow
+350 BNE FACT_DONE        ; If overflow, exit
+360 DEC $35              ; Decrement multiplier
+370 JMP FACT_LOOP        ; Continue loop
+
+380 FACT_DONE RTS        ; Return to caller
+
+; =======================================
+; SIMPLIFIED MULTIPLICATION SUBROUTINE
+; =======================================
+; Multiplies 16-bit number in $40-$41 by 8-bit number in $35
+; Uses repeated addition to avoid complex loops
+
+400 MULTIPLY_SIMPLE LDA $35  ; Get multiplier
+410 CMP #1                   ; If multiplier is 1, nothing to do
+420 BEQ MULT_DONE            ; 
+430 STA $36                  ; Store multiplier counter
+440 LDA $40                  ; Store original low byte
+450 STA $37                  ; 
+460 LDA $41                  ; Store original high byte
+470 STA $38                  ;
+
+480 DEC $36                  ; Decrement counter (we already have 1x)
+
+490 ADD_LOOP LDA $40         ; Get current low byte
+500 CLC                      ; Clear carry
+510 ADC $37                  ; Add original low byte
+520 STA $40                  ; Store result
+530 LDA $41                  ; Get current high byte
+540 ADC $38                  ; Add original high byte + carry
+550 STA $41                  ; Store result
+560 BCS OVERFLOW             ; If carry set, we overflowed
+570 DEC $36                  ; Decrement counter
+580 BNE ADD_LOOP             ; Continue if not zero
+
+590 MULT_DONE RTS            ; Return successfully
+
+600 OVERFLOW LDA #1          ; Set error flag
+610 STA $42                  ;
+620 RTS                      ; Return
+
+; =======================================
+; DISPLAY SUBROUTINES
+; =======================================
+
+700 ERROR_MSG LDA #255   ; Store error indicator
+710 STA $60              ; Error occurred - result too large
+720 RTS                  ; Return
+
+730 SHOW_RESULT LDA $50  ; Get result low byte
+740 STA $61              ; Store in display location
+750 LDA $51              ; Get result high byte  
+760 STA $62              ; Store in display location
+770 LDA #200             ; Success indicator
+780 STA $63              ; Mark calculation complete
+790 RTS                  ; Return
