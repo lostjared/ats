@@ -223,7 +223,6 @@ namespace translate {
             interp::label_table[inst.label_text] = code.instruct.size();  
             
             if (tokens.size() <= 1) {
-                // This is just a label on its own line
                 code.instruct.push_back(inst);
                 return true;
             }

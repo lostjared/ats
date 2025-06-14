@@ -662,7 +662,13 @@ namespace interp {
         p.sp = (p.sp - 1) & 0xFF;
         c.poke(0x0100 + p.sp, return_addr & 0xFF);
         p.sp = (p.sp - 1) & 0xFF;
-        p.ip = c.instruct.at(p.getIp()).op1.label_index - 1; 
+        if(c.instruct.at(p.getIp()).op1.op_t == icode::op_type::OP_LABELTEXT ||
+           c.instruct.at(p.getIp()).op1.op_t == icode::op_type::OP_LABEL) {
+            p.ip = c.instruct.at(p.getIp()).op1.label_index - 1;
+        } else if(c.instruct.at(p.getIp()).op1.op_t == icode::op_type::OP_MEMORY &&
+                  c.instruct.at(p.getIp()).mode == ABSOLUTE) {
+            p.ip = c.instruct.at(p.getIp()).op1.op - 1;
+        } 
     }
 
 
@@ -1088,9 +1094,8 @@ namespace interp {
         c.proc.reg_a = c.peek(0x0100 + c.proc.sp);
         updateZNFlags(c.proc, c.proc.reg_a);
     }
-
     void i_php(Code &c) {
-        uint8_t status = c.proc.valFlags() | 0x10; 
+        uint8_t status = c.proc.valFlags() | 0x30;
         c.poke(0x0100 + c.proc.sp, status);
         c.proc.sp--;
     }
