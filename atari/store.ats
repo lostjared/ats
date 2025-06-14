@@ -1,0 +1,53 @@
+10  LDA #$42        ; A = $42
+20  STA $10         ; $10 = $42
+30  LDA #0
+40  LDA $10         ; A = $42 (zero page)
+50  STA $20         ; $20 = $42
+60  LDA #$99
+70  STA $1234       ; $1234 = $99
+80  LDA $1234       ; A = $99 (absolute)
+90  LDX #$55        ; X = $55
+100 STX $11         ; $11 = $55
+110 LDX $11         ; X = $55 (zero page)
+120 STX $21         ; $21 = $55
+130 LDX #$77
+140 STX $1235       ; $1235 = $77
+150 LDX $1235       ; X = $77 (absolute)
+160 LDY #$33        ; Y = $33
+170 STY $12         ; $12 = $33
+180 LDY $12         ; Y = $33 (zero page)
+190 STY $22         ; $22 = $33
+200 LDY #$44
+210 STY $1236       ; $1236 = $44
+220 LDY $1236       ; Y = $44 (absolute)
+; Indexed addressing
+230 LDA #$AA
+240 STA $30,X       ; $30+X = $AA (X should be set before)
+250 LDX #$02
+260 LDA $2E,X       ; A = $AA (should load from $30)
+270 LDY #$03
+280 LDA $2D,Y       ; A = $AA (should load from $30)
+; Indirect addressing
+290 LDA #$40
+300 STA $40
+310 LDA #$00
+320 STA $41
+330 LDA #$CC
+340 STA $4000
+350 LDA ($40),Y     ; Y=3, loads from $4003 (set Y before)
+360 LDY #$03
+370 LDA ($40),Y     ; A = value at $4003 (should be $00 unless set)
+; Indexed Indirect
+380 LDX #$04
+390 LDA #$50
+400 STA $44
+410 LDA #$00
+420 STA $45
+430 LDA #$DD
+440 STA $5000
+450 LDA ($40,X)     ; X=4, pointer at $44/$45 = $0050, loads from $5000
+; Store via indirect indexed
+460 LDA #$EE
+470 LDY #$01
+480 STA ($40),Y     ; stores $EE at $4001
+490 END

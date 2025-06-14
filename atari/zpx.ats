@@ -1,0 +1,15 @@
+; Example: Zero Page,X and Absolute,X addressing
+
+10  LDX #3         ; X = 3
+
+; Zero Page,X
+20  LDA #$AA       ; A = $AA
+30  STA $10,X      ; Store A at $10+X = $13
+40  LDA #0         ; A = 0
+50  LDA $10,X      ; Load A from $13 (should get $AA)
+
+; Absolute,X
+60  LDA #$55       ; A = $55
+70  STA $2000,X    ; Store A at $2000+X = $2003
+80  LDA #0         ; A = 0
+90  LDA $2000,X    ; Load A from $2003 (should get $55)

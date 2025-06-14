@@ -1,0 +1,8 @@
+10 LDA #$34      ; Load low byte of target
+20 STA $20       ; Store at zero page $20
+30 LDA #$12      ; Load high byte of target  
+40 STA $21       ; Store at zero page $21
+50 LDA #$FF      ; Load test value
+60 STA ($20),Y   ; Store at address pointed to by $20/$21 + Y
+70 LDA ($20),Y   ; Load back from same location
+80 END

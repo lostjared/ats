@@ -1,0 +1,634 @@
+; =======================================
+; COMPLETE 6502 INSTRUCTION TEST SUITE
+; =======================================
+; Tests all instructions and addressing modes
+; Results stored in memory locations $00-$FF
+; 
+; Evaluation guide at the end of the program
+; 
+; Each test follows this pattern:
+; 1. Set up a known state
+; 2. Execute the instruction being tested
+; 3. Store results (register values or flags)
+; 4. Move to next test
+;
+; If a memory location contains the expected value,
+; that instruction is implemented correctly.
+
+; =======================================
+; INITIALIZATION
+; =======================================
+
+10 LDA #$00        ; Clear A
+20 LDX #$00        ; Clear X
+30 LDY #$00        ; Clear Y
+40 CLC             ; Clear carry
+50 CLD             ; Clear decimal
+60 CLI             ; Clear interrupt disable
+70 CLV             ; Clear overflow
+
+; Write test pattern to memory pages
+80 LDX #$00        ; Start at index 0
+90 TXA             ; X value to A
+100 STA $0300,X    ; Store in page 3
+110 EOR #$FF       ; Flip all bits
+120 STA $0400,X    ; Store in page 4
+130 INX            ; Next address
+140 BNE 90         ; Loop until page filled
+
+; =======================================
+; TEST 1: LOAD & STORE INSTRUCTIONS
+; =======================================
+
+; Test LDA (all addressing modes)
+150 LDA #$A5       ; Immediate
+160 STA $00        ; Store result (Should be $A5)
+170 LDA $0300      ; Absolute (value is $00)
+180 STA $01        ; Store result (Should be $00)
+190 LDX #$10       ; Set X offset
+200 LDA $0300,X    ; Absolute,X (value is $10)
+210 STA $02        ; Store result (Should be $10)
+220 LDY #$20       ; Set Y offset
+230 LDA $0300,Y    ; Absolute,Y (value is $20)
+240 STA $03        ; Store result (Should be $20)
+250 LDA $30        ; Zero Page (uninitialized, should be $00)
+260 STA $04        ; Store result (Should be $00)
+270 LDA $20,X      ; Zero Page,X (X=$10, address=$30, should be $00)
+280 STA $05        ; Store result (Should be $00)
+290 LDA #$AA       ; New test value
+300 STA $40        ; Store at $40
+310 LDA ($30,X)    ; Indirect,X (X=$10, pointer at $40, should be $AA)
+320 STA $06        ; Store result (Should be $AA)
+330 LDA #$BB       ; New test value
+340 STA $0350      ; Store at $0350
+350 LDA #$50       ; Low byte of address
+360 STA $50        ; Store at pointer address
+370 LDA #$03       ; High byte of address
+380 STA $51        ; Store at pointer address+1
+390 LDY #$00       ; Clear Y
+400 LDA ($50),Y    ; Indirect,Y (pointer at $50/$51 -> $0350, should be $BB)
+410 STA $07        ; Store result (Should be $BB)
+
+; Test LDX (all addressing modes)
+420 LDX #$A6       ; Immediate
+430 STX $08        ; Store result (Should be $A6)
+440 LDX $0300      ; Absolute (value is $00)
+450 STX $09        ; Store result (Should be $00)
+460 LDY #$30       ; Set Y offset
+470 LDX $0300,Y    ; Absolute,Y (value is $30)
+480 STX $0A        ; Store result (Should be $30)
+490 LDX $30        ; Zero Page (should be $00)
+500 STX $0B        ; Store result (Should be $00)
+510 LDX $20,Y      ; Zero Page,Y (Y=$30, address=$50, value depends on earlier tests)
+520 STX $0C        ; Store result (value depends on earlier tests)
+
+; Test LDY (all addressing modes)
+530 LDY #$A7       ; Immediate
+540 STY $0D        ; Store result (Should be $A7)
+550 LDY $0300      ; Absolute (value is $00)
+560 STY $0E        ; Store result (Should be $00)
+570 LDX #$40       ; Set X offset
+580 LDY $0300,X    ; Absolute,X (value is $40)
+590 STY $0F        ; Store result (Should be $40)
+600 LDY $30        ; Zero Page (should be $00)
+610 STY $10        ; Store result (Should be $00)
+620 LDY $20,X      ; Zero Page,X (X=$40, address=$60, should be $00 if uninitialized)
+630 STY $11        ; Store result (Should be $00)
+
+; Test STA (all addressing modes)
+640 LDA #$A8       ; Load test value
+650 STA $0300      ; Absolute
+660 LDA $0300      ; Verify by loading back
+670 STA $12        ; Store result (Should be $A8)
+680 LDA #$A9       ; New test value
+690 STA $0300,X    ; Absolute,X (X=$40, address=$0340)
+700 LDA $0340      ; Verify by loading back
+710 STA $13        ; Store result (Should be $A9)
+720 LDA #$AA       ; New test value
+730 STA $0300,Y    ; Absolute,Y (Y=$40, address=$0340)
+740 LDA $0340      ; Verify by loading back
+750 STA $14        ; Store result (Should be $AA)
+760 LDA #$AB       ; New test value
+770 STA $60        ; Zero Page
+780 LDA $60        ; Verify by loading back
+790 STA $15        ; Store result (Should be $AB)
+800 LDA #$AC       ; New test value
+810 STA $30,X      ; Zero Page,X (X=$40, wraps to address=$70)
+820 LDA $70        ; Verify by loading back
+830 STA $16        ; Store result (Should be $AC)
+840 LDA #$AD       ; New test value
+850 LDX #$20       ; New X offset
+860 STA ($50,X)    ; Indirect,X (X=$20, pointer at $70, pointing to whatever was stored there)
+870 LDA #$40       ; Low byte of target address
+880 STA $70        ; Store to create pointer
+890 LDA #$03       ; High byte of target address
+900 STA $71        ; Complete pointer to $0340
+910 LDA #$AE       ; New test value
+920 STA ($70),Y    ; Indirect,Y (Y=$40, pointer at $70/$71 -> $0340+$40 = $0380)
+930 LDA $0380      ; Verify by loading back
+940 STA $17        ; Store result (Should be $AE)
+
+; Test STX (all addressing modes)
+950 LDX #$AF       ; Load test value
+960 STX $0301      ; Absolute
+970 LDA $0301      ; Verify by loading back
+980 STA $18        ; Store result (Should be $AF)
+990 LDX #$B0       ; New test value
+1000 STX $61        ; Zero Page
+1010 LDA $61        ; Verify by loading back
+1020 STA $19        ; Store result (Should be $B0)
+1030 LDX #$B1       ; New test value
+1040 STX $31,Y      ; Zero Page,Y (Y=$40, wraps to address=$71)
+1050 LDA $71        ; Verify by loading back
+1060 STA $1A        ; Store result (Should be $B1)
+
+; Test STY (all addressing modes)
+1070 LDY #$B2       ; Load test value
+1080 STY $0302      ; Absolute
+1090 LDA $0302      ; Verify by loading back
+1100 STA $1B        ; Store result (Should be $B2)
+1110 LDY #$B3       ; New test value
+1120 STY $62        ; Zero Page
+1130 LDA $62        ; Verify by loading back
+1140 STA $1C        ; Store result (Should be $B3)
+1150 LDY #$B4       ; New test value
+1160 STY $32,X      ; Zero Page,X (X=$20, address=$52)
+1170 LDA $52        ; Verify by loading back
+1180 STA $1D        ; Store result (Should be $B4)
+
+; =======================================
+; TEST 2: REGISTER TRANSFERS
+; =======================================
+
+1190 LDA #$C0       ; Load test value
+1200 TAX            ; Transfer A to X
+1210 STX $1E        ; Store X (Should be $C0)
+1220 TXA            ; Transfer X to A
+1230 STA $1F        ; Store A (Should be $C0)
+1240 TAY            ; Transfer A to Y
+1250 STY $20        ; Store Y (Should be $C0)
+1260 TYA            ; Transfer Y to A
+1270 STA $21        ; Store A (Should be $C0)
+1280 TSX            ; Transfer SP to X
+1290 STX $22        ; Store X (Usually $FF unless stack used)
+1300 LDX #$F0       ; Load test value to X
+1310 TXS            ; Transfer X to SP (cannot verify directly)
+1320 TSX            ; Transfer SP back to X
+1330 STX $23        ; Store X (Should be $F0)
+
+; =======================================
+; TEST 3: STACK OPERATIONS
+; =======================================
+
+1340 LDA #$D0       ; Load test value
+1350 PHA            ; Push A on stack
+1360 LDA #$00       ; Clear A
+1370 PLA            ; Pull from stack
+1380 STA $24        ; Store A (Should be $D0)
+1390 LDA #$01       ; Set some flags
+1400 SEC            ; Set carry
+1410 PHP            ; Push processor status
+1420 CLC            ; Clear carry
+1430 LDA #$00       ; Clear A
+1440 PLP            ; Pull processor status
+1450 LDA #$00       ; Clear A
+1460 ADC #$00       ; Add with carry
+1470 STA $25        ; Store A (Should be $01 if carry was pulled from stack)
+
+; =======================================
+; TEST 4: LOGICAL OPERATIONS
+; =======================================
+
+; Test AND
+1480 LDA #$F0       ; 11110000
+1490 AND #$0F       ; 00001111
+1500 STA $26        ; Store result (Should be $00)
+1510 LDA #$AA       ; 10101010
+1520 AND #$55       ; 01010101
+1530 STA $27        ; Store result (Should be $00)
+1540 LDA #$F0       ; 11110000
+1550 AND #$F0       ; 11110000
+1560 STA $28        ; Store result (Should be $F0)
+
+; Test EOR
+1570 LDA #$F0       ; 11110000
+1580 EOR #$0F       ; 00001111
+1590 STA $29        ; Store result (Should be $FF)
+1600 LDA #$AA       ; 10101010
+1610 EOR #$55       ; 01010101
+1620 STA $2A        ; Store result (Should be $FF)
+1630 LDA #$F0       ; 11110000
+1640 EOR #$F0       ; 11110000
+1650 STA $2B        ; Store result (Should be $00)
+
+; Test ORA
+1660 LDA #$F0       ; 11110000
+1670 ORA #$0F       ; 00001111
+1680 STA $2C        ; Store result (Should be $FF)
+1690 LDA #$A0       ; 10100000
+1700 ORA #$05       ; 00000101
+1710 STA $2D        ; Store result (Should be $A5)
+1720 LDA #$00       ; 00000000
+1730 ORA #$00       ; 00000000
+1740 STA $2E        ; Store result (Should be $00)
+
+; Test BIT
+1750 LDA #$C0       ; 11000000 (bit 7 and 6 set)
+1760 STA $80        ; Store to test location
+1770 LDA #$FF       ; 11111111 (all bits set)
+1780 BIT $80        ; Test with memory (N and V should be set from bits 7 and 6)
+1790 PHP            ; Push processor status
+1800 PLA            ; Pull to A
+1810 STA $2F        ; Store flags (Bits 7 and 6 should be set if BIT works)
+1820 LDA #$00       ; 00000000 (no bits set)
+1830 STA $81        ; Store to test location
+1840 LDA #$FF       ; 11111111 (all bits set)
+1850 BIT $81        ; Test with memory (N and V should be clear, Z should be set)
+1860 PHP            ; Push processor status
+1870 PLA            ; Pull to A
+1880 STA $30        ; Store flags (Bit 1 should be set for Z flag)
+
+; =======================================
+; TEST 5: ARITHMETIC OPERATIONS
+; =======================================
+
+; Test ADC
+1890 CLC            ; Clear carry
+1900 LDA #$12       ; First number
+1910 ADC #$34       ; Add second number
+1920 STA $31        ; Store result (Should be $46)
+1930 LDA #$FF       ; First number (255)
+1940 ADC #$01       ; Add 1
+1950 STA $32        ; Store result (Should be $00)
+1960 PHP            ; Push processor status
+1970 PLA            ; Pull to A
+1980 STA $33        ; Store flags (Carry should be set)
+1990 SEC            ; Set carry
+2000 LDA #$12       ; First number
+2010 ADC #$34       ; Add second number with carry
+2020 STA $34        ; Store result (Should be $47)
+
+; Test SBC
+2030 SEC            ; Set carry (required for correct subtraction)
+2040 LDA #$50       ; First number
+2050 SBC #$20       ; Subtract second number
+2060 STA $35        ; Store result (Should be $30)
+2070 LDA #$00       ; First number (0)
+2080 SBC #$01       ; Subtract 1
+2090 STA $36        ; Store result (Should be $FF)
+2100 PHP            ; Push processor status
+2110 PLA            ; Pull to A
+2120 STA $37        ; Store flags (Carry should be clear)
+2130 SEC            ; Set carry
+2140 LDA #$00       ; First number
+2150 SBC #$00       ; Subtract 0
+2160 STA $38        ; Store result (Should be $00)
+
+; Test CMP
+2170 LDA #$40       ; Load test value
+2180 CMP #$40       ; Compare with same value
+2190 PHP            ; Push processor status
+2200 PLA            ; Pull to A
+2210 STA $39        ; Store flags (Z and C should be set)
+2220 LDA #$40       ; Load test value
+2230 CMP #$30       ; Compare with smaller value
+2240 PHP            ; Push processor status
+2250 PLA            ; Pull to A
+2260 STA $3A        ; Store flags (C should be set, Z should be clear)
+2270 LDA #$40       ; Load test value
+2280 CMP #$50       ; Compare with larger value
+2290 PHP            ; Push processor status
+2300 PLA            ; Pull to A
+2310 STA $3B        ; Store flags (C and Z should be clear, N might be set)
+
+; Test CPX
+2320 LDX #$40       ; Load test value
+2330 CPX #$40       ; Compare with same value
+2340 PHP            ; Push processor status
+2350 PLA            ; Pull to A
+2360 STA $3C        ; Store flags (Z and C should be set)
+2370 LDX #$40       ; Load test value
+2380 CPX #$30       ; Compare with smaller value
+2390 PHP            ; Push processor status
+2400 PLA            ; Pull to A
+2410 STA $3D        ; Store flags (C should be set, Z should be clear)
+
+; Test CPY
+2420 LDY #$40       ; Load test value
+2430 CPY #$40       ; Compare with same value
+2440 PHP            ; Push processor status
+2450 PLA            ; Pull to A
+2460 STA $3E        ; Store flags (Z and C should be set)
+2470 LDY #$40       ; Load test value
+2480 CPY #$30       ; Compare with smaller value
+2490 PHP            ; Push processor status
+2500 PLA            ; Pull to A
+2510 STA $3F        ; Store flags (C should be set, Z should be clear)
+
+; =======================================
+; TEST 6: INCREMENT & DECREMENT
+; =======================================
+
+; Test INC
+2520 LDA #$45       ; Test value
+2530 STA $82        ; Store to memory
+2540 INC $82        ; Increment memory
+2550 LDA $82        ; Load result
+2560 STA $40        ; Store result (Should be $46)
+2570 LDA #$FF       ; Max value
+2580 STA $83        ; Store to memory
+2590 INC $83        ; Increment memory (should wrap to 0)
+2600 LDA $83        ; Load result
+2610 STA $41        ; Store result (Should be $00)
+
+; Test DEC
+2620 LDA #$45       ; Test value
+2630 STA $84        ; Store to memory
+2640 DEC $84        ; Decrement memory
+2650 LDA $84        ; Load result
+2660 STA $42        ; Store result (Should be $44)
+2670 LDA #$00       ; Min value
+2680 STA $85        ; Store to memory
+2690 DEC $85        ; Decrement memory (should wrap to 255)
+2700 LDA $85        ; Load result
+2710 STA $43        ; Store result (Should be $FF)
+
+; Test INX
+2720 LDX #$77       ; Test value
+2730 INX            ; Increment X
+2740 STX $44        ; Store result (Should be $78)
+2750 LDX #$FF       ; Max value
+2760 INX            ; Increment X (should wrap to 0)
+2770 STX $45        ; Store result (Should be $00)
+
+; Test DEX
+2780 LDX #$77       ; Test value
+2790 DEX            ; Decrement X
+2800 STX $46        ; Store result (Should be $76)
+2810 LDX #$00       ; Min value
+2820 DEX            ; Decrement X (should wrap to 255)
+2830 STX $47        ; Store result (Should be $FF)
+
+; Test INY
+2840 LDY #$77       ; Test value
+2850 INY            ; Increment Y
+2860 STY $48        ; Store result (Should be $78)
+2870 LDY #$FF       ; Max value
+2880 INY            ; Increment Y (should wrap to 0)
+2890 STY $49        ; Store result (Should be $00)
+
+; Test DEY
+2900 LDY #$77       ; Test value
+2910 DEY            ; Decrement Y
+2920 STY $4A        ; Store result (Should be $76)
+2930 LDY #$00       ; Min value
+2940 DEY            ; Decrement Y (should wrap to 255)
+2950 STY $4B        ; Store result (Should be $FF)
+
+; =======================================
+; TEST 7: SHIFTS & ROTATES
+; =======================================
+
+; Test ASL (Accumulator)
+2960 LDA #$55       ; 01010101
+2970 ASL            ; Shift left
+2980 STA $4C        ; Store result (Should be $AA)
+2990 PHP            ; Push processor status
+3000 PLA            ; Pull to A
+3010 STA $4D        ; Store flags (C should be clear)
+3020 LDA #$80       ; 10000000
+3030 ASL            ; Shift left (bit 7 shifts into carry)
+3040 STA $4E        ; Store result (Should be $00)
+3050 PHP            ; Push processor status
+3060 PLA            ; Pull to A
+3070 STA $4F        ; Store flags (C should be set, Z should be set)
+
+; Test ASL (Memory)
+3080 LDA #$55       ; 01010101
+3090 STA $86        ; Store to memory
+3100 ASL $86        ; Shift memory left
+3110 LDA $86        ; Load result
+3120 STA $50        ; Store result (Should be $AA)
+
+; Test LSR (Accumulator)
+3130 LDA #$55       ; 01010101
+3140 LSR            ; Shift right
+3150 STA $51        ; Store result (Should be $2A)
+3160 PHP            ; Push processor status
+3170 PLA            ; Pull to A
+3180 STA $52        ; Store flags (C should be set)
+3190 LDA #$02       ; 00000010
+3200 LSR            ; Shift right
+3210 STA $53        ; Store result (Should be $01)
+3220 LSR            ; Shift right
+3230 STA $54        ; Store result (Should be $00)
+3240 PHP            ; Push processor status
+3250 PLA            ; Pull to A
+3260 STA $55        ; Store flags (C should be set, Z should be set)
+
+; Test LSR (Memory)
+3270 LDA #$55       ; 01010101
+3280 STA $87        ; Store to memory
+3290 LSR $87        ; Shift memory right
+3300 LDA $87        ; Load result
+3310 STA $56        ; Store result (Should be $2A)
+
+; Test ROL (Accumulator)
+3320 CLC            ; Clear carry
+3330 LDA #$55       ; 01010101
+3340 ROL            ; Rotate left
+3350 STA $57        ; Store result (Should be $AA)
+3360 SEC            ; Set carry
+3370 LDA #$55       ; 01010101
+3380 ROL            ; Rotate left with carry
+3390 STA $58        ; Store result (Should be $AB)
+
+; Test ROL (Memory)
+3400 CLC            ; Clear carry
+3410 LDA #$55       ; 01010101
+3420 STA $88        ; Store to memory
+3430 ROL $88        ; Rotate memory left
+3440 LDA $88        ; Load result
+3450 STA $59        ; Store result (Should be $AA)
+
+; Test ROR (Accumulator)
+3460 CLC            ; Clear carry
+3470 LDA #$55       ; 01010101
+3480 ROR            ; Rotate right
+3490 STA $5A        ; Store result (Should be $2A)
+3500 SEC            ; Set carry
+3510 LDA #$55       ; 01010101
+3520 ROR            ; Rotate right with carry
+3530 STA $5B        ; Store result (Should be $AA)
+
+; Test ROR (Memory)
+3540 CLC            ; Clear carry
+3550 LDA #$55       ; 01010101
+3560 STA $89        ; Store to memory
+3570 ROR $89        ; Rotate memory right
+3580 LDA $89        ; Load result
+3590 STA $5C        ; Store result (Should be $2A)
+
+; =======================================
+; TEST 8: JUMPS & SUBROUTINES
+; =======================================
+
+; Test JMP (Absolute)
+3600 JMP 3620       ; Jump to 3620
+3610 LDA #$FF       ; This should be skipped
+3620 LDA #$88       ; This should be executed
+3630 STA $5D        ; Store result (Should be $88)
+
+; Test JMP (Indirect)
+3640 LDA #$70       ; Low byte of target address
+3650 STA $8A        ; Store to pointer
+3660 LDA #$0E       ; High byte of target address (3670)
+3670 STA $8B        ; Store to pointer+1
+3680 JMP ($8A)      ; Jump indirect to address in $8A/$8B (should be 3670)
+3690 LDA #$FF       ; This should be skipped
+3700 LDA #$89       ; This should be executed
+3710 STA $5E        ; Store result (Should be $89)
+
+; Test JSR and RTS
+3720 JSR 3760       ; Jump to subroutine
+3730 LDA #$8A       ; Should execute after return
+3740 STA $5F        ; Store result (Should be $8A)
+3750 JMP 3800       ; Skip over subroutine
+
+; Subroutine
+3760 LDA #$8B       ; Load test value
+3770 STA $60        ; Store result (Should be $8B)
+3780 RTS            ; Return from subroutine
+
+; =======================================
+; TEST 9: BRANCHES
+; =======================================
+
+3800 CLC            ; Clear carry
+3810 BCS 3830       ; Branch if carry set (should not branch)
+3820 LDA #$90       ; Should execute
+3830 STA $61        ; Store result (Should be $90)
+3840 SEC            ; Set carry
+3850 BCS 3870       ; Branch if carry set (should branch)
+3860 LDA #$FF       ; Should be skipped
+3870 LDA #$91       ; Should execute
+3880 STA $62        ; Store result (Should be $91)
+
+; Test BEQ and BNE
+3890 LDA #$00       ; Load 0 (sets Z flag)
+3900 BEQ 3920       ; Branch if zero (should branch)
+3910 LDA #$FF       ; Should be skipped
+3920 LDA #$92       ; Should execute
+3930 STA $63        ; Store result (Should be $92)
+3940 LDA #$01       ; Load non-zero (clears Z flag)
+3950 BEQ 3970       ; Branch if zero (should not branch)
+3960 LDA #$93       ; Should execute
+3970 STA $64        ; Store result (Should be $93)
+3980 BNE 4000       ; Branch if not zero (should branch)
+3990 LDA #$FF       ; Should be skipped
+4000 LDA #$94       ; Should execute
+4010 STA $65        ; Store result (Should be $94)
+
+; Test BMI and BPL
+4020 LDA #$80       ; Load negative value (sets N flag)
+4030 BMI 4050       ; Branch if negative (should branch)
+4040 LDA #$FF       ; Should be skipped
+4050 LDA #$95       ; Should execute
+4060 STA $66        ; Store result (Should be $95)
+4070 LDA #$7F       ; Load positive value (clears N flag)
+4080 BMI 4100       ; Branch if negative (should not branch)
+4090 LDA #$96       ; Should execute
+4100 STA $67        ; Store result (Should be $96)
+4110 BPL 4130       ; Branch if positive (should branch)
+4120 LDA #$FF       ; Should be skipped
+4130 LDA #$97       ; Should execute
+4140 STA $68        ; Store result (Should be $97)
+
+; Test BVC and BVS
+4150 CLV            ; Clear overflow
+4160 BVS 4180       ; Branch if overflow set (should not branch)
+4170 LDA #$98       ; Should execute
+4180 STA $69        ; Store result (Should be $98)
+4190 LDA #$40       ; Load value
+4200 STA $8C        ; Store to memory
+4210 BIT $8C        ; Set overflow from bit 6 of memory
+4220 BVS 4240       ; Branch if overflow set (should branch)
+4230 LDA #$FF       ; Should be skipped
+4240 LDA #$99       ; Should execute
+4250 STA $6A        ; Store result (Should be $99)
+
+; =======================================
+; TEST 10: FLAG OPERATIONS
+; =======================================
+
+; Test flag operations
+4260 SEC            ; Set carry
+4270 PHP            ; Push processor status
+4280 PLA            ; Pull to A
+4290 STA $6B        ; Store flags (C should be set)
+4300 CLC            ; Clear carry
+4310 PHP            ; Push processor status
+4320 PLA            ; Pull to A
+4330 STA $6C        ; Store flags (C should be clear)
+
+4340 SED            ; Set decimal
+4350 PHP            ; Push processor status
+4360 PLA            ; Pull to A
+4370 STA $6D        ; Store flags (D should be set)
+4380 CLD            ; Clear decimal
+4390 PHP            ; Push processor status
+4400 PLA            ; Pull to A
+4410 STA $6E        ; Store flags (D should be clear)
+
+4420 SEI            ; Set interrupt disable
+4430 PHP            ; Push processor status
+4440 PLA            ; Pull to A
+4450 STA $6F        ; Store flags (I should be set)
+4460 CLI            ; Clear interrupt disable
+4470 PHP            ; Push processor status
+4480 PLA            ; Pull to A
+4490 STA $70        ; Store flags (I should be clear)
+
+4500 LDA #$FF       ; Set A to trigger negative
+4510 EOR #$FF       ; XOR to clear A
+4520 STA $71        ; Store A (Should be $00)
+4530 PHP            ; Push processor status
+4540 PLA            ; Pull to A
+4550 STA $72        ; Store flags (Z should be set)
+
+; =======================================
+; FINAL VALIDATION
+; =======================================
+
+; Store a final success code
+4560 LDA #$42       ; Success code
+4570 STA $7F        ; Store at final result location
+
+4580 END            ; End the program
+
+; =======================================
+; RESULT VALIDATION
+; =======================================
+; Check the following locations to verify functionality:
+;
+; $00-$07: LDA addressing modes
+; $08-$0C: LDX addressing modes
+; $0D-$11: LDY addressing modes
+; $12-$17: STA addressing modes
+; $18-$1A: STX addressing modes
+; $1B-$1D: STY addressing modes
+; $1E-$23: Register transfers
+; $24-$25: Stack operations
+; $26-$2E: Logical operations
+; $2F-$30: BIT instruction
+; $31-$38: ADC and SBC
+; $39-$3F: CMP, CPX, CPY
+; $40-$4B: Increment/Decrement
+; $4C-$5C: Shifts and rotates
+; $5D-$60: Jumps and subroutines
+; $61-$6A: Branches
+; $6B-$72: Flag operations
+; $7F: Success code ($42)
+;
+; If all memory locations contain expected values,
+; your 6502 implementation is correct!
