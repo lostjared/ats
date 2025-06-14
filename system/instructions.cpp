@@ -654,17 +654,27 @@ namespace interp {
     }
 
 
+    // new
     void i_jsr(Code &c) {
-        int in = c.proc.getIp();
-        uint16_t return_addr = c.proc.ip + 1;
-        uint8_t orig_sp = c.proc.sp;
-        uint8_t high = (return_addr >> 8) & 0xFF;
-        c.poke(0x0100 + c.proc.sp, high);
-        c.proc.sp = (c.proc.sp - 1) & 0xFF;
-        uint8_t low = return_addr & 0xFF;
-        c.poke(0x0100 + c.proc.sp, low);
-        c.proc.sp = (c.proc.sp - 1) & 0xFF;
-        c.proc.ip = c.instruct.at(in).op1.label_index - 1;
+        auto &p = c.proc;
+        uint16_t return_addr = p.ip - 1;
+        c.poke(0x0100 + p.sp, (return_addr >> 8) & 0xFF);
+        p.sp = (p.sp - 1) & 0xFF;
+        c.poke(0x0100 + p.sp, return_addr & 0xFF);
+        p.sp = (p.sp - 1) & 0xFF;
+        p.ip = c.instruct.at(p.getIp()).op1.label_index - 1; 
+    }
+
+
+    // new
+    void i_rts(Code &c) {
+        auto &p = c.proc;
+        p.sp = (p.sp + 1) & 0xFF;
+        uint8_t low  = c.peek(0x0100 + p.sp);
+        p.sp = (p.sp + 1) & 0xFF;
+        uint8_t high = c.peek(0x0100 + p.sp);
+        uint16_t return_addr = ((uint16_t)high << 8) | low;
+        p.ip = return_addr + 1;
     }
 
 
@@ -1066,15 +1076,7 @@ namespace interp {
     }
     
 
-    
-    void i_rts(Code &c) {
-        c.proc.sp = (c.proc.sp + 1) & 0xFF;
-        uint8_t low = c.peek(0x0100 + c.proc.sp);
-        c.proc.sp = (c.proc.sp + 1) & 0xFF;
-        uint8_t high = c.peek(0x0100 + c.proc.sp);
-        uint16_t addr = ((uint16_t)high << 8) | low;
-        c.proc.ip = addr;
-    }
+
 
     void i_pha(Code &c) {
         c.poke(0x0100 + c.proc.sp, c.proc.reg_a);
