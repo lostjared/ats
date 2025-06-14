@@ -205,12 +205,8 @@ namespace interp {
     bool validateAddressingMode(std::vector<lex::Token> &tokens, icode::opc instruction, unsigned int offset) {
         int instrIndex = 1 + offset; 
 
-        std::cout << "=== validateAddressingMode DEBUG ===\n";
-        std::cout << "Instruction: " << icode::op_array[static_cast<unsigned int>(instruction)] << "\n";
-        std::cout << "Token count: " << tokens.size() << ", instrIndex: " << instrIndex << "\n";
         
         if (instruction == icode::opc::JSR) {
-            std::cout << "Handling JSR instruction...\n";
             if (tokens.size() <= instrIndex + 1) {
                 comp_err << "Syntax Error: JSR instruction requires a target address or label.\n";
                 return false;
@@ -228,16 +224,15 @@ namespace interp {
             }
         }
         
-        // Handle implied instructions
+        
         if (tokens.size() <= instrIndex + 1) {
-            std::cout << "Checking for implied instruction...\n";
             
             if(instruction == icode::opc::END) {
                 std::cout << "Found END instruction, terminating validation.\n";
-                return true; // END instruction does not require validation
+                return true; 
             }
 
-            // Check if this instruction supports implied mode
+
             if (instruction == icode::opc::CLC || instruction == icode::opc::CLD || 
                 instruction == icode::opc::CLI || instruction == icode::opc::CLV ||
                 instruction == icode::opc::SEC || instruction == icode::opc::SED ||
@@ -252,29 +247,27 @@ namespace interp {
                 instruction == icode::opc::RTS || instruction == icode::opc::RTI ||
                 instruction == icode::opc::BRK) {
                 
-                std::cout << "Found implied instruction, validating...\n";
+
                 bool result = validateInstructionAddressingMode(instruction, "IMPLIED");
-                std::cout << "Implied validation result: " << result << "\n";
-                return result;
-            }
-            // Check if this instruction supports accumulator mode
-            else if (instruction == icode::opc::ASL || instruction == icode::opc::LSR ||
-                     instruction == icode::opc::ROL || instruction == icode::opc::ROR) {
                 
-                std::cout << "Found accumulator instruction, validating...\n";
-                bool result = validateInstructionAddressingMode(instruction, "ACCUMULATOR");
-                std::cout << "Accumulator validation result: " << result << "\n";
                 return result;
             }
             
+            else if (instruction == icode::opc::ASL || instruction == icode::opc::LSR ||
+                     instruction == icode::opc::ROL || instruction == icode::opc::ROR) {
+                
+                
+                bool result = validateInstructionAddressingMode(instruction, "ACCUMULATOR");
+                
+                return result;
+            }
             std::cout << "Instruction not recognized as implied or accumulator\n";
             comp_err << "Syntax Error: " << tokens[instrIndex].getToken() << " instruction requires an operand.\n";
             return false;
         }
-        
-        std::cout << "Has operands, checking addressing modes...\n";
+    
         int operandIndex = instrIndex + 1;
-        
+      
         
         if (isBranchInstruction(instruction)) {
             if (tokens[operandIndex].getTokenType() == lex::TOKEN_DIGIT) {
@@ -365,7 +358,7 @@ namespace interp {
     }
 
     bool validateInstructionIndirectMode(icode::opc instruction, const std::string& mode) {
-        std::cout << "validate mode: " << mode << "\n";
+        
         if (mode == "RELATIVE") {
                return isBranchInstruction(instruction);
         }
@@ -416,15 +409,15 @@ namespace interp {
             return validateInstructionIndirectMode(instruction, addressingMode);
         }
 
-        // Handle ($zp,X) and ($zp),X as INDEXED_INDIRECT
+        
         if (
-            // Standard: (addr , X )
+        
             (tokens.size() > startIndex + 4 &&
             tokens[startIndex + 2].getToken() == "," &&
             (tokens[startIndex + 3].getToken() == "X" || tokens[startIndex + 3].getToken() == "x") &&
             tokens[startIndex + 4].getToken() == ")")
             ||
-            // Non-standard: (addr ) , X
+        
             (tokens.size() > startIndex + 4 &&
             tokens[startIndex + 2].getToken() == ")" &&
             tokens[startIndex + 3].getToken() == "," &&
@@ -434,7 +427,7 @@ namespace interp {
             return validateInstructionIndirectMode(instruction, addressingMode);
         }
 
-        // Handle ($zp),Y as INDIRECT_INDEXED
+        
         if (tokens.size() > startIndex + 4 &&
             tokens[startIndex + 2].getToken() == ")" &&
             tokens[startIndex + 3].getToken() == "," &&
@@ -443,7 +436,7 @@ namespace interp {
             return validateInstructionIndirectMode(instruction, addressingMode);
         }
 
-        // Handle just (addr) for non-JMP (should error)
+        
         if (tokens[startIndex + 2].getToken() == ")") {
             if (instruction != icode::opc::JMP) {
                 comp_err << "Syntax Error: Only JMP supports (addr) indirect mode.\n";
@@ -457,11 +450,9 @@ namespace interp {
         return false;
     }
     bool validateInstructionAddressingMode(icode::opc instruction, const std::string& mode) {        
-        std::cout << "validateInstructionAddressingMode: " << icode::op_array[static_cast<unsigned int>(instruction)] 
-                  << " with mode: " << mode << "\n";
-                  
+                
         if (mode == "RELATIVE") {
-            // Only branch instructions support relative addressing
+            
             bool isRelative = (instruction == icode::opc::BPL ||  // Branch if Plus
                               instruction == icode::opc::BMI ||  // Branch if Minus
                               instruction == icode::opc::BVC ||  // Branch if Overflow Clear
@@ -471,12 +462,10 @@ namespace interp {
                               instruction == icode::opc::BNE ||  // Branch if Not Equal
                               instruction == icode::opc::BEQ);   // Branch if Equal
             
-            std::cout << "Relative check result: " << isRelative << "\n";
             return isRelative;
         }
               
         if (mode == "IMPLIED") {
-            // List of all instructions that support implied addressing
             bool isImplied = (instruction == icode::opc::CLC || instruction == icode::opc::CLD || 
                              instruction == icode::opc::CLI || instruction == icode::opc::CLV ||
                              instruction == icode::opc::SEC || instruction == icode::opc::SED ||
@@ -490,12 +479,10 @@ namespace interp {
                              instruction == icode::opc::PLA || instruction == icode::opc::PLP ||
                              instruction == icode::opc::RTS || instruction == icode::opc::RTI);
     
-            std::cout << "Implied check result: " << isImplied << "\n";
             return isImplied;
         }
         
         if (mode == "IMMEDIATE") {
-            // Most instructions support immediate mode, but not all
             return (instruction == icode::opc::LDA || instruction == icode::opc::LDX || 
                     instruction == icode::opc::LDY || instruction == icode::opc::CMP ||
                     instruction == icode::opc::CPX || instruction == icode::opc::CPY ||
@@ -505,7 +492,6 @@ namespace interp {
         }
         
         if (mode == "ABSOLUTE_X") {
-            // Instructions that support X indexing
             return (instruction == icode::opc::LDA || instruction == icode::opc::LDY ||
                     instruction == icode::opc::STA || instruction == icode::opc::STY ||
                     instruction == icode::opc::CMP || instruction == icode::opc::ADC ||
@@ -585,11 +571,11 @@ namespace interp {
         if (mode == "ACCUMULATOR") {
             bool isAccumulator = (instruction == icode::opc::ASL || instruction == icode::opc::LSR ||
                                 instruction == icode::opc::ROL || instruction == icode::opc::ROR);
-            std::cout << "Accumulator check result: " << isAccumulator << "\n";
+    
             return isAccumulator;
       }
         
-        std::cout << "Mode '" << mode << "' not recognized or not supported\n";
+    
         return false;
     }
     

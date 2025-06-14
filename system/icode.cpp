@@ -263,7 +263,7 @@ namespace icode {
         reg_x = reg_y = reg_a = 0;
         ip = 0;
         sp = 0xFF;        
-        std::cout << "DEBUG: Processor reset - SP initialized to " << (int)sp << "\n";
+        std::cout << "ats: Processor reset - SP initialized to " << (int)sp << "\n";
     }
     
     void Processor::setIp(const address_size &ip_val) {
