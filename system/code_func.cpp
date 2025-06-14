@@ -352,17 +352,18 @@ namespace interp {
         if (mode == "INDIRECT") {
             return instruction == icode::opc::JMP;
         }
-        if (mode == "INDEXED_INDIRECT") {
-            return (instruction == icode::opc::LDA ||
-                    instruction == icode::opc::STA ||
-                    instruction == icode::opc::CMP ||
-                    instruction == icode::opc::ADC ||
-                    instruction == icode::opc::SBC ||
-                    instruction == icode::opc::AND ||
-                    instruction == icode::opc::ORA ||
-                    instruction == icode::opc::EOR);
-        }
-        if (mode == "INDIRECT_INDEXED") {
+        
+        if (mode == "INDEXED_INDIRECT" || mode == "INDEXED_I") {
+        return (instruction == icode::opc::LDA ||
+                instruction == icode::opc::STA ||
+                instruction == icode::opc::CMP ||
+                instruction == icode::opc::ADC ||
+                instruction == icode::opc::SBC ||
+                instruction == icode::opc::AND ||
+                instruction == icode::opc::ORA ||
+                instruction == icode::opc::EOR);
+    }
+        if (mode == "INDIRECT_INDEXED" || mode == "INDIRECT_I") {
             return (instruction == icode::opc::LDA ||
                     instruction == icode::opc::STA ||
                     instruction == icode::opc::CMP ||
