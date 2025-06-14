@@ -9,10 +9,8 @@ namespace token {
             return;
         }
         
-        uint8_t lo = code.peek(address);     // Low byte at address
-        uint8_t hi = code.peek(address + 1); // High byte at address + 1
-        
-        // Combine as little-endian 16-bit value
+        uint8_t lo = code.peek(address);     
+        uint8_t hi = code.peek(address + 1); 
         uint16_t value = (static_cast<uint16_t>(hi) << 8) | lo;
         
         std::cout << "[ $" 
@@ -25,6 +23,7 @@ namespace token {
                 << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << static_cast<unsigned int>(hi)
                 << " ] -> $"
                 << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << value
+                << " | #" << std::dec << value
                 << " ]\n";
     }
     
