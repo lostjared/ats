@@ -1,5 +1,8 @@
 # ATS
 
+![6502](https://github.com/user-attachments/assets/32f0bd69-8a24-431d-8a4e-dc2921dc244a)
+
+
 The main goal of this project is to facilitate self-learning in the realm of interpreters, experimenting with a range of concepts heavily influenced by "The Atari Assembler" book. While it doesn't strive for an exact reproduction and acknowledges the presence of some inaccuracies, the project is designed to enrich the learning experience.
 
 ## Prerequisites
