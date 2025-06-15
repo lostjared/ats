@@ -417,6 +417,47 @@
             height: 12px;
             border-radius: 2px;
         }
+        .memory-dump-container {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .memory-dump-textarea {
+            width: 100%;
+            height: 100%;
+            background: #111;
+            color: #f0f0f0;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            resize: none;
+            overflow-y: auto;
+            white-space: pre;
+        }
+
+        .view-toggle-btn {
+            background: #444;
+            color: #fff;
+            border: 1px solid #666;
+            border-radius: 5px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-toggle-btn:hover {
+            background: #555;
+        }
+
+        .view-toggle-btn.active {
+            background: #cc0000;
+            border-color: #cc0000;
+        }
 </style>
 </head>
 <body>
@@ -1737,6 +1778,67 @@ END`,
         debugMsg('Memory viewer closed');
     }
 
+    // Add these variables with your existing memory variables
+    let currentView = 'grid'; // 'grid' or 'dump'
+
+    // Add these functions to your existing JavaScript
+    function switchToGridView() {
+        currentView = 'grid';
+        document.getElementById('gridViewContainer').style.display = 'flex';
+        document.getElementById('dumpViewContainer').style.display = 'none';
+        document.getElementById('gridViewBtn').classList.add('active');
+        document.getElementById('dumpViewBtn').classList.remove('active');
+        debugMsg('Switched to grid view');
+    }
+
+    function switchToDumpView() {
+        currentView = 'dump';
+        document.getElementById('gridViewContainer').style.display = 'none';
+        document.getElementById('dumpViewContainer').style.display = 'flex';
+        document.getElementById('gridViewBtn').classList.remove('active');
+        document.getElementById('dumpViewBtn').classList.add('active');
+        generateMemoryDump();
+        debugMsg('Switched to dump view');
+    }
+
+    function generateMemoryDump() {
+        if (!atsDebugger) return;
+        
+        try {
+            debugMsg('Generating memory dump...');
+            
+            const modifiedJson = atsDebugger.getModifiedMemory();
+            const modifiedList = JSON.parse(modifiedJson);
+            
+            let dumpText = '';
+            
+            if (modifiedList.length === 0) {
+                dumpText = 'No memory addresses have been modified yet.\nRun your program to see memory changes.';
+            } else {
+                dumpText += `Memory Dump - ${modifiedList.length} Modified Addresses\n`;
+                dumpText += '=' .repeat(50) + '\n\n';
+                
+                modifiedList.forEach(mod => {
+                    const address = mod.address;
+                    const value = mod.value;
+                    const hexAddr = address.toString(16).toUpperCase().padStart(4, '0');
+                    const hexVal = value.toString(16).toUpperCase().padStart(2, '0');
+                    const decVal = value.toString().padStart(3, ' ');
+                    
+                    dumpText += `Memory Address: [ $${hexAddr} ] = [ $${hexVal} | ${decVal} ]\n`;
+                });
+            }
+            
+            document.getElementById('memoryDumpText').value = dumpText;
+            debugMsg(`Memory dump generated with ${modifiedList.length} entries`);
+            
+        } catch (error) {
+            debugMsg(`Memory dump generation error: ${error.message}`, 'error');
+            document.getElementById('memoryDumpText').value = `Error generating memory dump: ${error.message}`;
+        }
+    }
+
+    // Update your existing refreshMemory function to also refresh the dump view
     function refreshMemory() {
         if (!atsDebugger) return;
         
@@ -1753,6 +1855,11 @@ END`,
             });
             
             debugMsg(`Memory refreshed. Modified addresses: ${modifiedAddresses.size}`);
+            
+            // If we're in dump view, refresh the dump
+            if (currentView === 'dump') {
+                generateMemoryDump();
+            }
             
         } catch (error) {
             debugMsg(`Memory refresh error: ${error.message}`, 'error');
@@ -1879,8 +1986,19 @@ END`,
     // Add event listeners for existing buttons
     buildBtn.addEventListener('click', buildCode);
     generateBtn.addEventListener('click', generateReport);
-    clearBtn.addEventListener('click', clearCode);
+    clearBtn.addEventListener('click', clearCode);  
+    const gridViewBtn = document.getElementById('gridViewBtn');
+    const dumpViewBtn = document.getElementById('dumpViewBtn');
 
+    if (gridViewBtn) {
+        gridViewBtn.addEventListener('click', switchToGridView);
+        debugMsg('Grid view button event listener added');
+    }
+
+    if (dumpViewBtn) {
+        dumpViewBtn.addEventListener('click', switchToDumpView);
+        debugMsg('Dump view button event listener added');
+    }
     
     // CREATE THE MISSING EXECUTION CONTROL BUTTONS
     const buttonGroup = document.querySelector('.button-group');
@@ -2098,69 +2216,83 @@ END`,
         onerror="console.error('❌ Failed to load ats.js - file may not exist or have syntax errors')">
 </script>
 
+<!-- ...existing code... -->
 <div id="memoryOverlay" class="memory-overlay"></div>
 <div id="memoryViewer" class="memory-viewer">
-    <div class="memory-viewer-header">
-        <h3>🧠 Memory Viewer</h3>
-        <button class="close-btn" id="memoryCloseBtn">✕ Close</button>
+  <div class="memory-viewer-header">
+    <h3>🧠 Memory Viewer</h3>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <button class="view-toggle-btn active" id="gridViewBtn">📊 Grid View</button>
+      <button class="view-toggle-btn" id="dumpViewBtn">📄 Text Dump</button>
+      <button class="close-btn" id="memoryCloseBtn">✕ Close</button>
     </div>
-    <div class="memory-viewer-content">
-        <div class="memory-search">
-            <label style="color: #ffcc00;">Jump to address:</label>
-            <input type="text" id="memorySearch" placeholder="$1000" maxlength="6">
-            <span style="color: #666; margin-left: 20px;">|</span>
-            <button class="btn btn-secondary" id="memoryRefreshBtn" style="padding: 6px 12px; font-size: 12px;">🔄 Refresh</button>
-        </div>
-        
-        <div class="memory-legend">
-            <div class="legend-item">
-                <div class="legend-color" style="background: #1a1a1a;"></div>
-                <span style="color: #ccc;">Unmodified</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #004400;"></div>
-                <span style="color: #00ff00;">Modified</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #444400;"></div>
-                <span style="color: #ffff00;">Highlighted</span>
-            </div>
-        </div>
-        
-        <div class="memory-info">
-            <div>
-                <span style="color: #ffcc00;">Selected:</span>
-                <span id="selectedAddress" style="color: #00ff00;">None</span>
-            </div>
-            <div>
-                <span style="color: #ffcc00;">Value:</span>
-                <span id="selectedValue" style="color: #00ff00;">--</span>
-            </div>
-            <div>
-                <span style="color: #ffcc00;">Decimal:</span>
-                <span id="selectedDecimal" style="color: #00ff00;">--</span>
-            </div>
-            <div>
-                <span style="color: #ffcc00;">ASCII:</span>
-                <span id="selectedAscii" style="color: #00ff00;">--</span>
-            </div>
-        </div>
-        
-        <div class="memory-grid-container">
-            <table id="memoryTable" class="memory-grid">
-                <thead>
-                    <tr>
-                        <th class="address-column">Address</th>
-                        <th>00</th><th>01</th><th>02</th><th>03</th><th>04</th><th>05</th><th>06</th><th>07</th>
-                        <th>08</th><th>09</th><th>0A</th><th>0B</th><th>0C</th><th>0D</th><th>0E</th><th>0F</th>
-                    </tr>
-                </thead>
-                <tbody id="memoryTableBody">
-                    <!-- Memory grid will be populated here -->
-                </tbody>
-            </table>
-        </div>
+  </div>
+  <div class="memory-viewer-content">
+    <div class="memory-search">
+      <label style="color: #ffcc00;">Jump to address:</label>
+      <input type="text" id="memorySearch" placeholder="$1000" maxlength="6">
+      <span style="color: #666; margin-left: 20px;">|</span>
+      <button class="btn btn-secondary" id="memoryGoBtn" style="padding: 6px 12px; font-size: 12px;">🎯 Go</button>
+      <button class="btn btn-secondary" id="memoryRefreshBtn" style="padding: 6px 12px; font-size: 12px;">🔄 Refresh</button>
     </div>
-</div>
-</body>
+    <!-- Grid View Container -->
+    <div id="gridViewContainer" style="display: flex; flex-direction: column; flex: 1;">
+      <div class="memory-legend">
+        <div class="legend-item">
+          <div class="legend-color" style="background: #1a1a1a;"></div>
+          <span style="color: #ccc;">Unmodified</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #004400;"></div>
+          <span style="color: #00ff00;">Modified</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #444400;"></div>
+          <span style="color: #ffff00;">Highlighted</span>
+        </div>
+      </div>
+      <div class="memory-info">
+        <div>
+          <span style="color: #ffcc00;">Selected:</span>
+          <span id="selectedAddress" style="color: #00ff00;">None</span>
+        </div>
+        <div>
+          <span style="color: #ffcc00;">Value:</span>
+          <span id="selectedValue" style="color: #00ff00;">--</span>
+        </div>
+        <div>
+          <span style="color: #ffcc00;">Decimal:</span>
+          <span id="selectedDecimal" style="color: #00ff00;">--</span>
+        </div>
+        <div>
+          <span style="color: #ffcc00;">ASCII:</span>
+          <span id="selectedAscii" style="color: #00ff00;">--</span>
+        </div>
+      </div>
+      <div class="memory-grid-container">
+        <table id="memoryTable" class="memory-grid">
+          <thead>
+            <tr>
+              <th>Address</th>
+              <th>00</th><th>01</th><th>02</th><th>03</th>
+              <th>04</th><th>05</th><th>06</th><th>07</th>
+              <th>08</th><th>09</th><th>0A</th><th>0B</th>
+              <th>0C</th><th>0D</th><th>0E</th><th>0F</th>
+            </tr>
+          </thead>
+          <tbody id="memoryTableBody">
+            <!-- Memory rows will be generated here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Text Dump View Container -->
+    <div id="dumpViewContainer" class="memory-dump-container" style="display: none;">
+      <div style="margin-bottom: 10px; color: #ffcc00; font-size: 12px;">
+        Raw Memory Dump - Modified Addresses Only
+      </div>
+      <textarea id="memoryDumpText" class="memory-dump-textarea" readonly></textarea>
+    </div>
+  </div>
+</div></body>
 </html>
