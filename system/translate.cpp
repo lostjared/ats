@@ -314,8 +314,21 @@ namespace translate {
                     : std::stoul(tokens[1].getToken(), nullptr, 10);
 
                 if (v <= 0xFF) {
-                    inst.mode = interp::ZEROPAGE_X;
+                    if(confirm_mode(inst.opcode, interp::ZEROPAGE_X, inst.op_byte)) {
+                        inst.mode = interp::ZEROPAGE_X;
+                    } else if(confirm_mode(inst.opcode, interp::ABSOLUTE_X, inst.op_byte)) {
+                        inst.mode = interp::ABSOLUTE_X;
+                    } else {
+                        std::ostringstream stream;
+                        stream << "Error on Line: " << line_value << " instruction does not support ,X indexing.\n";
+                        throw cExcep(stream.str());
+                    }
                 } else {
+                    if(!confirm_mode(inst.opcode, interp::ABSOLUTE_X, inst.op_byte)) {
+                        std::ostringstream stream;
+                        stream << "Error on Line: " << line_value << " instruction does not support ABSOLUTE,X indexing.\n";
+                        throw cExcep(stream.str());
+                    }
                     inst.mode = interp::ABSOLUTE_X;
                 }
 
@@ -333,8 +346,21 @@ namespace translate {
                     : std::stoul(tokens[1].getToken(), nullptr, 10);
 
                 if (v <= 0xFF) {
-                    inst.mode = interp::ZEROPAGE_Y;
+                    if(confirm_mode(inst.opcode, interp::ZEROPAGE_Y, inst.op_byte)) {
+                        inst.mode = interp::ZEROPAGE_Y;
+                    } else if(confirm_mode(inst.opcode, interp::ABSOLUTE_Y, inst.op_byte)) {
+                        inst.mode = interp::ABSOLUTE_Y;
+                    } else {
+                        std::ostringstream stream;
+                        stream << "Error on Line: " << line_value << " instruction does not support ,Y indexing.\n";
+                        throw cExcep(stream.str());
+                    }
                 } else {
+                    if(!confirm_mode(inst.opcode, interp::ABSOLUTE_Y, inst.op_byte)) {
+                        std::ostringstream stream;
+                        stream << "Error on Line: " << line_value << " instruction does not support ABSOLUTE,Y indexing.\n";
+                        throw cExcep(stream.str());
+                    }
                     inst.mode = interp::ABSOLUTE_Y;
                 }
 
@@ -349,17 +375,11 @@ namespace translate {
                     tokens[3].getToken() == "," &&
                     (tokens[4].getToken() == "X" || tokens[4].getToken() == "x") &&
                     tokens[5].getToken() == ")") {
-                    inst.mode = interp::INDEXED_I;
-                    inst.op1 = icode::Operand(icode::toHex(tokens[2].getToken()), icode::op_type::OP_MEMORY);
-                    code.instruct.push_back(inst);
-                    return true;
-                }
-        
-                if (tokens[1].getToken() == "(" &&
-                    (tokens[2].getTokenType() == lex::TOKEN_HEX || tokens[2].getTokenType() == lex::TOKEN_DIGIT) &&
-                    tokens[3].getToken() == ")" &&
-                    tokens[4].getToken() == "," &&
-                    (tokens[5].getToken() == "X" || tokens[5].getToken() == "x")) {
+                    if(!confirm_mode(inst.opcode, interp::INDEXED_I, inst.op_byte)) {
+                        std::ostringstream stream;
+                        stream << "Error on Line: " << line_value << " instruction does not support (addr,X) addressing.\n";
+                        throw cExcep(stream.str());
+                    }
                     inst.mode = interp::INDEXED_I;
                     inst.op1 = icode::Operand(icode::toHex(tokens[2].getToken()), icode::op_type::OP_MEMORY);
                     code.instruct.push_back(inst);
@@ -371,6 +391,11 @@ namespace translate {
                     tokens[3].getToken() == ")" &&
                     tokens[4].getToken() == "," &&
                     (tokens[5].getToken() == "Y" || tokens[5].getToken() == "y")) {
+                    if(!confirm_mode(inst.opcode, interp::INDIRECT_I, inst.op_byte)) {
+                        std::ostringstream stream;
+                        stream << "Error on Line: " << line_value << " instruction does not support (addr),Y addressing.\n";
+                        throw cExcep(stream.str());
+                    }
                     inst.mode = interp::INDIRECT_I;
                     inst.op1 = icode::Operand(icode::toHex(tokens[2].getToken()), icode::op_type::OP_MEMORY);
                     code.instruct.push_back(inst);
@@ -434,20 +459,26 @@ namespace translate {
                         break;
                     case lex::TOKEN_HEX: {
                         
-                        if(confirm_mode(inst.opcode, interp::ABSOLUTE, inst.op_byte) == false) {
-                            std::ostringstream stream;
-                            stream << "Error on Line: " << line_value << " " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " not supported in ABSOLUTE addressing mode.\n";
-                            throw cExcep(stream.str());
-                        }
                         unsigned int hex_address = icode::toHex(tokens[1].getToken());
                         if(hex_address <= 255) {
-                            inst.op1 = icode::Operand(hex_address, icode::op_type::OP_MEMORY);
-                            inst.mode = interp::ZEROPAGE;
-                            
+                            if(confirm_mode(inst.opcode, interp::ZEROPAGE, inst.op_byte)) {
+                                inst.mode = interp::ZEROPAGE;
+                            } else if(confirm_mode(inst.opcode, interp::ABSOLUTE, inst.op_byte)) {
+                                inst.mode = interp::ABSOLUTE;
+                            } else {
+                                std::ostringstream stream;
+                                stream << "Error on Line: " << line_value << " " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " not supported in addressing mode.\n";
+                                throw cExcep(stream.str());
+                            }
                         } else {
-                            inst.op1 = icode::Operand(hex_address, icode::op_type::OP_MEMORY);
+                            if(confirm_mode(inst.opcode, interp::ABSOLUTE, inst.op_byte) == false) {
+                                std::ostringstream stream;
+                                stream << "Error on Line: " << line_value << " " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " not supported in ABSOLUTE addressing mode.\n";
+                                throw cExcep(stream.str());
+                            }
                             inst.mode = interp::ABSOLUTE;
                         }
+                        inst.op1 = icode::Operand(hex_address, icode::op_type::OP_MEMORY);
                         code.instruct.push_back(inst);
                         return true;
                     }
@@ -561,36 +592,46 @@ namespace translate {
                         
                         if(tokens[2].getToken() == "," && reg == "x") {
                             
-                            if(confirm_mode(inst.opcode, interp::ABSOLUTE_X, inst.op_byte)==false) {
-                                if(confirm_mode(inst.opcode, interp::ZEROPAGE_X, inst.op_byte)) {
-                                    inst.mode = interp::ZEROPAGE_X;
-                                } else {
+                            if(hex_value > 0xFF) {
+                                if(confirm_mode(inst.opcode, interp::ABSOLUTE_X, inst.op_byte)==false) {
                                     std::ostringstream stream;
                                     stream << "Error on Line: " << line_value << " instruction " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " has X register but not supported in ABSOLUTE X address mode.\n";
                                     throw cExcep(stream.str());
                                 }
-                            }
-                            
-                            if(hex_value > 0xFF)
                                 inst.mode = interp::ABSOLUTE_X;
-                            else
-                                inst.mode = interp::ZEROPAGE_X;
-                        }
-                        if(tokens[2].getToken() == "," && reg == "y") {
-                            if(confirm_mode(inst.opcode, interp::ABSOLUTE_Y,inst.op_byte)==false) {
-                                if(confirm_mode(inst.opcode, interp::ZEROPAGE_Y, inst.op_byte)) {
-                                    inst.mode = interp::ZEROPAGE_Y;
+                            } else {
+                                if(confirm_mode(inst.opcode, interp::ZEROPAGE_X, inst.op_byte)==false) {
+                                    if(confirm_mode(inst.opcode, interp::ABSOLUTE_X, inst.op_byte)==false) {
+                                        std::ostringstream stream;
+                                        stream << "Error on Line: " << line_value << " instruction " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " not supported in indexed X address mode.\n";
+                                        throw cExcep(stream.str());
+                                    }
+                                    inst.mode = interp::ABSOLUTE_X;
                                 } else {
-                                    std::ostringstream stream;
-                                    stream << "Error on Line: " << line_value << " instruction " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " has Y register but not supported in ABSOLUTE y address mode.\n";
-                                    throw cExcep(stream.str());
+                                    inst.mode = interp::ZEROPAGE_X;
                                 }
                             }
-                            
-                            if(hex_value <= 255)
-                                inst.mode = interp::ZEROPAGE_Y;
-                            else
+                        }
+                        if(tokens[2].getToken() == "," && reg == "y") {
+                            if(hex_value <= 255) {
+                                if(confirm_mode(inst.opcode, interp::ZEROPAGE_Y, inst.op_byte)==false) {
+                                    if(confirm_mode(inst.opcode, interp::ABSOLUTE_Y, inst.op_byte)==false) {
+                                        std::ostringstream stream;
+                                        stream << "Error on Line: " << line_value << " instruction " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " not supported in indexed Y address mode.\n";
+                                        throw cExcep(stream.str());
+                                    }
+                                    inst.mode = interp::ABSOLUTE_Y;
+                                } else {
+                                    inst.mode = interp::ZEROPAGE_Y;
+                                }
+                            } else {
+                                if(confirm_mode(inst.opcode, interp::ABSOLUTE_Y, inst.op_byte)==false) {
+                                    std::ostringstream stream;
+                                    stream << "Error on Line: " << line_value << " instruction " << icode::op_array[static_cast<unsigned int>(inst.opcode)] << " has Y register but not supported in ABSOLUTE Y address mode.\n";
+                                    throw cExcep(stream.str());
+                                }
                                 inst.mode = interp::ABSOLUTE_Y;
+                            }
                         }
                         inst.op1 = icode::Operand(hex_value, icode::op_type::OP_MEMORY);
 

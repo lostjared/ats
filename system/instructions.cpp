@@ -294,7 +294,7 @@ namespace interp {
             } break;
             
             case icode::op_type::OP_MEMORY: {
-                uint8_t addr = c.instruct.at(in).op1.op;
+                uint16_t addr = c.instruct.at(in).op1.op;
                 switch(c.instruct.at(in).mode) {
                     case ABSOLUTE: {
                         uint8_t cc = c.peek(addr);
@@ -411,12 +411,12 @@ namespace interp {
     void i_brk(Code &c) {
         uint16_t pc_plus_2 = c.proc.ip + 2;
         c.poke(0x0100 + c.proc.sp, (pc_plus_2 >> 8) & 0xFF);
-        c.proc.sp--;
+        c.proc.sp = (c.proc.sp - 1) & 0xFF;
         c.poke(0x0100 + c.proc.sp, pc_plus_2 & 0xFF);
-        c.proc.sp--;
+        c.proc.sp = (c.proc.sp - 1) & 0xFF;
         uint8_t status = c.proc.valFlags() | 0x10; 
         c.poke(0x0100 + c.proc.sp, status);
-        c.proc.sp--;
+        c.proc.sp = (c.proc.sp - 1) & 0xFF;
         
         c.proc.setFlag(icode::FLAG_INTERRUPT, 1);
         c.stop();
@@ -576,7 +576,7 @@ namespace interp {
 
     void i_dec(Code &c) {
         int in = c.proc.getIp();
-        uint8_t addr = c.instruct.at(in).op1.op;
+        uint16_t addr = c.instruct.at(in).op1.op;
         switch(c.instruct.at(in).mode) {
             case ABSOLUTE: {
                 uint8_t value = c.peek(addr) - 1;
@@ -839,7 +839,7 @@ namespace interp {
             } break;
             
             case icode::op_type::OP_MEMORY: {
-                uint8_t addr = c.instruct[ip].op1.op;
+                uint16_t addr = c.instruct[ip].op1.op;
                 switch(c.instruct[ip].mode) {
                     case ABSOLUTE: {
                         uint8_t cc = c.peek(addr);
@@ -1032,7 +1032,7 @@ namespace interp {
 
     void i_inc(Code &c) {
         int in = c.proc.getIp();
-        uint8_t addr = c.instruct.at(in).op1.op;
+        uint16_t addr = c.instruct.at(in).op1.op;
         switch(c.instruct.at(in).mode) {
             case ABSOLUTE: {
                 uint8_t value = c.peek(addr) + 1;
@@ -1097,21 +1097,21 @@ namespace interp {
     void i_php(Code &c) {
         uint8_t status = c.proc.valFlags() | 0x30;
         c.poke(0x0100 + c.proc.sp, status);
-        c.proc.sp--;
+        c.proc.sp = (c.proc.sp - 1) & 0xFF;
     }
 
     void i_plp(Code &c) {
-        c.proc.sp++;
+        c.proc.sp = (c.proc.sp + 1) & 0xFF;
         uint8_t flags = c.peek(0x0100 + c.proc.sp);
         c.proc.setFlags(flags);
     }
 
     void i_rti(Code &c) {
-        c.proc.sp++;
+        c.proc.sp = (c.proc.sp + 1) & 0xFF;
         uint8_t status = c.peek(0x0100 + c.proc.sp);
-        c.proc.sp++;
+        c.proc.sp = (c.proc.sp + 1) & 0xFF;
         uint8_t pcl = c.peek(0x0100 + c.proc.sp);
-        c.proc.sp++;
+        c.proc.sp = (c.proc.sp + 1) & 0xFF;
         uint8_t pch = c.peek(0x0100 + c.proc.sp);
         
         c.proc.setFlags(status);
@@ -1137,7 +1137,7 @@ namespace interp {
             } break;
             
             case icode::op_type::OP_MEMORY: {
-                uint8_t addr = c.instruct.at(in).op1.op;
+                uint16_t addr = c.instruct.at(in).op1.op;
                 switch(c.instruct.at(in).mode) {
                     case ABSOLUTE: {
                         uint8_t cc = c.peek(addr);
@@ -1205,7 +1205,7 @@ namespace interp {
             } break;
             
             case icode::op_type::OP_MEMORY: {
-                uint8_t addr = c.instruct.at(in).op1.op;
+                uint16_t addr = c.instruct.at(in).op1.op;
                 switch(c.instruct.at(in).mode) {
                     case ABSOLUTE: {
                         uint8_t cc = c.peek(addr);

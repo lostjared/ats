@@ -416,12 +416,6 @@ namespace interp {
             tokens[startIndex + 2].getToken() == "," &&
             (tokens[startIndex + 3].getToken() == "X" || tokens[startIndex + 3].getToken() == "x") &&
             tokens[startIndex + 4].getToken() == ")")
-            ||
-        
-            (tokens.size() > startIndex + 4 &&
-            tokens[startIndex + 2].getToken() == ")" &&
-            tokens[startIndex + 3].getToken() == "," &&
-            (tokens[startIndex + 4].getToken() == "X" || tokens[startIndex + 4].getToken() == "x"))
         ) {
             addressingMode = "INDEXED_INDIRECT";
             return validateInstructionIndirectMode(instruction, addressingMode);
