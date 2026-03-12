@@ -5,6 +5,39 @@
 #include "translate.hpp"
 #include "tee_streambuf.hpp"
 #include"code.hpp"
+
+namespace {
+    std::string html_escape(const std::string &s) {
+        std::string out;
+        out.reserve(s.size() * 12 / 10 + 8);
+        for (char c : s) {
+            switch (c) {
+                case '&':  out += "&amp;";  break;
+                case '<':  out += "&lt;";   break;
+                case '>':  out += "&gt;";   break;
+                case '"': out += "&quot;"; break;
+                case '\'': out += "&#39;";  break;
+                default:   out.push_back(c); break;
+            }
+        }
+        return out;
+    }
+    std::string json_escape(const std::string &s) {
+        std::string out;
+        for (char c : s) {
+            switch (c) {
+                case '\\': out += "\\\\"; break;
+                case '"':  out += "\\\""; break;
+                case '\n': out += "\\n"; break;
+                case '\r': out += "\\r"; break;
+                case '\t': out += "\\t"; break;
+                default:    out.push_back(c); break;
+            }
+        }
+        return out;
+    }
+}
+
 // Function that returns HTML as a string
 std::string generateHTML() {
     std::ostringstream html;
@@ -264,24 +297,24 @@ std::string generateHTML() {
             
             // Label column
             if(inst.label) {
-                html << "                        <td class=\"label\">" << inst.label_text << "</td>\n";
+                html << "                        <td class=\"label\">" << html_escape(inst.label_text) << "</td>\n";
             } else {
                 html << "                        <td>-</td>\n";
             }
             
             // Instruction text
-            html << "                        <td class=\"instruction\">" << inst.text << "</td>\n";
+            html << "                        <td class=\"instruction\">" << html_escape(inst.text) << "</td>\n";
             
             // Opcode (safely)
             try {
-                html << "                        <td class=\"opcode\">" << icode::op_array[static_cast<unsigned int>(inst.opcode)] << "</td>\n";
+                html << "                        <td class=\"opcode\">" << html_escape(icode::op_array[static_cast<unsigned int>(inst.opcode)]) << "</td>\n";
             } catch(...) {
                 html << "                        <td class=\"opcode\">ERROR</td>\n";
             }
             
             // Address mode (safely)
             try {
-                html << "                        <td class=\"address-mode\">" << interp::add_mode[inst.mode] << "</td>\n";
+                html << "                        <td class=\"address-mode\">" << html_escape(interp::add_mode[inst.mode]) << "</td>\n";
             } catch(...) {
                 html << "                        <td class=\"address-mode\">ERROR</td>\n";
             }
@@ -290,7 +323,7 @@ std::string generateHTML() {
             html << "                        <td class=\"operand\">";
             try {
                 if(inst.op1.op_t == icode::op_type::OP_LABELTEXT) {
-                    html << "Label: " << inst.op1.label_text;
+                    html << "Label: " << html_escape(inst.op1.label_text);
                 } else if(inst.op1.op_t == icode::op_type::OP_DECIMAL) {
                     html << "$" << std::hex << std::uppercase << (int)inst.op1.op << std::dec;
                 } else if(inst.op1.op_t == icode::op_type::OP_MEMORY) {
@@ -306,7 +339,7 @@ std::string generateHTML() {
             html << "</td>\n";
             
             // Machine code
-            html << "                        <td class=\"machine-code\">" << hex_code << "</td>\n";
+            html << "                        <td class=\"machine-code\">" << html_escape(hex_code) << "</td>\n";
             
             html << "                    </tr>\n";
         }
@@ -497,9 +530,9 @@ public:
         info << "\"valid\":true,";
         info << "\"index\":" << nextIndex << ",";
         info << "\"lineNum\":" << inst.line_num << ",";
-        info << "\"text\":\"" << inst.text << "\",";
-        info << "\"opcode\":\"" << icode::op_array[static_cast<unsigned int>(inst.opcode)] << "\",";
-        info << "\"addressMode\":\"" << interp::add_mode[inst.mode] << "\",";
+        info << "\"text\":\"" << json_escape(inst.text) << "\",";
+        info << "\"opcode\":\"" << json_escape(icode::op_array[static_cast<unsigned int>(inst.opcode)]) << "\",";
+        info << "\"addressMode\":\"" << json_escape(interp::add_mode[inst.mode]) << "\",";
         
         if (inst.opcode == icode::opc::BNE || inst.opcode == icode::opc::BEQ || 
             inst.opcode == icode::opc::BCC || inst.opcode == icode::opc::BCS ||

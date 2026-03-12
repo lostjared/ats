@@ -1,5 +1,23 @@
 #include "function.hpp"
 
+namespace {
+    std::string html_escape(const std::string &s) {
+        std::string out;
+        out.reserve(s.size() * 12 / 10 + 8);
+        for (char c : s) {
+            switch (c) {
+                case '&':  out += "&amp;";  break;
+                case '<':  out += "&lt;";   break;
+                case '>':  out += "&gt;";   break;
+                case '"': out += "&quot;"; break;
+                case '\'': out += "&#39;";  break;
+                default:   out.push_back(c); break;
+            }
+        }
+        return out;
+    }
+}
+
 namespace token {
     void token_HTML(const std::string &command, std::vector<lex::Token> &tokens) {
         if(tokens[1].getTokenType() != lex::TOKEN_STRING) {
@@ -23,9 +41,9 @@ namespace token {
         for(unsigned int i = 0; i < code.instruct.size(); ++i) {
             file << "<tr>";
             file << "<th>" << code.instruct[i].line_num << "</th>";
-            file << "<th>" << interp::add_mode[code.instruct[i].mode] << "</th>";
-            file << "<th>" << code.instruct[i].text << "</th>";
-            file << "<th>" << icode::instructionToHex(code.instruct[i]) << "</th>";
+            file << "<th>" << html_escape(interp::add_mode[code.instruct[i].mode]) << "</th>";
+            file << "<th>" << html_escape(code.instruct[i].text) << "</th>";
+            file << "<th>" << html_escape(icode::instructionToHex(code.instruct[i])) << "</th>";
             file << "</tr>\n";
         }
         file << "\n</table>\n";

@@ -1142,6 +1142,12 @@ END`,
     
     
     
+    // HTML escaping helper to prevent XSS
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = String(str);
+        return div.innerHTML;
+    }
 
     // Debug logging function
     function debugMsg(message, type = 'info') {
@@ -1161,7 +1167,7 @@ END`,
             debugSection.innerHTML = `
                 <h4>🐛 Debug Log:</h4>
                 <div style="font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto; background: #111; padding: 10px; border-radius: 5px;">
-                    ${debugLog.slice(-20).map(log => `<div>${log}</div>`).join('')}
+                    ${debugLog.slice(-20).map(log => `<div>${escapeHtml(log)}</div>`).join('')}
                 </div>
             `;
         }
@@ -1424,7 +1430,7 @@ END`,
             outputContent.innerHTML = `
                 <div style="text-align: center; padding: 40px; color: #ff6666;">
                     <h3>❌ Compilation Failed</h3>
-                    <p style="margin-top: 10px;">${error.message}</p>
+                    <p style="margin-top: 10px;">${escapeHtml(error.message)}</p>
                     <p style="margin-top: 15px; color: #cccccc;">Please check your assembly code and try again.</p>
                 </div>
             `;
@@ -1732,9 +1738,9 @@ END`,
                         ${instrInfo.valid ? `
                             <div style="margin: 8px 0;"><span style="color: #ffcc00;">Step:</span> <span style="color: #00ff00;">${state.currentInstruction + 1} of ${state.totalInstructions}</span></div>
                             <div style="margin: 8px 0;"><span style="color: #ffcc00;">Line:</span> <span style="color: #00ff00;">${instrInfo.lineNum}</span></div>
-                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">${executionStarted ? 'Current' : 'Next'}:</span> <span style="color: #00ff00;">${instrInfo.text}</span></div>
-                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Opcode:</span> <span style="color: #00ff00;">${instrInfo.opcode}</span></div>
-                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Mode:</span> <span style="color: #00ff00;">${instrInfo.addressMode}</span></div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">${executionStarted ? 'Current' : 'Next'}:</span> <span style="color: #00ff00;">${escapeHtml(instrInfo.text)}</span></div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Opcode:</span> <span style="color: #00ff00;">${escapeHtml(instrInfo.opcode)}</span></div>
+                            <div style="margin: 8px 0;"><span style="color: #ffcc00;">Mode:</span> <span style="color: #00ff00;">${escapeHtml(instrInfo.addressMode)}</span></div>
                             <div style="margin: 8px 0;"><span style="color: #ffcc00;">Branch:</span> <span style="color: ${instrInfo.willBranch ? '#00ff00' : '#ff6666'};">${instrInfo.willBranch ? 'WILL TAKE' : 'WILL NOT TAKE'}</span></div>
                             <div style="margin: 8px 0;"><span style="color: #ffcc00;">Target:</span> <span style="color: #00ff00;">${instrInfo.branchTarget}</span></div>
                             
@@ -1751,7 +1757,7 @@ END`,
             processorContent.innerHTML = `
                 <div style="text-align: center; padding: 40px; color: #ff6666;">
                     <h3>❌ Error</h3>
-                    <p style="margin-top: 10px;">Failed to update processor state: ${error.message}</p>
+                    <p style="margin-top: 10px;">Failed to update processor state: ${escapeHtml(error.message)}</p>
                 </div>
             `;
         }
